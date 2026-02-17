@@ -48,7 +48,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       type: "article",
       publishedTime: post.date,
-      ...(post.thumbnail && { images: [post.thumbnail] }),
     },
   };
 }
