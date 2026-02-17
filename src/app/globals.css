@@ -1,26 +1,195 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-display);
+  --font-mono: var(--font-mono-code);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-surface: var(--surface);
+
+  /* Custom shadows for toss-style cards */
+  --shadow-toss: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-toss-hover: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+  /* brand.colors.light — Custom theme */
+  --primary: hsl(354 87% 49%);
+  --primary-foreground: hsl(0 0% 100%);
+  --background: hsl(30 30% 98%);
+  --foreground: hsl(20 15% 15%);
+  --muted: hsl(25 15% 94%);
+  --muted-foreground: hsl(20 8% 45%);
+  --card: hsl(30 25% 99%);
+  --card-foreground: hsl(20 15% 15%);
+  --border: hsl(25 12% 90%);
+  --input: hsl(25 12% 90%);
+  --ring: hsl(354 87% 49%);
+  --secondary: hsl(25 15% 94%);
+  --secondary-foreground: hsl(20 15% 15%);
+  --accent: hsl(22 60% 94%);
+  --accent-foreground: hsl(22 60% 35%);
+  --destructive: hsl(0 84% 60%);
+  --popover: hsl(30 25% 99%);
+  --popover-foreground: hsl(20 15% 15%);
+  --surface: hsl(25 15% 94%);
+
+  --chart-1: hsl(354 87% 49%);
+  --chart-2: hsl(22 74% 51%);
+  --chart-3: hsl(226 32% 48%);
+  --chart-4: hsl(5 68% 49%);
+  --chart-5: hsl(150 44% 39%);
+
+  --sidebar: hsl(30 20% 97%);
+  --sidebar-foreground: hsl(20 15% 15%);
+  --sidebar-primary: hsl(354 87% 49%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(22 60% 94%);
+  --sidebar-accent-foreground: hsl(20 15% 15%);
+  --sidebar-border: hsl(25 12% 90%);
+  --sidebar-ring: hsl(354 87% 49%);
+}
+
+.dark {
+  /* brand.colors.dark — Custom theme */
+  --primary: hsl(354 85% 55%);
+  --primary-foreground: hsl(0 0% 100%);
+  --background: hsl(20 15% 10%);
+  --foreground: hsl(30 15% 92%);
+  --muted: hsl(20 12% 16%);
+  --muted-foreground: hsl(25 8% 60%);
+  --card: hsl(20 12% 15%);
+  --card-foreground: hsl(30 15% 92%);
+  --border: hsl(20 10% 22%);
+  --input: hsl(20 10% 22%);
+  --ring: hsl(354 85% 55%);
+  --secondary: hsl(20 12% 16%);
+  --secondary-foreground: hsl(30 15% 92%);
+  --accent: hsl(22 50% 18%);
+  --accent-foreground: hsl(25 30% 90%);
+  --destructive: hsl(0 62% 50%);
+  --popover: hsl(20 12% 15%);
+  --popover-foreground: hsl(30 15% 92%);
+  --surface: hsl(20 12% 16%);
+
+  --chart-1: hsl(354 85% 60%);
+  --chart-2: hsl(22 74% 56%);
+  --chart-3: hsl(226 40% 58%);
+  --chart-4: hsl(5 68% 55%);
+  --chart-5: hsl(150 44% 45%);
+
+  --sidebar: hsl(20 12% 14%);
+  --sidebar-foreground: hsl(30 15% 92%);
+  --sidebar-primary: hsl(354 85% 55%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(22 50% 18%);
+  --sidebar-accent-foreground: hsl(30 15% 92%);
+  --sidebar-border: hsl(20 10% 22%);
+  --sidebar-ring: hsl(354 85% 55%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    overflow-y: scroll;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-wrap: break-word;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Notion color utilities — light mode */
+.notion-color-gray { color: #787774; }
+.notion-color-brown { color: #9f6b53; }
+.notion-color-orange { color: #d9730d; }
+.notion-color-yellow { color: #cb912f; }
+.notion-color-green { color: #448361; }
+.notion-color-blue { color: #337ea9; }
+.notion-color-purple { color: #9065b0; }
+.notion-color-pink { color: #c14c8a; }
+.notion-color-red { color: #d44c47; }
+
+.notion-bg-gray { background-color: #f1f1ef; }
+.notion-bg-brown { background-color: #f4eeee; }
+.notion-bg-orange { background-color: #fbecdd; }
+.notion-bg-yellow { background-color: #fbf3db; }
+.notion-bg-green { background-color: #edf3ec; }
+.notion-bg-blue { background-color: #e7f3f8; }
+.notion-bg-purple { background-color: #f4f0f7; }
+.notion-bg-pink { background-color: #f9f0f5; }
+.notion-bg-red { background-color: #fdebec; }
+
+/* Notion color utilities — dark mode */
+.dark .notion-color-gray { color: #979a9b; }
+.dark .notion-color-brown { color: #b4826f; }
+.dark .notion-color-orange { color: #e8910b; }
+.dark .notion-color-yellow { color: #dfab01; }
+.dark .notion-color-green { color: #60a679; }
+.dark .notion-color-blue { color: #529cca; }
+.dark .notion-color-purple { color: #a882c9; }
+.dark .notion-color-pink { color: #d15796; }
+.dark .notion-color-red { color: #e66b67; }
+
+.dark .notion-bg-gray { background-color: #454b4e; }
+.dark .notion-bg-brown { background-color: #594a3a; }
+.dark .notion-bg-orange { background-color: #5c3b23; }
+.dark .notion-bg-yellow { background-color: #5c4b1e; }
+.dark .notion-bg-green { background-color: #354c3b; }
+.dark .notion-bg-blue { background-color: #28456c; }
+.dark .notion-bg-purple { background-color: #49365e; }
+.dark .notion-bg-pink { background-color: #5e3148; }
+.dark .notion-bg-red { background-color: #6e3630; }
