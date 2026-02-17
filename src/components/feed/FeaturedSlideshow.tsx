@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
@@ -8,19 +8,33 @@ import type { TPost } from "@/types";
 
 const INTERVAL_MS = 5000;
 
+type Direction = "next" | "prev";
+
 export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState<Direction>("next");
+  const [isAnimating, setIsAnimating] = useState(false);
   const [paused, setPaused] = useState(false);
 
   const total = posts.length;
 
+  const goTo = useCallback(
+    (index: number, dir: Direction) => {
+      if (isAnimating || index === current) return;
+      setDirection(dir);
+      setIsAnimating(true);
+      setCurrent(index);
+    },
+    [isAnimating, current]
+  );
+
   const next = useCallback(() => {
-    setCurrent((i) => (i + 1) % total);
-  }, [total]);
+    goTo((current + 1) % total, "next");
+  }, [current, total, goTo]);
 
   const prev = useCallback(() => {
-    setCurrent((i) => (i - 1 + total) % total);
-  }, [total]);
+    goTo((current - 1 + total) % total, "prev");
+  }, [current, total, goTo]);
 
   useEffect(() => {
     if (paused || total <= 1) return;
@@ -28,7 +42,43 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
     return () => clearInterval(id);
   }, [paused, next, total]);
 
+  /* ── Touch swipe ── */
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
+
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      touchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      setPaused(true);
+    },
+    []
+  );
+
+  const onTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchRef.current) {
+        const dx = e.changedTouches[0].clientX - touchRef.current.x;
+        const dy = e.changedTouches[0].clientY - touchRef.current.y;
+        touchRef.current = null;
+        if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
+          dx < 0 ? next() : prev();
+        }
+      }
+      setPaused(false);
+    },
+    [next, prev]
+  );
+
   if (total === 0) return null;
+
+  const slideClass = (i: number) => {
+    if (i === current) {
+      return "translate-x-0 opacity-100 pointer-events-auto";
+    }
+    if (direction === "next") {
+      return "translate-x-full opacity-0 pointer-events-none";
+    }
+    return "-translate-x-full opacity-0 pointer-events-none";
+  };
 
   return (
     <section
@@ -36,18 +86,19 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="group relative w-full aspect-[2/1] md:aspect-[5/2] rounded-2xl overflow-hidden bg-muted">
+      <div
+        className="group relative w-full aspect-[2/1] md:aspect-[5/2] rounded-2xl overflow-hidden bg-muted"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         {/* Slides */}
         {posts.map((p, i) => (
           <Link
             key={p.id}
             href={`/${p.slug}`}
             aria-hidden={i !== current}
-            className={`absolute inset-0 transition-opacity duration-700 ${
-              i === current
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
-            }`}
+            className={`absolute inset-0 transition-all duration-500 ease-in-out ${slideClass(i)}`}
+            onTransitionEnd={() => setIsAnimating(false)}
           >
             {/* Thumbnail */}
             {p.thumbnail ? (
@@ -116,14 +167,14 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
 
         {/* Indicators */}
         {total > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
             {posts.map((p, i) => (
               <button
                 key={p.id}
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
-                  setCurrent(i);
+                  goTo(i, i > current ? "next" : "prev");
                 }}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   i === current
