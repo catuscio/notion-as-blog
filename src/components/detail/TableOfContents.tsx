@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 interface TocItem {
   id: string;
@@ -48,14 +54,12 @@ function useHeadings() {
   const listenersRef = useRef(new Set<() => void>());
   const headingsRef = useRef<TocItem[]>(emptyHeadings);
 
-  const subscribe = (callback: () => void) => {
+  const subscribe = useCallback((callback: () => void) => {
     listenersRef.current.add(callback);
 
-    // Initial collection + observe
     const prose = document.querySelector("article .prose");
     if (prose) {
       headingsRef.current = collectHeadings(prose);
-      callback();
 
       const observer = new MutationObserver(() => {
         headingsRef.current = collectHeadings(prose);
@@ -72,7 +76,7 @@ function useHeadings() {
     return () => {
       listenersRef.current.delete(callback);
     };
-  };
+  }, []);
 
   const getSnapshot = () => headingsRef.current;
   const getServerSnapshot = () => emptyHeadings;
