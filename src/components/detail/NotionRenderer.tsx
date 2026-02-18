@@ -1,6 +1,8 @@
 import { NotionBlockRenderer } from "@/components/detail/NotionBlockRenderer";
 import type { NotionBlockWithChildren } from "@/lib/notion/types";
 
+export const PROSE_CONTAINER_SELECTOR = "article .prose";
+
 export function NotionRenderer({
   blocks,
 }: {

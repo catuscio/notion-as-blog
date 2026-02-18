@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getPostDetailData } from "@/lib/notion/getPost";
+import { getPostDetailData, getRelatedPosts, getSeriesPosts } from "@/lib/notion/getPost";
 import { getAllPosts } from "@/lib/notion/getPosts";
 import { getAuthorByName } from "@/lib/notion/getAuthors";
 import { PostHeader } from "@/components/detail/PostHeader";
@@ -93,17 +93,8 @@ export default async function PostPage({ params }: Props) {
     // Author DB unavailable
   }
 
-  // Get related posts for "Read Next"
-  const relatedPosts = allPosts
-    .filter((p) => p.id !== post.id && p.category === post.category)
-    .slice(0, 3);
-
-  // Get series posts
-  const seriesPosts = post.series
-    ? allPosts
-        .filter((p) => p.series === post.series)
-        .sort((a, b) => a.date.localeCompare(b.date))
-    : [];
+  const relatedPosts = getRelatedPosts(post, allPosts);
+  const seriesPosts = getSeriesPosts(post, allPosts);
 
   const postUrl = `${brand.url}/${post.slug}`;
   const breadcrumbItems = [

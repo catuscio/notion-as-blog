@@ -5,6 +5,11 @@ import { usePathname } from "next/navigation";
 import { brand } from "@/config/brand";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 
+const navLinkClass = (active: boolean) =>
+  `text-sm font-medium whitespace-nowrap transition-colors ${
+    active ? "font-bold text-foreground" : "text-muted-foreground hover:text-foreground"
+  }`;
+
 export function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -27,24 +32,10 @@ export function Header() {
         </Link>
         <div className="flex items-center gap-4 shrink-0">
           <nav className="hidden md:flex items-center gap-5 overflow-x-auto hide-scrollbar">
-            <Link
-              href="/"
-              className={`text-sm font-medium whitespace-nowrap transition-colors ${
-                isHome
-                  ? "font-bold text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
+            <Link href="/" className={navLinkClass(isHome)}>
               Home
             </Link>
-            <Link
-              href="/about"
-              className={`text-sm font-medium whitespace-nowrap transition-colors ${
-                pathname === "/about"
-                  ? "font-bold text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
+            <Link href="/about" className={navLinkClass(pathname === "/about")}>
               About
             </Link>
             {brand.categories.map((cat) => {
@@ -54,11 +45,7 @@ export function Header() {
                 <Link
                   key={cat.name}
                   href={`/category/${encodeURIComponent(cat.name)}`}
-                  className={`text-sm font-medium whitespace-nowrap transition-colors ${
-                    isActive
-                      ? "font-bold text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={navLinkClass(isActive)}
                 >
                   {cat.name}
                 </Link>

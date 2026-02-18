@@ -24,6 +24,10 @@ function parseAuthorPage(page: PageObjectResponse): TAuthor {
   };
 }
 
+// Manual in-memory TTL cache instead of unstable_cache:
+// Authors DB is small and rarely changes, so a lightweight in-process cache
+// avoids Next.js cache serialization overhead. In serverless environments,
+// each instance maintains its own cache — acceptable given the short TTL.
 let cachedAuthors: TAuthor[] | null = null;
 let cacheTimestamp = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes

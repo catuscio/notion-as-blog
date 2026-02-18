@@ -50,6 +50,23 @@ export async function getPostDetailData(
   return { post, blocks, allPosts, readingTime };
 }
 
+export function getRelatedPosts(
+  post: TPost,
+  allPosts: TPost[],
+  limit = 3
+): TPost[] {
+  return allPosts
+    .filter((p) => p.id !== post.id && p.category === post.category)
+    .slice(0, limit);
+}
+
+export function getSeriesPosts(post: TPost, allPosts: TPost[]): TPost[] {
+  if (!post.series) return [];
+  return allPosts
+    .filter((p) => p.series === post.series)
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
 export async function getPostsByCategory(category: string): Promise<TPost[]> {
   const posts = await getAllPosts();
   return posts.filter(

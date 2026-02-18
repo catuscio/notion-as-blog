@@ -7,6 +7,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { slugifyHeading } from "@/lib/format";
+import { PROSE_CONTAINER_SELECTOR } from "@/components/detail/NotionRenderer";
 
 interface TocItem {
   id: string;
@@ -23,15 +25,7 @@ function collectHeadings(prose: Element): TocItem[] {
   const usedIds = new Set<string>();
 
   elements.forEach((el, idx) => {
-    let id = el.id;
-    if (!id) {
-      id =
-        el.textContent
-          ?.trim()
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^\p{L}\p{N}_-]/gu, "") || "";
-    }
+    let id = el.id || slugifyHeading(el.textContent || "", String(idx));
     if (!id) id = `heading-${idx}`;
     let uniqueId = id;
     let counter = 1;
@@ -57,7 +51,7 @@ function useHeadings() {
   const subscribe = useCallback((callback: () => void) => {
     listenersRef.current.add(callback);
 
-    const prose = document.querySelector("article .prose");
+    const prose = document.querySelector(PROSE_CONTAINER_SELECTOR);
     if (prose) {
       headingsRef.current = collectHeadings(prose);
 

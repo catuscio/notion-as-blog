@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { NotionBlockWithChildren, NotionRichText } from "@/lib/notion/types";
+import { slugifyHeading } from "@/lib/format";
 
 /* ------------------------------------------------------------------ */
 /*  Rich Text                                                          */
@@ -75,15 +76,8 @@ function BlockChildren({
 /* ------------------------------------------------------------------ */
 
 function headingId(richText: NotionRichText[], blockId: string): string {
-  const slug = richText
-    .map((t) => t.plain_text)
-    .join("")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\p{L}\p{N}_-]/gu, "")
-    .replace(/^-+|-+$/g, "");
-  return slug || `heading-${blockId}`;
+  const text = richText.map((t) => t.plain_text).join("");
+  return slugifyHeading(text, blockId);
 }
 
 /* ------------------------------------------------------------------ */
@@ -132,32 +126,27 @@ function ParagraphBlock({ block }: { block: NotionBlockWithChildren }) {
   );
 }
 
+const HEADING_CONFIG: Record<string, { tag: "h1" | "h2" | "h3"; className: string }> = {
+  heading_1: { tag: "h1", className: "text-3xl font-bold mt-10 mb-4" },
+  heading_2: { tag: "h2", className: "text-2xl font-bold mt-8 mb-3" },
+  heading_3: { tag: "h3", className: "text-xl font-semibold mt-6 mb-2" },
+};
+
 function HeadingBlock({ block }: { block: NotionBlockWithChildren }) {
-  if (block.type === "heading_1") {
-    const id = headingId(block.heading_1.rich_text, block.id);
-    return (
-      <h1 id={id} className="text-3xl font-bold mt-10 mb-4">
-        <RichText richText={block.heading_1.rich_text} />
-      </h1>
-    );
-  }
-  if (block.type === "heading_2") {
-    const id = headingId(block.heading_2.rich_text, block.id);
-    return (
-      <h2 id={id} className="text-2xl font-bold mt-8 mb-3">
-        <RichText richText={block.heading_2.rich_text} />
-      </h2>
-    );
-  }
-  if (block.type === "heading_3") {
-    const id = headingId(block.heading_3.rich_text, block.id);
-    return (
-      <h3 id={id} className="text-xl font-semibold mt-6 mb-2">
-        <RichText richText={block.heading_3.rich_text} />
-      </h3>
-    );
-  }
-  return null;
+  const config = HEADING_CONFIG[block.type];
+  if (!config) return null;
+
+  const data = (block as Record<string, unknown>)[block.type] as {
+    rich_text: NotionRichText[];
+  };
+  const Tag = config.tag;
+  const id = headingId(data.rich_text, block.id);
+
+  return (
+    <Tag id={id} className={config.className}>
+      <RichText richText={data.rich_text} />
+    </Tag>
+  );
 }
 
 function CodeBlock({ block }: { block: NotionBlockWithChildren }) {

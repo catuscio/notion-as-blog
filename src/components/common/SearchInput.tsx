@@ -1,59 +1,32 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useSearch } from "@/hooks/useSearch";
 import type { TPost } from "@/types";
 
 export function SearchInput() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<TPost[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { query, setQuery, results, loading, activeIndex, setActiveIndex } =
+    useSearch();
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
     setIsMac(navigator.platform.toUpperCase().includes("MAC"));
   }, []);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const mobileInputRef = useRef<HTMLInputElement>(null);
-
-  const search = useCallback(async (q: string) => {
-    if (q.trim().length < 2) {
-      setResults([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q.trim())}`);
-      if (res.ok) {
-        setResults(await res.json());
-      }
-    } catch {
-      // network error — silently ignore
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => search(query), 300);
-    return () => clearTimeout(timer);
-  }, [query, search]);
-
-  // Reset active index when results change
-  useEffect(() => {
-    setActiveIndex(-1);
-  }, [results]);
 
   // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -72,7 +45,6 @@ export function SearchInput() {
       if (e.key === "Escape") {
         setOpen(false);
         inputRef.current?.blur();
-        mobileInputRef.current?.blur();
       }
     }
     document.addEventListener("keydown", handleKeyDown);
@@ -86,7 +58,11 @@ export function SearchInput() {
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((prev) => Math.max(prev - 1, -1));
-    } else if (e.key === "Enter" && activeIndex >= 0 && results[activeIndex]) {
+    } else if (
+      e.key === "Enter" &&
+      activeIndex >= 0 &&
+      results[activeIndex]
+    ) {
       e.preventDefault();
       router.push(`/${results[activeIndex].slug}`);
     }
@@ -96,8 +72,7 @@ export function SearchInput() {
 
   return (
     <div ref={containerRef} className="relative">
-      {/* Desktop search */}
-      <div className="hidden md:flex items-center bg-muted rounded-full px-4 py-2 w-full focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+      <div className="flex items-center bg-muted rounded-full px-4 py-2 w-full focus-within:ring-2 focus-within:ring-primary/20 transition-all">
         <span className="material-symbols-outlined text-muted-foreground text-[20px]">
           search
         </span>
@@ -117,26 +92,6 @@ export function SearchInput() {
         <kbd className="hidden lg:inline-flex text-[10px] text-muted-foreground/60 border border-border rounded px-1.5 py-0.5 ml-1 shrink-0">
           {isMac ? "⌘K" : "Ctrl K"}
         </kbd>
-      </div>
-
-      {/* Mobile search */}
-      <div className="md:hidden flex items-center bg-muted rounded-full px-4 py-2 w-full focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-        <span className="material-symbols-outlined text-muted-foreground text-[20px]">
-          search
-        </span>
-        <input
-          ref={mobileInputRef}
-          className="bg-transparent border-none text-sm w-full focus:ring-0 placeholder:text-muted-foreground text-foreground ml-2 h-5 p-0 outline-none"
-          placeholder="Search articles..."
-          type="text"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={handleInputKeyDown}
-        />
       </div>
 
       {/* Dropdown results */}
