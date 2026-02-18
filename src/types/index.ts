@@ -18,7 +18,7 @@ export interface TPost {
   title: string;
   slug: string;
   status: "Public" | "PublicOnDetail" | "Draft" | "Private";
-  type: "Post" | "Paper" | "Page";
+  type: "Post" | "Page";
   date: string;
   tags: string[];
   category: string;
