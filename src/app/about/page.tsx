@@ -1,10 +1,8 @@
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/notion/getPost";
 import { NotionRenderer } from "@/components/detail/NotionRenderer";
-import { brand, revalidateSeconds } from "@/config/brand";
+import { brand } from "@/config/brand";
 import type { Metadata } from "next";
-
-export const revalidate = revalidateSeconds;
 
 export async function generateMetadata(): Promise<Metadata> {
   let result;

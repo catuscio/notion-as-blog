@@ -6,6 +6,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
+export const revalidate = 1800;
+
 function buildThemeCSS() {
   const toVars = (colors: Record<string, string>) =>
     Object.entries(colors)

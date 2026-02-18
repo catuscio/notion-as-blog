@@ -1,6 +1,3 @@
-/** ISR revalidate interval (seconds) */
-export const revalidateSeconds = 1800;
-
 export const brand = {
   // --- Site Info ---
   name: "Notion-As-Blog",
@@ -141,7 +138,6 @@ export const brand = {
   newsletter: { enabled: false },
   analytics: { gaId: process.env.NEXT_PUBLIC_GA_ID },
   postsPerPage: 10,
-  revalidateSeconds,
 } as const;
 
 export type Category = (typeof brand.categories)[number];
