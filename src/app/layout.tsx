@@ -6,6 +6,14 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
+function buildThemeCSS() {
+  const toVars = (colors: Record<string, string>) =>
+    Object.entries(colors)
+      .map(([k, v]) => `--${k}: hsl(${v});`)
+      .join("\n  ");
+  return `:root {\n  ${toVars(brand.colors.light)}\n}\n.dark {\n  ${toVars(brand.colors.dark)}\n}`;
+}
+
 const inter = Inter({
   variable: "--font-display",
   subsets: ["latin"],
@@ -50,6 +58,7 @@ export default function RootLayout({
   return (
     <html lang={brand.lang} suppressHydrationWarning>
       <head>
+        <style dangerouslySetInnerHTML={{ __html: buildThemeCSS() }} />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
