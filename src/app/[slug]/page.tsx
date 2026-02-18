@@ -21,10 +21,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { brand } from "@/config/brand";
+import { revalidateSeconds } from "@/config/brand";
 import type { Metadata } from "next";
 
-export const revalidate = brand.revalidateSeconds;
+export const revalidate = revalidateSeconds;
 
 type Props = {
   params: Promise<{ slug: string }>;

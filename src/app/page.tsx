@@ -5,8 +5,8 @@ import { RecentPostsSection } from "@/components/feed/RecentPostsSection";
 import { NewsletterCTA } from "@/components/feed/NewsletterCTA";
 import { getAllPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
-import { brand } from "@/config/brand";
-export const revalidate = brand.revalidateSeconds;
+import { revalidateSeconds } from "@/config/brand";
+export const revalidate = revalidateSeconds;
 
 export default async function HomePage() {
   let posts: Awaited<ReturnType<typeof getAllPosts>> = [];

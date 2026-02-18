@@ -4,10 +4,10 @@ import { FeedPostList } from "@/components/feed/FeedPostList";
 import { getPostsByCategory } from "@/lib/notion/getPost";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { getAllAuthors } from "@/lib/notion/getAuthors";
-import { brand } from "@/config/brand";
+import { brand, revalidateSeconds } from "@/config/brand";
 import type { Metadata } from "next";
 
-export const revalidate = brand.revalidateSeconds;
+export const revalidate = revalidateSeconds;
 
 type Props = {
   params: Promise<{ category: string }>;

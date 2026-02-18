@@ -141,4 +141,7 @@ export const brand = {
   revalidateSeconds: 1800,
 } as const;
 
+/** Next.js segment config requires a statically analyzable literal. */
+export const revalidateSeconds = brand.revalidateSeconds;
+
 export type Category = (typeof brand.categories)[number];
