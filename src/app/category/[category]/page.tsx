@@ -14,9 +14,20 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
   const decoded = decodeURIComponent(category);
+  const categoryUrl = `${brand.url}/category/${encodeURIComponent(decoded)}`;
   return {
     title: `${decoded} — ${brand.name}`,
     description: `Browse ${decoded} articles on ${brand.name}`,
+    alternates: {
+      canonical: categoryUrl,
+    },
+    openGraph: {
+      title: `${decoded} — ${brand.name}`,
+      description: `Browse ${decoded} articles on ${brand.name}`,
+      url: categoryUrl,
+      siteName: brand.name,
+      type: "website",
+    },
   };
 }
 

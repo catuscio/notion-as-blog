@@ -25,6 +25,10 @@ export async function GET() {
         category: post.category
           ? [{ name: post.category }]
           : [],
+        author: post.author
+          ? [{ name: post.author }]
+          : [],
+        image: post.thumbnail || undefined,
       });
     });
   } catch {

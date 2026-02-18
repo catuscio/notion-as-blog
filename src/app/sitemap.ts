@@ -12,6 +12,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1,
     },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     ...brand.categories.map((cat) => ({
       url: `${baseUrl}/category/${encodeURIComponent(cat.name)}`,
       lastModified: new Date(),
@@ -26,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/${post.slug}`,
       lastModified: post.date ? new Date(post.date) : new Date(),
       changeFrequency: "monthly" as const,
-      priority: 0.6,
+      priority: 0.7,
     }));
     return [...staticRoutes, ...postRoutes];
   } catch {

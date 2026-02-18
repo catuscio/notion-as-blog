@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { brand } from "@/config/brand";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { WebSiteJsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
 
 export const revalidate = 1800;
@@ -46,6 +47,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
+  alternates: {
+    canonical: brand.url,
+  },
   robots: {
     index: true,
     follow: true,
@@ -67,6 +71,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
+      <WebSiteJsonLd />
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased overflow-x-clip selection:bg-primary/20 selection:text-primary`}
       >

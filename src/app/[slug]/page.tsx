@@ -12,6 +12,8 @@ import { ReadNext } from "@/components/detail/ReadNext";
 import { SeriesNav } from "@/components/detail/SeriesNav";
 import { SeriesCollection } from "@/components/detail/SeriesCollection";
 import { CommentBox } from "@/components/detail/CommentBox";
+import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { brand } from "@/config/brand";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -38,14 +40,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!result) return { title: "Not Found" };
 
   const { post } = result;
+  const postUrl = `${brand.url}/${post.slug}`;
   return {
     title: post.title,
     description: post.summary,
+    keywords: post.tags.length > 0 ? post.tags : undefined,
+    authors: [{ name: post.author }],
+    alternates: {
+      canonical: postUrl,
+    },
     openGraph: {
       title: post.title,
       description: post.summary,
       type: "article",
       publishedTime: post.date,
+      url: postUrl,
+      ...(post.thumbnail && { images: [post.thumbnail] }),
     },
   };
 }
@@ -93,8 +103,32 @@ export default async function PostPage({ params }: Props) {
         .sort((a, b) => a.date.localeCompare(b.date))
     : [];
 
+  const postUrl = `${brand.url}/${post.slug}`;
+  const breadcrumbItems = [
+    { name: "Home", url: brand.url },
+    ...(post.category
+      ? [
+          {
+            name: post.category,
+            url: `${brand.url}/category/${encodeURIComponent(post.category)}`,
+          },
+        ]
+      : []),
+    { name: post.title, url: postUrl },
+  ];
+
   return (
     <div className="w-full max-w-[1024px] mx-auto flex flex-col lg:flex-row gap-12 px-6 py-8">
+      <ArticleJsonLd
+        title={post.title}
+        description={post.summary}
+        url={postUrl}
+        datePublished={post.date}
+        authorName={post.author}
+        image={post.thumbnail || undefined}
+        tags={post.tags}
+      />
+      <BreadcrumbJsonLd items={breadcrumbItems} />
       <article className="w-full flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
         {/* Breadcrumb */}
         <Breadcrumb className="mb-6 overflow-hidden">
