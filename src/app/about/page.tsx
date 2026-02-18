@@ -4,7 +4,7 @@ import { NotionRenderer } from "@/components/detail/NotionRenderer";
 import { brand } from "@/config/brand";
 import type { Metadata } from "next";
 
-export const revalidate = 3600;
+export const revalidate = brand.revalidateSeconds;
 
 export async function generateMetadata(): Promise<Metadata> {
   let result;

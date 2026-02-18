@@ -138,6 +138,7 @@ export const brand = {
   newsletter: { enabled: false },
   analytics: { gaId: process.env.NEXT_PUBLIC_GA_ID },
   postsPerPage: 10,
+  revalidateSeconds: 1800,
 } as const;
 
 export type Category = (typeof brand.categories)[number];

@@ -7,7 +7,7 @@ import { getAllAuthors } from "@/lib/notion/getAuthors";
 import { brand } from "@/config/brand";
 import type { Metadata } from "next";
 
-export const revalidate = 3600;
+export const revalidate = brand.revalidateSeconds;
 
 type Props = {
   params: Promise<{ category: string }>;
