@@ -1,3 +1,36 @@
+// ─── Theme builder ──────────────────────────────────────────────
+// Generates 15 shadcn tokens from 5 base values.
+// Use overrides to fine-tune individual tokens.
+type ThemeBase = {
+  brand: string;    // accent color → primary, ring
+  bg: string;       // page background → background
+  text: string;     // body text → foreground, card-fg, secondary-fg
+  surface: string;  // card/muted fill → muted, secondary
+  edge: string;     // border/input → border, input
+};
+
+function buildTheme(base: ThemeBase, overrides: Record<string, string> = {}) {
+  return {
+    primary:                base.brand,
+    "primary-foreground":   "0 0% 100%",
+    background:             base.bg,
+    foreground:             base.text,
+    card:                   base.bg,
+    "card-foreground":      base.text,
+    muted:                  base.surface,
+    "muted-foreground":     base.text,
+    secondary:              base.surface,
+    "secondary-foreground": base.text,
+    accent:                 base.surface,
+    "accent-foreground":    base.text,
+    destructive:            "0 84% 60%",
+    border:                 base.edge,
+    input:                  base.edge,
+    ring:                   base.brand,
+    ...overrides,
+  };
+}
+
 export const brand = {
   // --- Site Info ---
   name: "Notion-As-Blog",
@@ -14,76 +47,41 @@ export const brand = {
     icon: "code_blocks",
   },
 
-  // --- Colors (HSL for CSS variables) — Custom theme ---
+  // --- Colors (HSL) ─────────────────────────────────────────────
+  // Customize: change the 5 base values below to update the entire theme.
   colors: {
-    light: {
-      primary: "354 87% 49%",
-      "primary-foreground": "0 0% 100%",
-      background: "30 30% 98%",
-      foreground: "20 15% 15%",
-      muted: "25 15% 94%",
-      "muted-foreground": "20 8% 45%",
-      card: "30 25% 99%",
-      "card-foreground": "20 15% 15%",
-      border: "25 12% 90%",
-      input: "25 12% 90%",
-      ring: "354 87% 49%",
-      secondary: "25 15% 94%",
-      "secondary-foreground": "20 15% 15%",
-      accent: "22 60% 94%",
-      "accent-foreground": "22 60% 35%",
-      destructive: "0 84% 60%",
-      popover: "30 25% 99%",
-      "popover-foreground": "20 15% 15%",
-      surface: "25 15% 94%",
-      "chart-1": "354 87% 49%",
-      "chart-2": "22 74% 51%",
-      "chart-3": "226 32% 48%",
-      "chart-4": "5 68% 49%",
-      "chart-5": "150 44% 39%",
-      sidebar: "30 20% 97%",
-      "sidebar-foreground": "20 15% 15%",
-      "sidebar-primary": "354 87% 49%",
-      "sidebar-primary-foreground": "0 0% 100%",
-      "sidebar-accent": "22 60% 94%",
-      "sidebar-accent-foreground": "20 15% 15%",
-      "sidebar-border": "25 12% 90%",
-      "sidebar-ring": "354 87% 49%",
-    },
-    dark: {
-      primary: "354 85% 55%",
-      "primary-foreground": "0 0% 100%",
-      background: "20 15% 10%",
-      foreground: "30 15% 92%",
-      muted: "20 12% 16%",
-      "muted-foreground": "25 8% 60%",
-      card: "20 12% 15%",
-      "card-foreground": "30 15% 92%",
-      border: "20 10% 22%",
-      input: "20 10% 22%",
-      ring: "354 85% 55%",
-      secondary: "20 12% 16%",
-      "secondary-foreground": "30 15% 92%",
-      accent: "22 50% 18%",
-      "accent-foreground": "25 30% 90%",
-      destructive: "0 62% 50%",
-      popover: "20 12% 15%",
-      "popover-foreground": "30 15% 92%",
-      surface: "20 12% 16%",
-      "chart-1": "354 85% 60%",
-      "chart-2": "22 74% 56%",
-      "chart-3": "226 40% 58%",
-      "chart-4": "5 68% 55%",
-      "chart-5": "150 44% 45%",
-      sidebar: "20 12% 14%",
-      "sidebar-foreground": "30 15% 92%",
-      "sidebar-primary": "354 85% 55%",
-      "sidebar-primary-foreground": "0 0% 100%",
-      "sidebar-accent": "22 50% 18%",
-      "sidebar-accent-foreground": "30 15% 92%",
-      "sidebar-border": "20 10% 22%",
-      "sidebar-ring": "354 85% 55%",
-    },
+    light: buildTheme(
+      {
+        brand:   "354 87% 49%",   // crimson red
+        bg:      "30 30% 98%",
+        text:    "20 15% 15%",
+        surface: "25 15% 94%",
+        edge:    "25 12% 90%",
+      },
+      // fine-tuning (optional)
+      {
+        card:                "30 25% 99%",
+        "muted-foreground":  "20 8% 45%",
+        accent:              "22 60% 94%",
+        "accent-foreground": "22 60% 35%",
+      },
+    ),
+    dark: buildTheme(
+      {
+        brand:   "354 85% 55%",
+        bg:      "20 15% 10%",
+        text:    "30 15% 92%",
+        surface: "20 12% 16%",
+        edge:    "20 10% 22%",
+      },
+      {
+        card:                "20 12% 15%",
+        "muted-foreground":  "25 8% 60%",
+        accent:              "22 50% 18%",
+        "accent-foreground": "25 30% 90%",
+        destructive:         "0 62% 50%",
+      },
+    ),
   },
 
   // --- Fonts ---
