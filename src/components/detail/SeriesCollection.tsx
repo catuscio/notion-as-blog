@@ -27,7 +27,7 @@ export function SeriesCollection({
       </div>
       <div className="relative">
         <div className="overflow-x-auto hide-scrollbar">
-          <div className="inline-flex gap-4 py-4">
+          <div className="inline-flex gap-4 py-4 px-1">
           {posts.map((post, index) => {
             const isCurrent = post.id === currentPostId;
             const formattedDate = post.date
@@ -99,8 +99,6 @@ export function SeriesCollection({
           })}
           </div>
         </div>
-        {/* Scroll fade hint */}
-        <div className="absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent pointer-events-none" />
       </div>
     </section>
   );
