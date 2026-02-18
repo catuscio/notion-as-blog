@@ -20,6 +20,7 @@ export interface TPost {
   status: "Public" | "PublicOnDetail" | "Draft" | "Private";
   type: "Post" | "Page";
   date: string;
+  lastEditedTime: string;
   tags: string[];
   category: string;
   series: string;

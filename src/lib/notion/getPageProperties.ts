@@ -46,6 +46,7 @@ export function getPageProperties(
     status: (status as TPost["status"]) || "Draft",
     type: (type as TPost["type"]) || "Post",
     date,
+    lastEditedTime: page.last_edited_time,
     tags,
     category,
     series,

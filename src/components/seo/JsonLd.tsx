@@ -41,7 +41,11 @@ type ArticleJsonLdProps = {
   description: string;
   url: string;
   datePublished: string;
+  dateModified: string;
   authorName: string;
+  authorUrl?: string;
+  authorImage?: string;
+  authorJobTitle?: string;
   image?: string;
   tags?: string[];
 };
@@ -51,10 +55,22 @@ export function ArticleJsonLd({
   description,
   url,
   datePublished,
+  dateModified,
   authorName,
+  authorUrl,
+  authorImage,
+  authorJobTitle,
   image,
   tags,
 }: ArticleJsonLdProps) {
+  const author: Record<string, unknown> = {
+    "@type": "Person",
+    name: authorName,
+    ...(authorUrl && { url: authorUrl }),
+    ...(authorImage && { image: authorImage }),
+    ...(authorJobTitle && { jobTitle: authorJobTitle }),
+  };
+
   return (
     <JsonLdScript
       data={{
@@ -64,10 +80,8 @@ export function ArticleJsonLd({
         description,
         url,
         datePublished,
-        author: {
-          "@type": "Person",
-          name: authorName,
-        },
+        dateModified,
+        author,
         publisher: {
           "@type": "Organization",
           name: brand.name,

@@ -54,6 +54,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       type: "article",
       publishedTime: post.date,
+      modifiedTime: post.lastEditedTime,
+      section: post.category || undefined,
+      authors: [post.author],
       url: postUrl,
       ...(post.thumbnail && { images: [post.thumbnail] }),
     },
@@ -124,7 +127,11 @@ export default async function PostPage({ params }: Props) {
         description={post.summary}
         url={postUrl}
         datePublished={post.date}
+        dateModified={post.lastEditedTime}
         authorName={post.author}
+        authorUrl={author?.socials.website || author?.socials.github || undefined}
+        authorImage={author?.avatar || undefined}
+        authorJobTitle={author?.role || undefined}
         image={post.thumbnail || undefined}
         tags={post.tags}
       />
