@@ -72,5 +72,10 @@ export function getProp(
   props: Properties,
   name: string
 ): PropertyValue | undefined {
-  return props[name] ?? props[name.charAt(0).toUpperCase() + name.slice(1)];
+  if (props[name]) return props[name];
+  const lower = name.toLowerCase();
+  for (const key of Object.keys(props)) {
+    if (key.toLowerCase() === lower) return props[key];
+  }
+  return undefined;
 }
