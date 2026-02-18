@@ -58,7 +58,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       section: post.category || undefined,
       authors: [post.author],
       url: postUrl,
-      ...(post.thumbnail && { images: [post.thumbnail] }),
     },
   };
 }

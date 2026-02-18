@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { notionClient } from "./client";
 import { getPageProperties } from "./getPageProperties";
 import { filterPublicPosts } from "./filterPosts";
@@ -31,13 +32,19 @@ async function fetchAllFromNotion(): Promise<TPost[]> {
   return pages.map((page) => getPageProperties(page));
 }
 
+const getCachedPosts = unstable_cache(
+  fetchAllFromNotion,
+  ["all-posts"],
+  { revalidate: 1800 }
+);
+
 export async function getAllPosts(): Promise<TPost[]> {
-  const all = await fetchAllFromNotion();
+  const all = await getCachedPosts();
   return filterPublicPosts(all);
 }
 
 export async function getAllPages(): Promise<TPost[]> {
-  const all = await fetchAllFromNotion();
+  const all = await getCachedPosts();
   return all.filter(
     (item) => item.type === "Page" && (item.status === "Public" || item.status === "PublicOnDetail")
   );

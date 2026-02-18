@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { brand } from "@/config/brand";
 import { getAllPosts } from "@/lib/notion/getPosts";
 
-export const runtime = "edge";
+export const revalidate = 1800;
 export const alt = "Post thumbnail";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
