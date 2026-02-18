@@ -1,3 +1,6 @@
+/** ISR revalidate interval (seconds) */
+export const revalidateSeconds = 1800;
+
 export const brand = {
   // --- Site Info ---
   name: "Notion-As-Blog",
@@ -138,10 +141,7 @@ export const brand = {
   newsletter: { enabled: false },
   analytics: { gaId: process.env.NEXT_PUBLIC_GA_ID },
   postsPerPage: 10,
-  revalidateSeconds: 1800,
+  revalidateSeconds,
 } as const;
-
-/** Next.js segment config requires a statically analyzable literal. */
-export const revalidateSeconds = brand.revalidateSeconds;
 
 export type Category = (typeof brand.categories)[number];
