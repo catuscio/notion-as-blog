@@ -5,6 +5,7 @@ import { RecentPostsSection } from "@/components/feed/RecentPostsSection";
 import { NewsletterCTA } from "@/components/feed/NewsletterCTA";
 import { getAllPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
+import { brand } from "@/config/brand";
 
 export default async function HomePage() {
   let posts: Awaited<ReturnType<typeof getAllPosts>> = [];
@@ -20,7 +21,10 @@ export default async function HomePage() {
   return (
     <div className="pt-12 pb-20">
       {pinnedPosts.length > 0 ? (
-        <FeaturedSlideshow posts={pinnedPosts} />
+        <>
+          <h1 className="sr-only">{`${brand.name} — ${brand.title}`}</h1>
+          <FeaturedSlideshow posts={pinnedPosts} />
+        </>
       ) : (
         <HeroSection />
       )}
