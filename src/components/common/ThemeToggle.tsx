@@ -12,18 +12,16 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  if (!mounted) return null;
-
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => mounted && setTheme(theme === "dark" ? "light" : "dark")}
       className="rounded-full"
       aria-label="Toggle theme"
     >
       <span className="material-symbols-outlined text-[20px]">
-        {theme === "dark" ? "light_mode" : "dark_mode"}
+        {mounted ? (theme === "dark" ? "light_mode" : "dark_mode") : "dark_mode"}
       </span>
     </Button>
   );

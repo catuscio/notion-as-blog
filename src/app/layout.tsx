@@ -49,6 +49,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: brand.url,
+    languages: { [brand.lang]: brand.url },
   },
   robots: {
     index: true,
