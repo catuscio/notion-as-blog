@@ -15,7 +15,7 @@ interface TocItem {
 }
 
 const TAG_LEVEL: Record<string, number> = { H1: 1, H2: 2, H3: 3 };
-const INDENT: Record<number, string> = { 1: "pl-4", 2: "pl-4", 3: "pl-8" };
+const INDENT: Record<number, string> = { 1: "pl-4", 2: "pl-8", 3: "pl-12" };
 
 function collectHeadings(prose: Element): TocItem[] {
   const elements = prose.querySelectorAll("h1, h2, h3");
