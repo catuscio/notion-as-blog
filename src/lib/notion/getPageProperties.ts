@@ -6,6 +6,7 @@ import {
   getMultiSelectValues,
   getDateValue,
   getPeopleNames,
+  getPeopleIds,
   getFileUrl,
   getProp,
 } from "./propertyHelpers";
@@ -31,6 +32,7 @@ export function getPageProperties(
 
   const authorProp = get("author");
   const author = getPeopleNames(authorProp) || getRichTextPlain(authorProp);
+  const authorIds = getPeopleIds(authorProp);
 
   const summary = getRichTextPlain(get("summary"));
   const thumbnail = getFileUrl(get("thumbnail"));
@@ -51,6 +53,7 @@ export function getPageProperties(
     category,
     series,
     author,
+    authorIds,
     summary,
     thumbnail,
     fullWidth: false,

@@ -1,16 +1,21 @@
 import { notionClient } from "./client";
+import { createSemaphore } from "./semaphore";
 import type { NotionBlock, NotionBlockWithChildren } from "./types";
+
+const sem = createSemaphore(3);
 
 async function fetchAllBlocks(blockId: string): Promise<NotionBlock[]> {
   const blocks: NotionBlock[] = [];
   let cursor: string | undefined = undefined;
 
   do {
-    const response = await notionClient.blocks.children.list({
-      block_id: blockId,
-      start_cursor: cursor,
-      page_size: 100,
-    });
+    const response = await sem.withLimit(() =>
+      notionClient.blocks.children.list({
+        block_id: blockId,
+        start_cursor: cursor,
+        page_size: 100,
+      })
+    );
 
     for (const block of response.results) {
       if ("type" in block) {

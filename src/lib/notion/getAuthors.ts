@@ -1,8 +1,8 @@
 import { notionClient } from "./client";
 import { brand } from "@/config/brand";
-import type { TAuthor } from "@/types";
+import type { TAuthor, AuthorSummary } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { getRichTextPlain, getFileUrl, getUrl, getProp } from "./propertyHelpers";
+import { getRichTextPlain, getFileUrl, getUrlOrText, getPeopleIds, getProp } from "./propertyHelpers";
 
 function parseAuthorPage(page: PageObjectResponse): TAuthor {
   const props = page.properties;
@@ -14,11 +14,12 @@ function parseAuthorPage(page: PageObjectResponse): TAuthor {
     avatar: getFileUrl(get("avatar")),
     bio: getRichTextPlain(get("bio")),
     role: getRichTextPlain(get("role")),
+    peopleIds: getPeopleIds(get("people")),
     socials: {
-      github: getUrl(get("github")),
-      x: getUrl(get("x") ?? get("twitter")),
-      linkedin: getUrl(get("linkedin")),
-      website: getUrl(get("website")),
+      github: getUrlOrText(get("github")),
+      x: getUrlOrText(get("x") ?? get("twitter")),
+      linkedin: getUrlOrText(get("linkedin")),
+      website: getUrlOrText(get("website")),
       email: getRichTextPlain(get("email")),
     },
   };
@@ -73,4 +74,25 @@ export async function getAllAuthors(): Promise<TAuthor[]> {
 export async function getAuthorByName(name: string): Promise<TAuthor | null> {
   const authors = await getAllAuthors();
   return authors.find((a) => a.name === name) ?? null;
+}
+
+export async function getAuthorByPeopleIds(peopleIds: string[]): Promise<TAuthor | null> {
+  if (peopleIds.length === 0) return null;
+  const authors = await getAllAuthors();
+  return authors.find((a) =>
+    a.peopleIds.some((pid) => peopleIds.includes(pid))
+  ) ?? null;
+}
+
+export async function getAuthorLookupMap(): Promise<Record<string, AuthorSummary>> {
+  const authors = await getAllAuthors();
+  const map: Record<string, AuthorSummary> = {};
+  for (const a of authors) {
+    const summary: AuthorSummary = { avatar: a.avatar, name: a.name };
+    map[a.name] = summary;
+    for (const pid of a.peopleIds) {
+      map[pid] = summary;
+    }
+  }
+  return map;
 }

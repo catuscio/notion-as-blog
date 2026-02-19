@@ -4,6 +4,7 @@ export interface TAuthor {
   avatar: string;
   bio: string;
   role: string;
+  peopleIds: string[];
   socials: {
     github?: string;
     x?: string;
@@ -25,11 +26,17 @@ export interface TPost {
   category: string;
   series: string;
   author: string;
+  authorIds: string[];
   summary: string;
   thumbnail: string;
   fullWidth: boolean;
   pinned: boolean;
 }
+
+export type AuthorSummary = {
+  avatar: string;
+  name: string;
+};
 
 export interface TTagItem {
   name: string;

@@ -1,5 +1,6 @@
-import { getAllPosts, getAllPages } from "./getPosts";
+import { getPublishedPosts, getAllPages } from "./getPosts";
 import { getPageBlocks } from "./getBlocks";
+import { cacheBlockImagesInPlace } from "./imageCache";
 import type { TPost } from "@/types";
 import type { NotionBlockWithChildren } from "./types";
 
@@ -33,21 +34,25 @@ export interface PostDetailData {
   blocks: NotionBlockWithChildren[];
   allPosts: TPost[];
   readingTime: number;
+  wordCount: number;
 }
 
 export async function getPostDetailData(
   slug: string
 ): Promise<PostDetailData | null> {
-  const allPosts = await getAllPosts();
+  const allPosts = await getPublishedPosts();
   const post = allPosts.find((p) => p.slug === slug);
 
   if (!post) return null;
 
   const blocks = await getPageBlocks(post.id);
+  await cacheBlockImagesInPlace(blocks);
+
   const text = extractTextFromBlocks(blocks);
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
   const readingTime = estimateReadingTime(text);
 
-  return { post, blocks, allPosts, readingTime };
+  return { post, blocks, allPosts, readingTime, wordCount };
 }
 
 export function getRelatedPosts(
@@ -68,7 +73,7 @@ export function getSeriesPosts(post: TPost, allPosts: TPost[]): TPost[] {
 }
 
 export async function getPostsByCategory(category: string): Promise<TPost[]> {
-  const posts = await getAllPosts();
+  const posts = await getPublishedPosts();
   return posts.filter(
     (p) => p.category.toLowerCase() === category.toLowerCase()
   );
@@ -83,5 +88,6 @@ export async function getPageBySlug(
   if (!page) return null;
 
   const blocks = await getPageBlocks(page.id);
+  await cacheBlockImagesInPlace(blocks);
   return { page, blocks };
 }

@@ -1,6 +1,6 @@
 import type { TPost } from "@/types";
 
-export function filterPublicPosts(posts: TPost[]): TPost[] {
+export function getPublicPostsByDate(posts: TPost[]): TPost[] {
   return posts
     .filter((post) => (post.status === "Public" || post.status === "PublicOnDetail") && post.type === "Post")
     .sort((a, b) => {

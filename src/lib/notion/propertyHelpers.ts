@@ -59,7 +59,26 @@ export function getFileUrl(prop: PropertyValue | undefined): string {
   return "";
 }
 
+export function getPeopleIds(prop: PropertyValue | undefined): string[] {
+  if (!prop) return [];
+  if (prop.type === "people") {
+    return prop.people
+      .map((p) => ("id" in p ? p.id : ""))
+      .filter(Boolean);
+  }
+  return [];
+}
+
 export function getUrl(prop: PropertyValue | undefined): string {
+  if (!prop) return "";
+  if (prop.type === "url" && prop.url) return prop.url;
+  if (prop.type === "rich_text") {
+    return prop.rich_text.map((t) => t.plain_text).join("");
+  }
+  return "";
+}
+
+export function getUrlOrText(prop: PropertyValue | undefined): string {
   if (!prop) return "";
   if (prop.type === "url" && prop.url) return prop.url;
   if (prop.type === "rich_text") {

@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { notionClient } from "./client";
 import { getPageProperties } from "./getPageProperties";
-import { filterPublicPosts } from "./filterPosts";
+import { getPublicPostsByDate } from "./filterPosts";
 import { brand } from "@/config/brand";
 import type { TPost } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -38,10 +38,13 @@ const getCachedPosts = unstable_cache(
   { revalidate: 1800 }
 );
 
-export async function getAllPosts(): Promise<TPost[]> {
+export async function getPublishedPosts(): Promise<TPost[]> {
   const all = await getCachedPosts();
-  return filterPublicPosts(all);
+  return getPublicPostsByDate(all);
 }
+
+/** @deprecated Use getPublishedPosts() instead */
+export const getAllPosts = getPublishedPosts;
 
 export async function getAllPages(): Promise<TPost[]> {
   const all = await getCachedPosts();
