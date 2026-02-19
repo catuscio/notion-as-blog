@@ -2,12 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
 import { formatDate } from "@/lib/format";
-import type { TPost } from "@/types";
-
-export type AuthorSummary = {
-  avatar: string;
-  name: string;
-};
+import type { TPost, AuthorSummary } from "@/types";
 
 export function FeedPostCard({
   post,

@@ -1,22 +1,22 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { brand } from "@/config/brand";
 import type { TPost } from "@/types";
 
-interface UseFilteredPaginatedPostsOptions {
+interface UseFeedPaginationOptions {
   posts: TPost[];
   authorFilter?: string | null;
 }
 
-export function useFilteredPaginatedPosts({
+export function useFeedPagination({
   posts,
   authorFilter,
-}: UseFilteredPaginatedPostsOptions) {
+}: UseFeedPaginationOptions) {
   const searchParams = useSearchParams();
   const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const activeTag = searchParams.get("tag");
 
   const filteredPosts = useMemo(() => {
     let result = posts;
@@ -36,7 +36,6 @@ export function useFilteredPaginatedPosts({
 
   return {
     activeTag,
-    setActiveTag,
     filteredPosts,
     paginatedPosts,
     currentPage,

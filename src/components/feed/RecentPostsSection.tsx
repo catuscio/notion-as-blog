@@ -5,7 +5,7 @@ import { PostList } from "./PostList";
 import { TagSidebar, MobileTagBar } from "./TagSidebar";
 import { SearchInput } from "@/components/common/SearchInput";
 import { Pagination } from "@/components/common/Pagination";
-import { useFilteredPaginatedPosts } from "@/hooks/useFilteredPaginatedPosts";
+import { useFeedPagination } from "@/hooks/useFeedPagination";
 import { brand } from "@/config/brand";
 import type { TPost, TTagItem } from "@/types";
 
@@ -21,11 +21,22 @@ export function RecentPostsSection({
 
   const {
     activeTag,
-    setActiveTag,
     filteredPosts,
     paginatedPosts,
     currentPage,
-  } = useFilteredPaginatedPosts({ posts, authorFilter });
+  } = useFeedPagination({ posts, authorFilter });
+
+  function handleTagClick(tag: string | null) {
+    const url = new URL(window.location.href);
+    if (tag) {
+      url.searchParams.set("tag", tag);
+    } else {
+      url.searchParams.delete("tag");
+    }
+    url.searchParams.delete("page");
+    window.history.pushState({}, "", url.toString());
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  }
 
   return (
     <section className="max-w-[1024px] mx-auto px-6 mt-12 mb-24">
@@ -51,7 +62,7 @@ export function RecentPostsSection({
       <MobileTagBar
         tags={tags}
         activeTag={activeTag}
-        onTagClick={setActiveTag}
+        onTagClick={handleTagClick}
       />
 
       <div className="flex gap-10 mt-8 lg:mt-0">
@@ -66,7 +77,7 @@ export function RecentPostsSection({
         <TagSidebar
           tags={tags}
           activeTag={activeTag}
-          onTagClick={setActiveTag}
+          onTagClick={handleTagClick}
         />
       </div>
     </section>
