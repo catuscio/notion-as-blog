@@ -36,6 +36,23 @@ export function WebSiteJsonLd() {
   );
 }
 
+export function OrganizationJsonLd() {
+  const org = brand.organization;
+  if (!org.name) return null;
+
+  const data: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: org.name,
+    url: org.url || brand.url,
+  };
+  if (org.description) data.description = org.description;
+  if (org.logo) data.logo = org.logo;
+  if (org.sameAs.length > 0) data.sameAs = [...org.sameAs];
+
+  return <JsonLdScript data={data} />;
+}
+
 type ArticleJsonLdProps = {
   title: string;
   description: string;
@@ -48,6 +65,8 @@ type ArticleJsonLdProps = {
   authorJobTitle?: string;
   image?: string;
   tags?: string[];
+  wordCount?: number;
+  timeRequired?: string;
 };
 
 export function ArticleJsonLd({
@@ -62,6 +81,8 @@ export function ArticleJsonLd({
   authorJobTitle,
   image,
   tags,
+  wordCount,
+  timeRequired,
 }: ArticleJsonLdProps) {
   const author: Record<string, unknown> = {
     "@type": "Person",
@@ -89,6 +110,8 @@ export function ArticleJsonLd({
         },
         ...(image && { image }),
         ...(tags && tags.length > 0 && { keywords: tags.join(", ") }),
+        ...(wordCount && { wordCount }),
+        ...(timeRequired && { timeRequired }),
         mainEntityOfPage: {
           "@type": "WebPage",
           "@id": url,
@@ -119,6 +142,61 @@ export function BreadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
           name: item.name,
           item: item.url,
         })),
+      }}
+    />
+  );
+}
+
+type BlogJsonLdProps = {
+  name: string;
+  description: string;
+  url: string;
+};
+
+export function BlogJsonLd({ name, description, url }: BlogJsonLdProps) {
+  return (
+    <JsonLdScript
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        name,
+        description,
+        url,
+        publisher: {
+          "@type": "Organization",
+          name: brand.name,
+          url: brand.url,
+        },
+      }}
+    />
+  );
+}
+
+type PersonJsonLdProps = {
+  name: string;
+  url: string;
+  image?: string;
+  jobTitle?: string;
+  description?: string;
+};
+
+export function PersonJsonLd({
+  name,
+  url,
+  image,
+  jobTitle,
+  description,
+}: PersonJsonLdProps) {
+  return (
+    <JsonLdScript
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name,
+        url,
+        ...(image && { image }),
+        ...(jobTitle && { jobTitle }),
+        ...(description && { description }),
       }}
     />
   );

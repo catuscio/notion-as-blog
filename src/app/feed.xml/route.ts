@@ -1,6 +1,6 @@
 import { Feed } from "feed";
 import { brand } from "@/config/brand";
-import { getAllPosts } from "@/lib/notion/getPosts";
+import { getPublishedPosts } from "@/lib/notion/getPosts";
 
 export async function GET() {
   const feed = new Feed({
@@ -14,7 +14,7 @@ export async function GET() {
   });
 
   try {
-    const posts = await getAllPosts();
+    const posts = await getPublishedPosts();
     posts.forEach((post) => {
       feed.addItem({
         title: post.title,
@@ -38,6 +38,7 @@ export async function GET() {
   return new Response(feed.rss2(), {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600",
     },
   });
 }

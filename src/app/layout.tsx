@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { brand } from "@/config/brand";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { WebSiteJsonLd } from "@/components/seo/JsonLd";
+import { WebSiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
 
 export const revalidate = 1800;
@@ -29,12 +29,20 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: `hsl(${brand.colors.light.background})` },
+    { media: "(prefers-color-scheme: dark)", color: `hsl(${brand.colors.dark.background})` },
+  ],
+};
+
 export const metadata: Metadata = {
   title: {
     default: `${brand.name} — ${brand.title}`,
     template: `%s | ${brand.name}`,
   },
   description: brand.description,
+  keywords: brand.keywords.length > 0 ? brand.keywords : undefined,
   metadataBase: new URL(brand.url),
   openGraph: {
     title: brand.name,
@@ -72,6 +80,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <WebSiteJsonLd />
+        <OrganizationJsonLd />
       </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased overflow-x-clip selection:bg-primary/20 selection:text-primary`}
