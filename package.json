@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cleancache": "rm -rf .cache/notion-images"
   },
   "dependencies": {
+    "@next/third-parties": "^16.1.6",
     "@notionhq/client": "^5.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
