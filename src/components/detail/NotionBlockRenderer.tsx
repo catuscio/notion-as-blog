@@ -1,62 +1,8 @@
 import Image from "next/image";
 import type { NotionBlockWithChildren, NotionRichText } from "@/lib/notion/types";
 import { slugifyHeading } from "@/lib/format";
-
-/* ------------------------------------------------------------------ */
-/*  Rich Text                                                          */
-/* ------------------------------------------------------------------ */
-
-function RichText({ richText }: { richText: NotionRichText[] }) {
-  if (!richText || richText.length === 0) return null;
-
-  return (
-    <>
-      {richText.map((t, i) => {
-        let node: React.ReactNode = t.plain_text;
-        const { bold, italic, strikethrough, underline, code, color } =
-          t.annotations;
-
-        if (code) {
-          node = (
-            <code className="bg-muted text-primary font-mono px-1.5 py-0.5 rounded text-[0.875em]">
-              {node}
-            </code>
-          );
-        }
-        if (bold) node = <strong>{node}</strong>;
-        if (italic) node = <em>{node}</em>;
-        if (strikethrough) node = <s>{node}</s>;
-        if (underline) node = <u>{node}</u>;
-
-        const colorClass =
-          color !== "default"
-            ? color.endsWith("_background")
-              ? `notion-bg-${color.replace("_background", "")}`
-              : `notion-color-${color}`
-            : undefined;
-
-        if (colorClass) {
-          node = <span className={colorClass}>{node}</span>;
-        }
-
-        if (t.href) {
-          node = (
-            <a
-              href={t.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-2"
-            >
-              {node}
-            </a>
-          );
-        }
-
-        return <span key={i}>{node}</span>;
-      })}
-    </>
-  );
-}
+import { RichText } from "./RichText";
+import { groupListItems } from "./groupListItems";
 
 /* ------------------------------------------------------------------ */
 /*  Block Children                                                     */
@@ -81,35 +27,21 @@ function headingId(richText: NotionRichText[], blockId: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/*  List grouping                                                      */
+/*  Image alt text helper                                              */
 /* ------------------------------------------------------------------ */
 
-type GroupedItem =
-  | { kind: "block"; block: NotionBlockWithChildren }
-  | {
-      kind: "list";
-      listType: "bulleted_list_item" | "numbered_list_item";
-      items: NotionBlockWithChildren[];
-    };
-
-function groupListItems(blocks: NotionBlockWithChildren[]): GroupedItem[] {
-  const groups: GroupedItem[] = [];
-
-  for (const block of blocks) {
-    const type = block.type;
-    if (type === "bulleted_list_item" || type === "numbered_list_item") {
-      const last = groups[groups.length - 1];
-      if (last && last.kind === "list" && last.listType === type) {
-        last.items.push(block);
-      } else {
-        groups.push({ kind: "list", listType: type, items: [block] });
-      }
-    } else {
-      groups.push({ kind: "block", block });
-    }
+function smartAlt(caption: NotionRichText[] | undefined, src: string): string {
+  if (caption && caption.length > 0) {
+    return caption.map((t) => t.plain_text).join("");
   }
-
-  return groups;
+  try {
+    const pathname = new URL(src, "https://placeholder.com").pathname;
+    const filename = pathname.split("/").pop() || "";
+    const name = filename.replace(/[-_]/g, " ").replace(/\.[^.]+$/, "").trim();
+    return name || "Image";
+  } catch {
+    return "Image";
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -245,8 +177,7 @@ function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
       ? block.image.file.url
       : block.image.external.url;
   const caption = block.image.caption;
-
-  const alt = caption?.map((t) => t.plain_text).join("") || "";
+  const alt = smartAlt(caption, src);
 
   return (
     <figure className="my-6">

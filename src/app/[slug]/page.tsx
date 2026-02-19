@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getPostDetailData, getRelatedPosts, getSeriesPosts } from "@/lib/notion/getPost";
-import { getAllPosts } from "@/lib/notion/getPosts";
+import { getPublishedPosts } from "@/lib/notion/getPosts";
 import { getAuthorByName } from "@/lib/notion/getAuthors";
+import { safeQuery } from "@/lib/notion/safeQuery";
 import { PostHeader } from "@/components/detail/PostHeader";
+import { PostBreadcrumb } from "@/components/detail/PostBreadcrumb";
+import { PostTags } from "@/components/detail/PostTags";
+import { PostJsonLd } from "@/components/detail/PostJsonLd";
 import { HeroImage } from "@/components/detail/HeroImage";
 import { NotionRenderer } from "@/components/detail/NotionRenderer";
 import { AuthorCard } from "@/components/detail/AuthorCard";
@@ -12,17 +15,7 @@ import { ReadNext } from "@/components/detail/ReadNext";
 import { SeriesNav } from "@/components/detail/SeriesNav";
 import { SeriesCollection } from "@/components/detail/SeriesCollection";
 import { CommentBox } from "@/components/detail/CommentBox";
-import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { brand } from "@/config/brand";
-import { Badge } from "@/components/ui/badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import type { Metadata } from "next";
 
 type Props = {
@@ -31,12 +24,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  let result;
-  try {
-    result = await getPostDetailData(slug);
-  } catch {
-    result = null;
-  }
+  const result = await safeQuery(() => getPostDetailData(slug), null);
   if (!result) return { title: "Not Found" };
 
   const { post } = result;
@@ -64,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   try {
-    const posts = await getAllPosts();
+    const posts = await getPublishedPosts();
     return posts.map((post) => ({ slug: post.slug }));
   } catch {
     return [];
@@ -74,87 +62,27 @@ export async function generateStaticParams() {
 export default async function PostPage({ params }: Props) {
   const { slug } = await params;
 
-  let result;
-  try {
-    result = await getPostDetailData(slug);
-  } catch {
-    result = null;
-  }
+  const result = await safeQuery(() => getPostDetailData(slug), null);
 
   if (!result) notFound();
 
-  const { post, blocks, allPosts, readingTime } = result;
+  const { post, blocks, allPosts, readingTime, wordCount } = result;
 
-  // Fetch author once, pass to both PostHeader and AuthorCard
-  let author = null;
-  try {
-    author = await getAuthorByName(post.author);
-  } catch {
-    // Author DB unavailable
-  }
+  const author = await safeQuery(() => getAuthorByName(post.author), null);
 
   const relatedPosts = getRelatedPosts(post, allPosts);
   const seriesPosts = getSeriesPosts(post, allPosts);
 
-  const postUrl = `${brand.url}/${post.slug}`;
-  const breadcrumbItems = [
-    { name: "Home", url: brand.url },
-    ...(post.category
-      ? [
-          {
-            name: post.category,
-            url: `${brand.url}/category/${encodeURIComponent(post.category)}`,
-          },
-        ]
-      : []),
-    { name: post.title, url: postUrl },
-  ];
-
   return (
     <div className="w-full max-w-[1024px] mx-auto flex flex-col lg:flex-row gap-12 px-6 py-8">
-      <ArticleJsonLd
-        title={post.title}
-        description={post.summary}
-        url={postUrl}
-        datePublished={post.date}
-        dateModified={post.lastEditedTime}
-        authorName={post.author}
-        authorUrl={author?.socials.website || author?.socials.github || undefined}
-        authorImage={author?.avatar || undefined}
-        authorJobTitle={author?.role || undefined}
-        image={post.thumbnail || undefined}
-        tags={post.tags}
+      <PostJsonLd
+        post={post}
+        author={author}
+        wordCount={wordCount}
+        readingTime={readingTime}
       />
-      <BreadcrumbJsonLd items={breadcrumbItems} />
       <article className="w-full flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
-        {/* Breadcrumb */}
-        <Breadcrumb className="mb-6 overflow-hidden">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            {post.category && (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link
-                      href={`/category/${encodeURIComponent(post.category)}`}
-                    >
-                      {post.category}
-                    </Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-              </>
-            )}
-            <BreadcrumbItem>
-              <BreadcrumbPage className="truncate max-w-[200px] sm:max-w-none">{post.title}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <PostBreadcrumb post={post} />
 
         <PostHeader post={post} author={author} readingTime={readingTime} />
 
@@ -164,19 +92,7 @@ export default async function PostPage({ params }: Props) {
 
         <NotionRenderer blocks={blocks} />
 
-        {/* Tags */}
-        {post.tags.length > 0 && (
-          <>
-            <hr className="border-border my-12" />
-            <div className="flex flex-wrap gap-2 mb-12">
-              {post.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="rounded-lg">
-                  #{tag}
-                </Badge>
-              ))}
-            </div>
-          </>
-        )}
+        <PostTags tags={post.tags} />
 
         {seriesPosts.length > 0 && (
           <SeriesCollection

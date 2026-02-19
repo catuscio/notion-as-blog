@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { brand } from "@/config/brand";
-import { getAllPosts } from "@/lib/notion/getPosts";
+import { getPublishedPosts } from "@/lib/notion/getPosts";
 
 export const revalidate = 1800;
 export const alt = "Post thumbnail";
@@ -17,7 +17,7 @@ export default async function OgImage({
 }) {
   const { slug } = await params;
 
-  const posts = await getAllPosts();
+  const posts = await getPublishedPosts();
   const post = posts.find((p) => p.slug === slug);
 
   if (!post) {

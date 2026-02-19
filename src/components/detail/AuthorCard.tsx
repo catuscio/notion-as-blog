@@ -62,7 +62,7 @@ export function AuthorCard({
         )}
         <div className="flex flex-wrap justify-center sm:justify-start items-center gap-4">
           <Link
-            href={`/?author=${encodeURIComponent(displayName)}`}
+            href={`/author/${encodeURIComponent(displayName)}`}
             className="text-sm font-semibold text-primary hover:underline"
           >
             View all posts &rarr;
