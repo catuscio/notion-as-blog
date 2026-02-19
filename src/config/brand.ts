@@ -42,9 +42,22 @@ export const brand = {
   since: 2025,
   lang: "en",
 
+  // --- SEO Keywords ---
+  keywords: [] as string[],
+
+  // --- Organization (JSON-LD) ---
+  organization: {
+    name: "",
+    url: "",
+    description: "",
+    logo: "",
+    sameAs: [] as string[],
+  },
+
   // --- Logo ---
   logo: {
     icon: "code_blocks",
+    image: "/logo.svg",
   },
 
   // --- Colors (HSL) ─────────────────────────────────────────────
@@ -122,6 +135,15 @@ export const brand = {
     linkedin: "https://linkedin.com/in/your-profile",
   },
 
+  // --- Search ---
+  search: {
+    dropdownLimit: 10,
+    pageLimit: 30,
+  },
+
+  // --- Footer Links ---
+  footerLinks: {} as Record<string, { label: string; href: string }[]>,
+
   // --- Plugins ---
   notion: {
     dataSourceId: process.env.NOTION_DATA_SOURCE_ID ?? "",
@@ -139,3 +161,14 @@ export const brand = {
 } as const;
 
 export type Category = (typeof brand.categories)[number];
+
+export function getCategoryBySlug(slug: string): Category | undefined {
+  const decoded = decodeURIComponent(slug);
+  return brand.categories.find(
+    (c) => c.name.toLowerCase() === decoded.toLowerCase()
+  );
+}
+
+export function getCategorySlug(name: string): string {
+  return encodeURIComponent(name);
+}
