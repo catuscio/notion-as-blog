@@ -22,7 +22,7 @@ export function Header() {
       <div className="max-w-[1024px] mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group shrink-0">
           {brand.logo.image && <BrandLogo size={32} />}
-          <span className={`text-xl font-bold tracking-tight ${brand.logo.image && brand.logo.showNameWithLogo === false ? "sr-only" : ""}`}>
+          <span className={`text-xl font-bold tracking-tight ${brand.logo.image && !brand.logo.showNameWithLogo ? "sr-only" : ""}`}>
             {brand.name}
           </span>
         </Link>

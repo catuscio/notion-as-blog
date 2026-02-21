@@ -11,7 +11,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             {brand.logo.image && <BrandLogo size={24} />}
-            <span className={`text-lg font-bold ${brand.logo.image && brand.logo.showNameWithLogo === false ? "sr-only" : ""}`}>
+            <span className={`text-lg font-bold ${brand.logo.image && !brand.logo.showNameWithLogo ? "sr-only" : ""}`}>
               {brand.name}
             </span>
           </div>
