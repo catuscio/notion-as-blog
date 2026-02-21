@@ -1,83 +1,96 @@
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
 import { AuthorHeader } from "@/components/feed/AuthorHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { PersonJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { getPublishedPosts } from "@/lib/notion/getPosts";
-import { getAllAuthors, getAuthorByName } from "@/lib/notion/getAuthors";
+import { getAllAuthors } from "@/lib/notion/getAuthors";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
+import { filterPostsByAuthor } from "@/lib/notion/filterPosts";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
+import { copy } from "@/config/copy";
+import { safeDecode } from "@/lib/safeDecode";
+import type { Post } from "@/types";
 import type { Metadata } from "next";
 
 type Props = {
   params: Promise<{ name: string }>;
 };
 
+async function resolveAuthor(name: string) {
+  const decoded = safeDecode(name);
+  const authors = await safeQuery(getAllAuthors, []);
+  return authors.find((a) => a.name === decoded) ?? null;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { name } = await params;
-  const decoded = decodeURIComponent(name);
-  const authorUrl = `${brand.url}/author/${encodeURIComponent(decoded)}`;
+  const author = await resolveAuthor(name);
+  if (!author) return { title: copy.notFound.title };
 
-  const author = await safeQuery(() => getAuthorByName(decoded), null);
-  const posts = await safeQuery(() => getPublishedPosts(), []);
-  const count = posts.filter((p) => p.author === decoded).length;
+  const allPosts = await safeQuery(getPublishedPosts, []);
+  const count = filterPostsByAuthor(allPosts, author.peopleIds).length;
+
+  const authorUrl = `${brand.url}/author/${encodeURIComponent(author.name)}`;
+  const description = author.bio || copy.author.descriptionFallback(brand.name, author.name);
 
   return {
-    title: `${decoded} — ${brand.name}`,
-    description: author?.bio || `Articles by ${decoded} on ${brand.name}`,
-    alternates: { canonical: authorUrl },
+    title: author.name,
+    description,
+    alternates: {
+      canonical: authorUrl,
+    },
     openGraph: {
-      title: `${decoded} — ${brand.name}`,
-      description: author?.bio || `Articles by ${decoded}`,
+      title: `${author.name} — ${brand.name}`,
+      description,
       url: authorUrl,
       siteName: brand.name,
       type: "profile",
+      images: [{ url: brand.assets.ogImage, width: brand.assets.ogWidth, height: brand.assets.ogHeight }],
     },
-    twitter: { card: "summary_large_image" },
+    twitter: {
+      card: "summary_large_image",
+      title: `${author.name} — ${brand.name}`,
+      description,
+      images: [brand.assets.ogImage],
+    },
     ...(count <= 2 && { robots: { index: false, follow: true } }),
   };
 }
 
 export async function generateStaticParams() {
-  try {
-    const authors = await getAllAuthors();
-    return authors.map((a) => ({ name: encodeURIComponent(a.name) }));
-  } catch {
-    return [];
-  }
+  const authors = await safeQuery(getAllAuthors, []);
+  return authors.map((a) => ({ name: encodeURIComponent(a.name) }));
 }
 
 export default async function AuthorPage({ params }: Props) {
   const { name } = await params;
-  const decoded = decodeURIComponent(name);
+  const author = await resolveAuthor(name);
+  if (!author) notFound();
 
-  const author = await safeQuery(() => getAuthorByName(decoded), null);
-  const allPosts = await safeQuery(() => getPublishedPosts(), []);
-  const posts = allPosts.filter((p) => p.author === decoded);
+  const allPosts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const posts = filterPostsByAuthor(allPosts, author.peopleIds);
   const { tags, authorsMap } = await getFeedPageData(posts);
 
-  const authorUrl = `${brand.url}/author/${encodeURIComponent(decoded)}`;
+  const authorUrl = `${brand.url}/author/${encodeURIComponent(author.name)}`;
+  const sameAs = Object.values(author.socials).filter(Boolean) as string[];
 
   return (
     <div className="max-w-[1024px] mx-auto px-6 py-12">
       <PersonJsonLd
-        name={decoded}
+        name={author.name}
         url={authorUrl}
-        image={author?.avatar}
-        jobTitle={author?.role}
-        description={author?.bio}
+        image={author.avatar || undefined}
+        jobTitle={author.role || undefined}
+        description={author.bio || undefined}
+        sameAs={sameAs}
       />
-      <BreadcrumbJsonLd
-        items={[
-          { name: "Home", url: brand.url },
-          { name: decoded, url: authorUrl },
-        ]}
-      />
-      <AuthorHeader
-        author={author}
-        authorName={decoded}
-        postCount={posts.length}
-      />
+      <BreadcrumbJsonLd items={[
+        { name: copy.footer.home, url: brand.url },
+        { name: author.name, url: authorUrl },
+      ]} />
+      <AuthorHeader author={author} />
       <Suspense>
         <FeedPostList posts={posts} tags={tags} authorsMap={authorsMap} />
       </Suspense>

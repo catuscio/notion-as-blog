@@ -1,12 +1,9 @@
 import { notFound } from "next/navigation";
-import { getPostDetailData, getRelatedPosts, getSeriesPosts } from "@/lib/notion/getPost";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
-import { getAuthorByName } from "@/lib/notion/getAuthors";
+import { getPostDetailData, getPageBySlug, estimateReadingTime } from "@/lib/notion/getPost";
+import { getPublishedPosts, getPublishedPages } from "@/lib/notion/getPosts";
+import { getAuthorByPeopleIds, getAuthorByName } from "@/lib/notion/getAuthors";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { PostHeader } from "@/components/detail/PostHeader";
-import { PostBreadcrumb } from "@/components/detail/PostBreadcrumb";
-import { PostTags } from "@/components/detail/PostTags";
-import { PostJsonLd } from "@/components/detail/PostJsonLd";
 import { HeroImage } from "@/components/detail/HeroImage";
 import { NotionRenderer } from "@/components/detail/NotionRenderer";
 import { AuthorCard } from "@/components/detail/AuthorCard";
@@ -15,24 +12,74 @@ import { ReadNext } from "@/components/detail/ReadNext";
 import { SeriesNav } from "@/components/detail/SeriesNav";
 import { SeriesCollection } from "@/components/detail/SeriesCollection";
 import { CommentBox } from "@/components/detail/CommentBox";
+import { PostJsonLd } from "@/components/detail/PostJsonLd";
+import { PostBreadcrumb } from "@/components/detail/PostBreadcrumb";
+import { PostTags } from "@/components/detail/PostTags";
 import { brand } from "@/config/brand";
+import { copy } from "@/config/copy";
+import type { Author } from "@/types";
+import type { PostDetailData } from "@/lib/notion/getPost";
 import type { Metadata } from "next";
+
+async function fetchPostAuthor(authorIds: string[], authorName: string): Promise<Author | null> {
+  return safeQuery<Author | null>(
+    async () => await getAuthorByPeopleIds(authorIds) ?? await getAuthorByName(authorName),
+    null
+  );
+}
+
+async function getPostPageData(slug: string): Promise<
+  (PostDetailData & { author: Author | null }) | null
+> {
+  // Try Post first
+  const result = await safeQuery(() => getPostDetailData(slug), null);
+  if (result) {
+    const author = await fetchPostAuthor(result.post.authorIds, result.post.author);
+    return { ...result, author };
+  }
+
+  // Fall back to Page type (about, etc.)
+  const pageResult = await safeQuery(() => getPageBySlug(slug), null);
+  if (!pageResult) return null;
+
+  const { page, blocks } = pageResult;
+  const text = blocks
+    .map((b) => {
+      const typed = (b as Record<string, unknown>)[b.type] as Record<string, unknown> | undefined;
+      if (typed && Array.isArray(typed.rich_text)) {
+        return (typed.rich_text as { plain_text: string }[]).map((t) => t.plain_text).join("");
+      }
+      return "";
+    })
+    .join(" ");
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  const readingTime = estimateReadingTime(text);
+  const author = await fetchPostAuthor(page.authorIds, page.author);
+
+  return { post: page, blocks, relatedPosts: [], seriesPosts: [], readingTime, wordCount, author };
+}
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
+async function findPostOrPage(slug: string) {
+  const posts = await safeQuery(getPublishedPosts, []);
+  const post = posts.find((p) => p.slug === slug);
+  if (post) return post;
+  const pages = await safeQuery(getPublishedPages, []);
+  return pages.find((p) => p.slug === slug) ?? null;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const result = await safeQuery(() => getPostDetailData(slug), null);
-  if (!result) return { title: "Not Found" };
+  const post = await findPostOrPage(slug);
+  if (!post) return { title: copy.notFound.title };
 
-  const { post } = result;
   const postUrl = `${brand.url}/${post.slug}`;
   return {
     title: post.title,
     description: post.summary,
-    keywords: post.tags.length > 0 ? post.tags : undefined,
     authors: [{ name: post.author }],
     alternates: {
       canonical: postUrl,
@@ -46,44 +93,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       section: post.category || undefined,
       authors: [post.author],
       url: postUrl,
+      images: [{ url: `/${post.slug}/opengraph-image`, width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.summary,
+      images: [`/${post.slug}/opengraph-image`],
     },
   };
 }
 
 export async function generateStaticParams() {
-  try {
-    const posts = await getPublishedPosts();
-    return posts.map((post) => ({ slug: post.slug }));
-  } catch {
-    return [];
-  }
+  const [posts, pages] = await Promise.all([
+    safeQuery(getPublishedPosts, []),
+    safeQuery(getPublishedPages, []),
+  ]);
+  return [...posts, ...pages].map((p) => ({ slug: p.slug }));
 }
 
 export default async function PostPage({ params }: Props) {
   const { slug } = await params;
+  const data = await getPostPageData(slug);
+  if (!data) notFound();
 
-  const result = await safeQuery(() => getPostDetailData(slug), null);
-
-  if (!result) notFound();
-
-  const { post, blocks, allPosts, readingTime, wordCount } = result;
-
-  const author = await safeQuery(() => getAuthorByName(post.author), null);
-
-  const relatedPosts = getRelatedPosts(post, allPosts);
-  const seriesPosts = getSeriesPosts(post, allPosts);
+  const { post, blocks, relatedPosts, seriesPosts, readingTime, wordCount, author } = data;
 
   return (
     <div className="w-full max-w-[1024px] mx-auto flex flex-col lg:flex-row gap-12 px-6 py-8">
-      <PostJsonLd
-        post={post}
-        author={author}
-        wordCount={wordCount}
-        readingTime={readingTime}
-      />
+      <PostJsonLd post={post} author={author} wordCount={wordCount} readingTime={readingTime} seriesPosts={seriesPosts} />
+
       <article className="w-full flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
         <PostBreadcrumb post={post} />
-
         <PostHeader post={post} author={author} readingTime={readingTime} />
 
         {post.thumbnail && (
@@ -91,14 +132,13 @@ export default async function PostPage({ params }: Props) {
         )}
 
         <NotionRenderer blocks={blocks} />
-
         <PostTags tags={post.tags} />
 
         {seriesPosts.length > 0 && (
           <SeriesCollection
             posts={seriesPosts}
             currentPostId={post.id}
-            seriesName={post.series}
+            seriesName={post.series ?? ""}
           />
         )}
 
@@ -110,7 +150,7 @@ export default async function PostPage({ params }: Props) {
             <SeriesNav
               posts={seriesPosts}
               currentPostId={post.id}
-              seriesName={post.series}
+              seriesName={post.series ?? ""}
             />
           )}
           <ReadNext posts={relatedPosts} />
@@ -121,13 +161,13 @@ export default async function PostPage({ params }: Props) {
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-72 shrink-0">
-        <div className="sticky top-[9.5rem] flex flex-col gap-8">
+        <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-8">
           <TableOfContents />
           {seriesPosts.length > 0 && (
             <SeriesNav
               posts={seriesPosts}
               currentPostId={post.id}
-              seriesName={post.series}
+              seriesName={post.series ?? ""}
             />
           )}
           <ReadNext posts={relatedPosts} />

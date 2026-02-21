@@ -1,10 +1,12 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { env } from "@/config/env";
 
 export async function POST(request: NextRequest) {
-  const token = request.headers.get("authorization")?.replace("Bearer ", "");
+  const authHeader = request.headers.get("authorization") ?? "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
-  const expected = process.env.TOKEN_FOR_REVALIDATE;
+  const expected = env.revalidateToken;
   if (!expected || token !== expected) {
     return NextResponse.json({ message: "Invalid token" }, { status: 401 });
   }

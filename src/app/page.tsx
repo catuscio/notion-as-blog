@@ -8,20 +8,16 @@ import { getPublishedPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
+import type { Post } from "@/types";
 
 export default async function HomePage() {
-  const posts = await safeQuery(() => getPublishedPosts(), []);
-
+  const posts = await safeQuery<Post[]>(getPublishedPosts, []);
   const tags = getAllTags(posts);
   const pinnedPosts = posts.filter((p) => p.pinned);
 
   return (
     <div className="pt-12 pb-20">
-      <BlogJsonLd
-        name={brand.name}
-        description={brand.description}
-        url={brand.url}
-      />
+      <BlogJsonLd url={brand.url} name={brand.title} description={brand.description} />
       {pinnedPosts.length > 0 ? (
         <>
           <h1 className="sr-only">{`${brand.name} — ${brand.title}`}</h1>

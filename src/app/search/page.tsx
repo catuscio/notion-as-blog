@@ -1,79 +1,81 @@
-import Link from "next/link";
+import { Suspense } from "react";
+import { FeedPostCard } from "@/components/feed/FeedPostCard";
 import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getAuthorLookupMap } from "@/lib/notion/getAuthors";
 import { searchPosts } from "@/lib/searchPosts";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
-import { formatDate } from "@/lib/format";
+import { copy } from "@/config/copy";
+import { resolveAuthor } from "@/lib/resolveAuthor";
+import type { Post, AuthorSummary } from "@/types";
 import type { Metadata } from "next";
 
 type Props = {
   searchParams: Promise<{ q?: string }>;
 };
 
-export const metadata: Metadata = {
-  title: `Search — ${brand.name}`,
-  robots: { index: false, follow: true },
-};
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { q } = await searchParams;
+  const query = q?.trim() ?? "";
+  const title = query ? copy.search.titleWithQuery(query) : copy.search.title;
+
+  return {
+    title,
+    description: copy.search.description(brand.name),
+    robots: { index: false, follow: true },
+  };
+}
+
+async function SearchResults({ query, authorsMap }: { query: string; authorsMap: Record<string, AuthorSummary> }) {
+  const allPosts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const results = query.length >= 2 ? searchPosts(allPosts, query).slice(0, brand.search.pageLimit) : [];
+
+  if (query.length < 2) {
+    return (
+      <div className="text-center py-16 text-muted-foreground">
+        <p className="text-lg">{copy.search.minLength}</p>
+      </div>
+    );
+  }
+
+  if (results.length === 0) {
+    return (
+      <div className="text-center py-16 text-muted-foreground">
+        <p className="text-lg">{copy.search.noResults(query)}</p>
+      </div>
+    );
+  }
+
+  return (
+    <section className="flex flex-col gap-6">
+      {results.map((post) => (
+        <FeedPostCard
+          key={post.id}
+          post={post}
+          author={resolveAuthor(post, authorsMap)}
+        />
+      ))}
+    </section>
+  );
+}
 
 export default async function SearchPage({ searchParams }: Props) {
-  const { q = "" } = await searchParams;
-  const query = q.trim();
-
-  const allPosts = await safeQuery(() => getPublishedPosts(), []);
-  const results = query ? searchPosts(allPosts, query).slice(0, brand.search.pageLimit) : [];
+  const { q } = await searchParams;
+  const query = q?.trim() ?? "";
+  const authorsMap = await safeQuery(getAuthorLookupMap, {});
 
   return (
     <div className="max-w-[1024px] mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-2">Search</h1>
-      {query && (
-        <p className="text-muted-foreground mb-8">
-          {results.length} {results.length === 1 ? "result" : "results"} for &ldquo;{query}&rdquo;
-        </p>
-      )}
-
-      {!query && (
-        <p className="text-muted-foreground mt-4">
-          Enter a search term to find articles.
-        </p>
-      )}
-
-      {query && results.length === 0 && (
-        <div className="text-center py-16 text-muted-foreground">
-          <span className="material-symbols-outlined text-[48px] mb-4 opacity-50">
-            search_off
-          </span>
-          <p className="text-lg">No results found for &ldquo;{query}&rdquo;</p>
-          <p className="text-sm mt-2">Try searching with different keywords.</p>
-        </div>
-      )}
-
-      {results.length > 0 && (
-        <div className="flex flex-col gap-4">
-          {results.map((post) => (
-            <Link
-              key={post.id}
-              href={`/${post.slug}`}
-              className="block p-6 rounded-xl border border-border hover:bg-muted/50 transition-colors"
-            >
-              <h2 className="text-lg font-semibold mb-1">{post.title}</h2>
-              {post.summary && (
-                <p className="text-muted-foreground text-sm line-clamp-2 mb-2">
-                  {post.summary}
-                </p>
-              )}
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                {post.category && <span>{post.category}</span>}
-                <span>{formatDate(post.date, "short")}</span>
-                {post.tags.slice(0, 3).map((tag) => (
-                  <span key={tag} className="bg-muted px-1.5 py-0.5 rounded">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      <h1 className="text-3xl font-bold tracking-tight mb-2">
+        {query ? (
+          copy.search.headingWithQuery(query)
+        ) : (
+          copy.search.heading
+        )}
+      </h1>
+      <Suspense>
+        <SearchResults query={query} authorsMap={authorsMap} />
+      </Suspense>
     </div>
   );
 }
