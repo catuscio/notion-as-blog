@@ -51,6 +51,17 @@ export const metadata: Metadata = {
   alternates: {
     canonical: brand.url,
   },
+  verification: {
+    google: brand.verification.google || undefined,
+    other: Object.fromEntries(
+      (
+        [
+          brand.verification.naver ? ["naver-site-verification", brand.verification.naver] : null,
+          brand.verification.microsoft ? ["msvalidate.01", brand.verification.microsoft] : null,
+        ] as const
+      ).filter((e): e is [string, string] => e !== null),
+    ),
+  },
   robots: {
     index: true,
     follow: true,

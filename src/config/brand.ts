@@ -329,6 +329,8 @@ export const brand = {
     apiConcurrency: 3,
     /** Number of pages fetched per request (max 100) */
     pageSize: 100,
+    /** Notion static image domain — used to skip Next.js image optimization */
+    staticDomain: "secure.notion-static.com",
   },
 
   /**
@@ -350,6 +352,7 @@ export const brand = {
     reactionsEnabled: "1",
     emitMetadata: "0",
     inputPosition: "bottom",
+    scriptUrl: "https://giscus.app/client.js",
   },
 
   /**
@@ -374,6 +377,18 @@ export const brand = {
    * e.g. G-XXXXXXXXXX
    */
   analytics: { gaId: env.gaId },
+
+  /**
+   * Site Verification
+   *
+   * Tokens for search engine webmaster tools.
+   * Leave empty ("") to omit the corresponding meta tag.
+   */
+  verification: {
+    google: "",
+    naver: "",
+    microsoft: "",
+  },
 
   // ═══════════════════════════════════════════════════════════════
   // Behavior

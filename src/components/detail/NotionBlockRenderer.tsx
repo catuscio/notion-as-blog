@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { NotionBlockWithChildren, NotionRichText } from "@/lib/notion/types";
 import { slugifyHeading } from "@/lib/format";
 import { notionColorClass } from "@/lib/notion/colorMap";
+import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { RichText } from "./RichText";
 import { groupListItems } from "./groupListItems";
@@ -190,7 +191,7 @@ function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
         height={450}
         className="rounded-xl max-w-full mx-auto h-auto"
         sizes="(max-width: 768px) 100vw, 800px"
-        unoptimized={src.includes("secure.notion-static.com")}
+        unoptimized={src.includes(brand.notion.staticDomain)}
       />
       {caption && caption.length > 0 && (
         <figcaption className="text-center text-sm text-muted-foreground mt-2">

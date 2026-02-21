@@ -15,7 +15,7 @@ export function CommentBox() {
     if (!ref.current) return;
 
     const script = document.createElement("script");
-    script.src = "https://giscus.app/client.js";
+    script.src = brand.giscus.scriptUrl;
     script.async = true;
 
     const attrs: Record<string, string> = {

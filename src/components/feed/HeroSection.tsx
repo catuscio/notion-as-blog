@@ -118,7 +118,7 @@ export function HeroSection() {
     <section className="max-w-[1024px] mx-auto px-6 mb-24 md:mb-32">
       <div className="max-w-3xl">
         <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.15] break-words">
-          {mounted ? animatedTitle : staticTitle}
+          {!mounted || typingDone ? staticTitle : animatedTitle}
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground font-normal leading-relaxed max-w-2xl">
           <Multiline text={brand.description} />
