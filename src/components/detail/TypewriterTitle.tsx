@@ -31,7 +31,7 @@ export function TypewriterTitle({
       <span aria-hidden="true">
         {text.slice(0, charIndex)}
         {!done && (
-          <span className="border-r-2 border-current animate-pulse" />
+          <span className="inline-block w-[3px] h-[0.8em] bg-current align-middle ml-0.5 animate-cursor-blink" />
         )}
       </span>
       <span className="sr-only">{text}</span>

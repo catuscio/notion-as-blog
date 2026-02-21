@@ -13,6 +13,7 @@ export default async function AppleIcon() {
     return new ImageResponse(
       (
         <img
+          alt=""
           src={`data:image/png;base64,${buf.toString("base64")}`}
           width={size.width}
           height={size.height}
