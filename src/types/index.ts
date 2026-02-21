@@ -1,10 +1,10 @@
-export interface TAuthor {
+export interface Author {
   id: string;
   name: string;
+  peopleIds: string[];
   avatar: string;
   bio: string;
   role: string;
-  peopleIds: string[];
   socials: {
     github?: string;
     x?: string;
@@ -14,7 +14,7 @@ export interface TAuthor {
   };
 }
 
-export interface TPost {
+export interface Post {
   id: string;
   title: string;
   slug: string;
@@ -23,8 +23,8 @@ export interface TPost {
   date: string;
   lastEditedTime: string;
   tags: string[];
-  category: string;
-  series: string;
+  category: string | null;
+  series: string | null;
   author: string;
   authorIds: string[];
   summary: string;
@@ -33,17 +33,12 @@ export interface TPost {
   pinned: boolean;
 }
 
-export type AuthorSummary = {
-  avatar: string;
-  name: string;
-};
+export type AuthorSummary = Pick<Author, "avatar" | "name">;
 
-export interface TTagItem {
+export interface SelectItemCount {
   name: string;
   count: number;
 }
 
-export interface TCategoryItem {
-  name: string;
-  count: number;
-}
+export type TagItem = SelectItemCount;
+export type CategoryItem = SelectItemCount;
