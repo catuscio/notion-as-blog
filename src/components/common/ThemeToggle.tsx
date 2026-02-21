@@ -1,16 +1,13 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useSyncExternalStore } from "react";
+import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const subscribe = () => () => {};
-const getSnapshot = () => true;
-const getServerSnapshot = () => false;
+import { useMounted } from "@/hooks/useMounted";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const mounted = useMounted();
 
   return (
     <Button
@@ -20,9 +17,11 @@ export function ThemeToggle() {
       className="rounded-full"
       aria-label="Toggle theme"
     >
-      <span className="material-symbols-outlined text-[20px]">
-        {mounted ? (theme === "dark" ? "light_mode" : "dark_mode") : "dark_mode"}
-      </span>
+      {mounted ? (
+        theme === "dark" ? <Sun size={20} /> : <Moon size={20} />
+      ) : (
+        <span className="inline-block w-5 h-5" />
+      )}
     </Button>
   );
 }

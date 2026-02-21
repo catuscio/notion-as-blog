@@ -1,26 +1,19 @@
+import { FileText } from "lucide-react";
 import { PostCard } from "./PostCard";
-import type { TPost } from "@/types";
+import { EmptyState } from "@/components/common/EmptyState";
+import { copy } from "@/config/copy";
+import type { Post } from "@/types";
 
-export function PostList({ posts }: { posts: TPost[] }) {
+export function PostList({ posts }: { posts: Post[] }) {
   if (posts.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <span className="material-symbols-outlined text-6xl mb-4 block opacity-30">
-          draft
-        </span>
-        <p className="text-lg">No posts yet. Check back soon!</p>
-      </div>
-    );
+    return <EmptyState icon={<FileText size={60} />} message={copy.noPosts} />;
   }
 
   return (
-    <div className="flex flex-col gap-8 md:gap-12">
-      {posts.map((post, i) => (
-        <div key={post.id}>
+    <div className="flex flex-col divide-y divide-border">
+      {posts.map((post) => (
+        <div key={post.id} className="py-8 md:py-12 first:pt-0 last:pb-0">
           <PostCard post={post} />
-          {i < posts.length - 1 && (
-            <div className="h-px bg-border w-full mt-8 md:mt-12" />
-          )}
         </div>
       ))}
     </div>

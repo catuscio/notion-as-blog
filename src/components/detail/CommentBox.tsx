@@ -16,19 +16,25 @@ export function CommentBox() {
 
     const script = document.createElement("script");
     script.src = "https://giscus.app/client.js";
-    script.setAttribute("data-repo", repo);
-    script.setAttribute("data-repo-id", repoId);
-    script.setAttribute("data-category", category);
-    script.setAttribute("data-category-id", categoryId);
-    script.setAttribute("data-mapping", "pathname");
-    script.setAttribute("data-strict", "0");
-    script.setAttribute("data-reactions-enabled", "1");
-    script.setAttribute("data-emit-metadata", "0");
-    script.setAttribute("data-input-position", "bottom");
-    script.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
-    script.setAttribute("data-lang", "en");
-    script.setAttribute("crossorigin", "anonymous");
     script.async = true;
+
+    const attrs: Record<string, string> = {
+      "data-repo": repo,
+      "data-repo-id": repoId,
+      "data-category": category,
+      "data-category-id": categoryId,
+      "data-mapping": brand.giscus.mapping,
+      "data-strict": brand.giscus.strict,
+      "data-reactions-enabled": brand.giscus.reactionsEnabled,
+      "data-emit-metadata": brand.giscus.emitMetadata,
+      "data-input-position": brand.giscus.inputPosition,
+      "data-theme": theme === "dark" ? "dark" : "light",
+      "data-lang": brand.lang,
+      crossorigin: "anonymous",
+    };
+    for (const [key, value] of Object.entries(attrs)) {
+      script.setAttribute(key, value);
+    }
 
     ref.current.innerHTML = "";
     ref.current.appendChild(script);

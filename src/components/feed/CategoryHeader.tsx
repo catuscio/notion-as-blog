@@ -1,4 +1,6 @@
 import { brand } from "@/config/brand";
+import { copy } from "@/config/copy";
+import { FeedPageHeader } from "./FeedPageHeader";
 
 export function CategoryHeader({ categoryName }: { categoryName: string }) {
   const cat = brand.categories.find(
@@ -8,18 +10,10 @@ export function CategoryHeader({ categoryName }: { categoryName: string }) {
   if (!cat) return null;
 
   return (
-    <section className="mb-12">
-      <div>
-        <span className="inline-block mb-3 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-          Category
-        </span>
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-          {cat.name}
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-          {cat.description}
-        </p>
-      </div>
-    </section>
+    <FeedPageHeader
+      badge={copy.category.badge}
+      title={cat.name}
+      subtitle={cat.description}
+    />
   );
 }

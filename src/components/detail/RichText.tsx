@@ -1,5 +1,18 @@
 import Link from "next/link";
+import { brand } from "@/config/brand";
+import { notionColorClass } from "@/lib/notion/colorMap";
 import type { NotionRichText } from "@/lib/notion/types";
+
+function toInternalPath(href: string): string | null {
+  if (href.startsWith("/")) return href;
+  try {
+    const url = new URL(href);
+    if (url.origin === brand.url) return url.pathname + url.search + url.hash;
+  } catch {
+    // invalid URL, treat as external
+  }
+  return null;
+}
 
 export function RichText({ richText }: { richText: NotionRichText[] }) {
   if (!richText || richText.length === 0) return null;
@@ -9,7 +22,7 @@ export function RichText({ richText }: { richText: NotionRichText[] }) {
       {richText.map((t, i) => {
         let node: React.ReactNode = t.plain_text;
         const { bold, italic, strikethrough, underline, code, color } =
-          t.annotations;
+          t.annotations ?? {};
 
         if (code) {
           node = (
@@ -23,29 +36,17 @@ export function RichText({ richText }: { richText: NotionRichText[] }) {
         if (strikethrough) node = <s>{node}</s>;
         if (underline) node = <u>{node}</u>;
 
-        const colorClass =
-          color !== "default"
-            ? color.endsWith("_background")
-              ? `notion-bg-${color.replace("_background", "")}`
-              : `notion-color-${color}`
-            : undefined;
-
-        if (colorClass) {
-          node = <span className={colorClass}>{node}</span>;
+        const colorCls = notionColorClass(color ?? "default");
+        if (colorCls) {
+          node = <span className={colorCls}>{node}</span>;
         }
 
         if (t.href) {
-          const isInternal =
-            t.href.startsWith("/") ||
-            (typeof window !== "undefined" && t.href.startsWith(window.location.origin));
-
-          if (isInternal) {
-            const href = t.href.startsWith("/")
-              ? t.href
-              : new URL(t.href).pathname;
+          const internalPath = toInternalPath(t.href);
+          if (internalPath) {
             node = (
               <Link
-                href={href}
+                href={internalPath}
                 className="text-primary underline underline-offset-2"
               >
                 {node}

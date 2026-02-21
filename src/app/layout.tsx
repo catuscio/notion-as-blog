@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "next-themes";
 import { brand } from "@/config/brand";
 import { Header } from "@/components/layout/Header";
@@ -14,20 +14,9 @@ function buildThemeCSS() {
     Object.entries(colors)
       .map(([k, v]) => `--${k}: hsl(${v});`)
       .join("\n  ");
-  return `:root {\n  ${toVars(brand.colors.light)}\n}\n.dark {\n  ${toVars(brand.colors.dark)}\n}`;
+  const fontVars = `--brand-font-sans: ${brand.fonts.sans.stack};\n  --font-mono-code: "${brand.fonts.mono.family}", monospace;`;
+  return `:root {\n  ${fontVars}\n  ${toVars(brand.colors.light)}\n}\n.dark {\n  ${toVars(brand.colors.dark)}\n}`;
 }
-
-const inter = Inter({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono-code",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
 
 export const viewport: Viewport = {
   themeColor: [
@@ -51,13 +40,16 @@ export const metadata: Metadata = {
     siteName: brand.name,
     locale: brand.lang,
     type: "website",
+    images: [{ url: brand.assets.ogImage, width: brand.assets.ogWidth, height: brand.assets.ogHeight }],
   },
   twitter: {
     card: "summary_large_image",
+    title: brand.name,
+    description: brand.description,
+    images: [brand.assets.ogImage],
   },
   alternates: {
     canonical: brand.url,
-    languages: { [brand.lang]: brand.url },
   },
   robots: {
     index: true,
@@ -74,16 +66,31 @@ export default function RootLayout({
     <html lang={brand.lang} suppressHydrationWarning>
       <head>
         <style dangerouslySetInnerHTML={{ __html: buildThemeCSS() }} />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        {brand.fonts.mono.preconnect.map((url) => (
+          <link key={url} rel="preconnect" href={url} crossOrigin="anonymous" />
+        ))}
         <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="preload"
+          as="style"
+          crossOrigin="anonymous"
+          href={brand.fonts.mono.cdn}
+        />
+        <link
           rel="stylesheet"
+          crossOrigin="anonymous"
+          href={brand.fonts.mono.cdn}
+        />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={brand.title}
+          href={`${brand.url}/feed.xml`}
         />
         <WebSiteJsonLd />
         <OrganizationJsonLd />
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased overflow-x-clip selection:bg-primary/20 selection:text-primary`}
+        className="font-sans antialiased overflow-x-clip selection:bg-primary/20 selection:text-primary"
       >
         <ThemeProvider
           attribute="class"
@@ -97,6 +104,7 @@ export default function RootLayout({
             <Footer />
           </div>
         </ThemeProvider>
+        {brand.analytics.gaId && <GoogleAnalytics gaId={brand.analytics.gaId} />}
       </body>
     </html>
   );

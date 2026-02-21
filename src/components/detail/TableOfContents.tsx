@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { slugifyHeading } from "@/lib/format";
+import { copy } from "@/config/copy";
 import { PROSE_CONTAINER_SELECTOR } from "@/components/detail/NotionRenderer";
 
 interface TocItem {
@@ -16,11 +17,12 @@ interface TocItem {
   level: number;
 }
 
-const TAG_LEVEL: Record<string, number> = { H1: 1, H2: 2, H3: 3 };
+const TOC_OBSERVER_MARGIN = "-80px 0px -80% 0px";
+const TAG_LEVEL: Record<string, number> = { H2: 1, H3: 2, H4: 3 };
 const INDENT: Record<number, string> = { 1: "pl-4", 2: "pl-8", 3: "pl-12" };
 
 function collectHeadings(prose: Element): TocItem[] {
-  const elements = prose.querySelectorAll("h1, h2, h3");
+  const elements = prose.querySelectorAll("h2, h3, h4");
   const items: TocItem[] = [];
   const usedIds = new Set<string>();
 
@@ -93,7 +95,7 @@ export function TableOfContents() {
           }
         }
       },
-      { rootMargin: "-80px 0px -80% 0px" }
+      { rootMargin: TOC_OBSERVER_MARGIN }
     );
 
     headings.forEach(({ id }) => {
@@ -109,7 +111,7 @@ export function TableOfContents() {
   return (
     <div className="flex flex-col">
       <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
-        On this page
+        {copy.toc.heading}
       </h4>
       <nav className="flex flex-col gap-3 relative border-l border-border">
         {headings.map((h) => (

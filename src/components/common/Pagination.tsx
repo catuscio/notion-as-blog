@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useSearchParams, usePathname } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface PaginationProps {
   totalItems: number;
@@ -42,27 +44,25 @@ export function Pagination({
   itemsPerPage = 10,
   currentPage,
 }: PaginationProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const navigate = useCallback(
-    (page: number) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (page <= 1) {
-        params.delete("page");
-      } else {
-        params.set("page", String(page));
-      }
-      const qs = params.toString();
-      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-      // scroll to top of the post list
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    },
-    [router, pathname, searchParams]
-  );
+  function buildPageHref(page: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(page));
+    }
+    const qs = params.toString();
+    return qs ? `${pathname}?${qs}` : pathname;
+  }
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   if (totalPages <= 1) return null;
 
@@ -73,15 +73,27 @@ export function Pagination({
       aria-label="Pagination"
       className="flex items-center justify-center gap-1 mt-12"
     >
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => navigate(currentPage - 1)}
-        disabled={currentPage <= 1}
-        aria-label="Previous page"
-      >
-        <span className="material-symbols-outlined text-lg">chevron_left</span>
-      </Button>
+      {currentPage <= 1 ? (
+        <span
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "icon" }),
+            "pointer-events-none opacity-50"
+          )}
+          aria-label="Previous page"
+        >
+          <ChevronLeft size={18} />
+        </span>
+      ) : (
+        <Link
+          href={buildPageHref(currentPage - 1)}
+          scroll={false}
+          onClick={scrollToTop}
+          className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+          aria-label="Previous page"
+        >
+          <ChevronLeft size={18} />
+        </Link>
+      )}
 
       {pages.map((page, i) =>
         page === "..." ? (
@@ -92,30 +104,46 @@ export function Pagination({
             ...
           </span>
         ) : (
-          <Button
+          <Link
             key={page}
-            variant={page === currentPage ? "default" : "ghost"}
-            size="icon"
-            onClick={() => navigate(page)}
+            href={buildPageHref(page)}
+            scroll={false}
+            onClick={scrollToTop}
+            className={cn(
+              buttonVariants({
+                variant: page === currentPage ? "default" : "ghost",
+                size: "icon",
+              })
+            )}
             aria-label={`Page ${page}`}
             aria-current={page === currentPage ? "page" : undefined}
           >
             {page}
-          </Button>
+          </Link>
         )
       )}
 
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => navigate(currentPage + 1)}
-        disabled={currentPage >= totalPages}
-        aria-label="Next page"
-      >
-        <span className="material-symbols-outlined text-lg">
-          chevron_right
+      {currentPage >= totalPages ? (
+        <span
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "icon" }),
+            "pointer-events-none opacity-50"
+          )}
+          aria-label="Next page"
+        >
+          <ChevronRight size={18} />
         </span>
-      </Button>
+      ) : (
+        <Link
+          href={buildPageHref(currentPage + 1)}
+          scroll={false}
+          onClick={scrollToTop}
+          className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+          aria-label="Next page"
+        >
+          <ChevronRight size={18} />
+        </Link>
+      )}
     </nav>
   );
 }

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
+import { copy } from "@/config/copy";
 import { formatDate } from "@/lib/format";
-import type { TPost } from "@/types";
+import type { Post } from "@/types";
 
 interface SeriesNavProps {
-  posts: TPost[];
+  posts: Post[];
   currentPostId: string;
   seriesName: string;
 }
@@ -14,7 +15,7 @@ function SeriesNavItem({
   index,
   isCurrent,
 }: {
-  post: TPost;
+  post: Post;
   index: number;
   isCurrent: boolean;
 }) {
@@ -51,7 +52,7 @@ function SeriesNavItem({
         {post.title}
       </h5>
       <span className="text-xs text-muted-foreground mt-1 block">
-        {isCurrent ? "Reading now" : formatDate(post.date, "short")}
+        {isCurrent ? copy.readingNow : formatDate(post.date, "short")}
       </span>
     </div>
   );
@@ -82,7 +83,9 @@ export function SeriesNav({ posts, currentPostId, seriesName }: SeriesNavProps) 
   return (
     <div>
       <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
-        Series · {seriesName}
+        <Link href={`/series/${encodeURIComponent(seriesName)}`} className="hover:text-primary transition-colors">
+          {copy.series.label} · {seriesName}
+        </Link>
       </h4>
       <div className="flex flex-col gap-3">
         {posts.map((post, index) => (

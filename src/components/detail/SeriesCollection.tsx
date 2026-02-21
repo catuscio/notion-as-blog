@@ -1,9 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import type { TPost } from "@/types";
+import { FileText } from "lucide-react";
+import { copy } from "@/config/copy";
+import { formatDate } from "@/lib/format";
+import type { Post } from "@/types";
 
 interface SeriesCollectionProps {
-  posts: TPost[];
+  posts: Post[];
   currentPostId: string;
   seriesName: string;
 }
@@ -20,7 +23,11 @@ export function SeriesCollection({
   return (
     <section className="mb-12">
       <div className="flex items-center justify-between gap-4 mb-6">
-        <h3 className="text-lg font-bold truncate">Series · {seriesName}</h3>
+        <h3 className="text-lg font-bold truncate">
+          <Link href={`/series/${encodeURIComponent(seriesName)}`} className="hover:text-primary transition-colors">
+            {copy.series.label} · {seriesName}
+          </Link>
+        </h3>
         <span className="text-sm text-muted-foreground shrink-0">
           {currentIndex + 1} / {posts.length}
         </span>
@@ -30,12 +37,7 @@ export function SeriesCollection({
           <div className="inline-flex gap-4 py-4 px-1">
           {posts.map((post, index) => {
             const isCurrent = post.id === currentPostId;
-            const formattedDate = post.date
-              ? new Date(post.date).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })
-              : "";
+            const formattedDate = post.date ? formatDate(post.date, "short") : "";
 
             const card = (
               <article
@@ -57,9 +59,7 @@ export function SeriesCollection({
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary/30">
-                      <span className="material-symbols-outlined text-4xl opacity-50">
-                        article
-                      </span>
+                      <FileText size={36} className="opacity-50" />
                     </div>
                   )}
                   <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-md">

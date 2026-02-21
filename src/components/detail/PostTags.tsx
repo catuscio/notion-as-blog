@@ -9,11 +9,11 @@ export function PostTags({ tags }: { tags: string[] }) {
       <hr className="border-border my-12" />
       <div className="flex flex-wrap gap-2 mb-12">
         {tags.map((tag) => (
-          <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <Badge variant="secondary" className="rounded-lg hover:bg-primary/10 transition-colors cursor-pointer">
+          <Badge key={tag} variant="secondary" className="rounded-lg" asChild>
+            <Link href={`/tag/${encodeURIComponent(tag)}`}>
               #{tag}
-            </Badge>
-          </Link>
+            </Link>
+          </Badge>
         ))}
       </div>
     </>

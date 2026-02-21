@@ -1,49 +1,35 @@
 import Image from "next/image";
-import type { TAuthor } from "@/types";
+import { copy } from "@/config/copy";
+import { FeedPageHeader } from "./FeedPageHeader";
+import type { Author } from "@/types";
 
-export function AuthorHeader({
-  author,
-  authorName,
-  postCount,
-}: {
-  author: TAuthor | null;
-  authorName: string;
-  postCount: number;
-}) {
-  const displayName = author?.name || authorName;
-  const avatar = author?.avatar;
-  const bio = author?.bio;
-  const role = author?.role;
-
+export function AuthorHeader({ author }: { author: Author }) {
   return (
-    <div className="mb-10 flex items-start gap-6">
-      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-        {avatar ? (
-          <Image
-            src={avatar}
-            alt={displayName}
-            width={80}
-            height={80}
-            className="object-cover w-full h-full"
-          />
-        ) : (
-          <span className="material-symbols-outlined text-[40px] text-muted-foreground">
-            person
-          </span>
-        )}
-      </div>
-      <div>
-        <h1 className="text-3xl font-bold">{displayName}</h1>
-        {role && (
-          <p className="text-muted-foreground text-sm mt-1">{role}</p>
-        )}
-        {bio && (
-          <p className="text-muted-foreground mt-2 leading-relaxed">{bio}</p>
-        )}
-        <p className="text-sm text-muted-foreground mt-2">
-          {postCount} {postCount === 1 ? "post" : "posts"}
-        </p>
-      </div>
-    </div>
+    <FeedPageHeader
+      badge={copy.author.badge}
+      title={
+        <span className="flex items-center gap-4">
+          {author.avatar && (
+            <Image
+              src={author.avatar}
+              alt={author.name}
+              width={56}
+              height={56}
+              className="rounded-full object-cover w-14 h-14"
+            />
+          )}
+          {author.name}
+        </span>
+      }
+      subtitle={
+        (author.role || author.bio) ? (
+          <>
+            {author.role && <span className="font-medium">{author.role}</span>}
+            {author.role && author.bio && <span> · </span>}
+            {author.bio}
+          </>
+        ) : undefined
+      }
+    />
   );
 }

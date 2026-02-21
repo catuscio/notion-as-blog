@@ -7,15 +7,19 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import type { TPost } from "@/types";
+import { getCategorySlug } from "@/config/brand";
+import { copy } from "@/config/copy";
+import type { Post } from "@/types";
 
-export function PostBreadcrumb({ post }: { post: TPost }) {
+export function PostBreadcrumb({ post }: { post: Post }) {
+  const categorySlug = post.category ? getCategorySlug(post.category) : undefined;
+
   return (
     <Breadcrumb className="mb-6 overflow-hidden">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/">Home</Link>
+            <Link href="/">{copy.footer.home}</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
@@ -23,9 +27,7 @@ export function PostBreadcrumb({ post }: { post: TPost }) {
           <>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link
-                  href={`/category/${encodeURIComponent(post.category)}`}
-                >
+                <Link href={`/category/${categorySlug}`}>
                   {post.category}
                 </Link>
               </BreadcrumbLink>

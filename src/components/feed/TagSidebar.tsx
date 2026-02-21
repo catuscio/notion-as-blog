@@ -1,10 +1,11 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import type { TTagItem } from "@/types";
+import { copy } from "@/config/copy";
+import type { TagItem } from "@/types";
 
 interface TagSidebarProps {
-  tags: TTagItem[];
+  tags: TagItem[];
   activeTag: string | null;
   onTagClick: (tag: string | null) => void;
 }
@@ -22,7 +23,7 @@ export function MobileTagBar({ tags, activeTag, onTagClick }: TagSidebarProps) {
               : "bg-muted text-muted-foreground hover:text-foreground"
           }`}
         >
-          All
+          {copy.tag.all}
         </button>
         {tags.map((tag) => (
           <button
@@ -51,7 +52,7 @@ export function TagSidebar({ tags, activeTag, onTagClick }: TagSidebarProps) {
     <aside className="hidden lg:block w-56 shrink-0">
       <div className="sticky top-28">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Tags
+          {copy.tag.tagsHeading}
         </h3>
         <div className="flex flex-col gap-1.5">
           <button
@@ -62,7 +63,7 @@ export function TagSidebar({ tags, activeTag, onTagClick }: TagSidebarProps) {
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
-            <span>All Posts</span>
+            <span>{copy.tag.allPosts}</span>
             <Badge
               variant={activeTag === null ? "default" : "secondary"}
               className="text-[11px] px-1.5 py-0 min-w-[22px] justify-center"

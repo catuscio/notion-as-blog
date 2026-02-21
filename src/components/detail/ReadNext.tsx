@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
-import type { TPost } from "@/types";
+import { copy } from "@/config/copy";
+import type { Post } from "@/types";
 
 export function ReadNext({
   posts,
   readingTimeMap,
 }: {
-  posts: TPost[];
+  posts: Post[];
   readingTimeMap?: Record<string, number>;
 }) {
   if (posts.length === 0) return null;
@@ -14,7 +15,7 @@ export function ReadNext({
   return (
     <div>
       <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
-        Read Next
+        {copy.readNext}
       </h4>
       <div className="flex flex-col gap-4">
         {posts.slice(0, 3).map((post) => (
@@ -35,7 +36,7 @@ export function ReadNext({
               </h5>
               <span className="text-xs text-muted-foreground mt-1 block">
                 {readingTimeMap?.[post.id]
-                  ? `${readingTimeMap[post.id]} min read`
+                  ? `${readingTimeMap[post.id]} ${copy.readingTime}`
                   : ""}
               </span>
             </div>

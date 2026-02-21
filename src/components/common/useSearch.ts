@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { TPost } from "@/types";
+import type { Post } from "@/types";
+
+const SEARCH_API = "/api/search";
+const SEARCH_DEBOUNCE_MS = 300;
 
 export function useSearch() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<TPost[]>([]);
+  const [results, setResults] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -16,12 +19,14 @@ export function useSearch() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q.trim())}`);
+      const res = await fetch(`${SEARCH_API}?q=${encodeURIComponent(q.trim())}`);
       if (res.ok) {
         setResults(await res.json());
+      } else {
+        setResults([]);
       }
     } catch {
-      // network error — silently ignore
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -29,7 +34,7 @@ export function useSearch() {
 
   // Debounced search
   useEffect(() => {
-    const timer = setTimeout(() => fetchResults(query), 300);
+    const timer = setTimeout(() => fetchResults(query), SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [query, fetchResults]);
 

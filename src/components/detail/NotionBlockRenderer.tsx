@@ -1,6 +1,8 @@
 import Image from "next/image";
 import type { NotionBlockWithChildren, NotionRichText } from "@/lib/notion/types";
 import { slugifyHeading } from "@/lib/format";
+import { notionColorClass } from "@/lib/notion/colorMap";
+import { copy } from "@/config/copy";
 import { RichText } from "./RichText";
 import { groupListItems } from "./groupListItems";
 
@@ -27,56 +29,45 @@ function headingId(richText: NotionRichText[], blockId: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Image alt text helper                                              */
-/* ------------------------------------------------------------------ */
-
-function smartAlt(caption: NotionRichText[] | undefined, src: string): string {
-  if (caption && caption.length > 0) {
-    return caption.map((t) => t.plain_text).join("");
-  }
-  try {
-    const pathname = new URL(src, "https://placeholder.com").pathname;
-    const filename = pathname.split("/").pop() || "";
-    const name = filename.replace(/[-_]/g, " ").replace(/\.[^.]+$/, "").trim();
-    return name || "Image";
-  } catch {
-    return "Image";
-  }
-}
-
-/* ------------------------------------------------------------------ */
 /*  Block components                                                   */
 /* ------------------------------------------------------------------ */
 
 function ParagraphBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "paragraph") return null;
   return (
-    <p className="my-2 leading-relaxed">
+    <p className="my-5 leading-relaxed">
       <RichText richText={block.paragraph.rich_text} />
       <BlockChildren blocks={block.children} />
     </p>
   );
 }
 
-const HEADING_CONFIG: Record<string, { tag: "h1" | "h2" | "h3"; className: string }> = {
-  heading_1: { tag: "h1", className: "text-3xl font-bold mt-10 mb-4" },
-  heading_2: { tag: "h2", className: "text-2xl font-bold mt-8 mb-3" },
-  heading_3: { tag: "h3", className: "text-xl font-semibold mt-6 mb-2" },
+const HEADING_CONFIG: Record<string, { tag: "h2" | "h3" | "h4"; className: string }> = {
+  heading_1: { tag: "h2", className: "text-3xl font-bold mt-12 mb-5" },
+  heading_2: { tag: "h3", className: "text-2xl font-semibold mt-10 mb-4" },
+  heading_3: { tag: "h4", className: "text-xl font-semibold mt-8 mb-3" },
 };
+
+function getHeadingRichText(block: NotionBlockWithChildren): NotionRichText[] {
+  switch (block.type) {
+    case "heading_1": return block.heading_1.rich_text;
+    case "heading_2": return block.heading_2.rich_text;
+    case "heading_3": return block.heading_3.rich_text;
+    default: return [];
+  }
+}
 
 function HeadingBlock({ block }: { block: NotionBlockWithChildren }) {
   const config = HEADING_CONFIG[block.type];
   if (!config) return null;
 
-  const data = (block as Record<string, unknown>)[block.type] as {
-    rich_text: NotionRichText[];
-  };
+  const richText = getHeadingRichText(block);
   const Tag = config.tag;
-  const id = headingId(data.rich_text, block.id);
+  const id = headingId(richText, block.id);
 
   return (
     <Tag id={id} className={config.className}>
-      <RichText richText={data.rich_text} />
+      <RichText richText={richText} />
     </Tag>
   );
 }
@@ -84,7 +75,7 @@ function HeadingBlock({ block }: { block: NotionBlockWithChildren }) {
 function CodeBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "code") return null;
   const language = block.code.language || "plain text";
-  const text = block.code.rich_text.map((t) => t.plain_text).join("");
+  const text = (block.code.rich_text ?? []).map((t) => t.plain_text).join("");
   const caption = block.code.caption;
 
   return (
@@ -111,9 +102,7 @@ function CalloutBlock({ block }: { block: NotionBlockWithChildren }) {
   const icon =
     block.callout.icon?.type === "emoji" ? block.callout.icon.emoji : "💡";
   const color = block.callout.color;
-  const bgClass = color.endsWith("_background")
-    ? `notion-bg-${color.replace("_background", "")}`
-    : "";
+  const bgClass = notionColorClass(color) ?? "";
 
   return (
     <div
@@ -170,14 +159,27 @@ function TodoBlock({ block }: { block: NotionBlockWithChildren }) {
   );
 }
 
+function deriveImageAlt(src: string, caption?: NotionRichText[]): string {
+  const captionText = caption?.map((t) => t.plain_text).join("") || "";
+  if (captionText) return captionText;
+  try {
+    const filename = decodeURIComponent(src.split("/").pop()?.split("?")[0] || "").replace(/[-_]/g, " ");
+    const isUuidLike = /^[0-9a-f]{8}[ ][0-9a-f]{4}[ ]/i.test(filename);
+    return isUuidLike ? "" : filename;
+  } catch {
+    return "";
+  }
+}
+
 function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "image") return null;
   const src =
     block.image.type === "file"
-      ? block.image.file.url
-      : block.image.external.url;
+      ? block.image.file?.url
+      : block.image.external?.url;
+  if (!src) return null;
   const caption = block.image.caption;
-  const alt = smartAlt(caption, src);
+  const alt = deriveImageAlt(src, caption);
 
   return (
     <figure className="my-6">
@@ -203,8 +205,9 @@ function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "video") return null;
   const url =
     block.video.type === "file"
-      ? block.video.file.url
-      : block.video.external.url;
+      ? block.video.file?.url
+      : block.video.external?.url;
+  if (!url) return null;
 
   // YouTube embed detection
   const ytMatch = url.match(
@@ -218,7 +221,7 @@ function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
           className="w-full h-full"
           allowFullScreen
           loading="lazy"
-          title="YouTube video"
+          title={copy.aria.youtubeVideo}
         />
       </div>
     );
@@ -265,7 +268,7 @@ function EmbedBlock({ block }: { block: NotionBlockWithChildren }) {
         className="w-full h-full"
         allowFullScreen
         loading="lazy"
-        title="Embedded content"
+        title={copy.aria.embeddedContent}
       />
     </div>
   );
@@ -283,7 +286,7 @@ function TableBlock({ block }: { block: NotionBlockWithChildren }) {
         <tbody>
           {rows.map((row, rowIdx) => {
             if (row.type !== "table_row") return null;
-            const cells = row.table_row.cells;
+            const cells = row.table_row?.cells ?? [];
             const isHeaderRow = hasColumnHeader && rowIdx === 0;
 
             return (
@@ -410,8 +413,8 @@ export function NotionBlockRenderer({
           group.listType === "bulleted_list_item" ? "ul" : "ol";
         const listClass =
           group.listType === "bulleted_list_item"
-            ? "list-disc pl-6 my-2 space-y-1"
-            : "list-decimal pl-6 my-2 space-y-1";
+            ? "list-disc pl-6 my-4 space-y-2"
+            : "list-decimal pl-6 my-4 space-y-2";
 
         return (
           <Tag key={`list-${idx}`} className={listClass}>

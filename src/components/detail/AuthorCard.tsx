@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Github, Twitter, Linkedin, Globe, Mail } from "lucide-react";
-import type { TAuthor } from "@/types";
+import { Github, Twitter, Linkedin, Globe, Mail, User } from "lucide-react";
+import { copy } from "@/config/copy";
+import type { Author } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 const socialOrder = ["email", "github", "x", "linkedin", "website"] as const;
@@ -18,10 +19,10 @@ export function AuthorCard({
   author,
   authorName,
 }: {
-  author: TAuthor | null;
+  author: Author | null;
   authorName: string;
 }) {
-  const displayName = author?.name || authorName || "Author";
+  const displayName = author?.name || authorName || copy.authorFallback;
   const bio = author?.bio || "";
   const role = author?.role || "";
   const avatar = author?.avatar || "";
@@ -43,9 +44,7 @@ export function AuthorCard({
             className="object-cover w-full h-full"
           />
         ) : (
-          <span className="material-symbols-outlined text-[40px] text-muted-foreground">
-            person
-          </span>
+          <User size={40} className="text-muted-foreground" />
         )}
       </div>
       <div className="flex-1">
@@ -65,7 +64,7 @@ export function AuthorCard({
             href={`/author/${encodeURIComponent(displayName)}`}
             className="text-sm font-semibold text-primary hover:underline"
           >
-            View all posts &rarr;
+            {copy.author.viewAllPosts} &rarr;
           </Link>
           {activeSocials.length > 0 && (
             <span className="w-px h-4 bg-border" />

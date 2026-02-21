@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
+import { copy } from "@/config/copy";
 import { formatDate } from "@/lib/format";
-import type { TPost } from "@/types";
+import type { Post } from "@/types";
 
-export function PostCard({ post }: { post: TPost }) {
+export function PostCard({ post }: { post: Post }) {
   return (
     <Link href={`/${post.slug}`}>
       <article className="group relative flex flex-col md:flex-row gap-6 md:gap-10 items-start p-4 -mx-4 rounded-2xl hover:bg-muted/50 transition-colors duration-300 cursor-pointer overflow-hidden">
@@ -14,7 +16,7 @@ export function PostCard({ post }: { post: TPost }) {
             <span className="text-muted-foreground/50">&bull;</span>
             <span className="text-muted-foreground">{formatDate(post.date)}</span>
           </div>
-          <h3 className="text-xl md:text-3xl font-bold mb-3 group-hover:text-primary transition-colors leading-tight break-words">
+          <h3 className="text-xl md:text-3xl font-semibold mb-3 group-hover:text-primary transition-colors leading-snug break-words">
             {post.title}
           </h3>
           {post.summary && (
@@ -22,11 +24,9 @@ export function PostCard({ post }: { post: TPost }) {
               {post.summary}
             </p>
           )}
-          <div className="flex items-center text-primary font-bold text-sm">
-            <span>Read article</span>
-            <span className="material-symbols-outlined text-[18px] ml-1 transition-transform group-hover:translate-x-1">
-              arrow_forward
-            </span>
+          <div className="flex items-center text-primary font-semibold text-sm">
+            <span>{copy.readArticle}</span>
+            <ArrowRight size={18} className="ml-1 transition-transform group-hover:translate-x-1" />
           </div>
         </div>
         <PostThumbnail

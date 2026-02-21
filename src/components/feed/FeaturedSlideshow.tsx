@@ -3,14 +3,18 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
-import type { TPost } from "@/types";
+import { brand } from "@/config/brand";
+import { copy } from "@/config/copy";
+import type { Post } from "@/types";
 
-const INTERVAL_MS = 5000;
+const INTERVAL_MS = brand.slideshow.intervalMs;
+const SWIPE_THRESHOLD_PX = 50;
 
 type Direction = "next" | "prev";
 
-export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
+export function FeaturedSlideshow({ posts }: { posts: Post[] }) {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");
   const [isAnimating, setIsAnimating] = useState(false);
@@ -59,8 +63,8 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
         const dx = e.changedTouches[0].clientX - touchRef.current.x;
         const dy = e.changedTouches[0].clientY - touchRef.current.y;
         touchRef.current = null;
-        if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
-          dx < 0 ? next() : prev();
+        if (Math.abs(dx) >= SWIPE_THRESHOLD_PX && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) { next(); } else { prev(); }
         }
       }
       setPaused(false);
@@ -68,7 +72,23 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
     [next, prev]
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prev();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        next();
+      }
+    },
+    [prev, next]
+  );
+
   if (total === 0) return null;
+
+  const arrowClassName =
+    "absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300";
 
   const slideClass = (i: number) => {
     if (i === current) {
@@ -87,7 +107,12 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
       onMouseLeave={() => setPaused(false)}
     >
       <div
-        className="group relative w-full aspect-[2/1] md:aspect-[5/2] rounded-2xl overflow-hidden bg-muted"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={copy.aria.featuredPosts}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        className="group relative w-full aspect-[2/1] md:aspect-[5/2] rounded-2xl overflow-hidden bg-muted outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -97,6 +122,7 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
             key={p.id}
             href={`/${p.slug}`}
             aria-hidden={i !== current}
+            tabIndex={i !== current ? -1 : undefined}
             className={`absolute inset-0 transition-all duration-500 ease-in-out ${slideClass(i)}`}
             onTransitionEnd={() => setIsAnimating(false)}
           >
@@ -106,6 +132,7 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
                 src={p.thumbnail}
                 alt={p.title}
                 fill
+                sizes="(max-width: 1024px) 100vw, 1024px"
                 className="object-cover"
                 priority={i === 0}
               />
@@ -121,7 +148,7 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
               <div className="flex items-center gap-3 mb-3">
                 {p.category && <CategoryBadge category={p.category} />}
               </div>
-              <h2 className="text-xl md:text-4xl font-bold mb-2 leading-tight drop-shadow-lg line-clamp-2">
+              <h2 className="text-xl md:text-4xl font-semibold mb-2 leading-snug drop-shadow-lg line-clamp-2">
                 {p.title}
               </h2>
               {p.summary && (
@@ -138,29 +165,19 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
           <>
             <button
               type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                prev();
-              }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
-              aria-label="Previous slide"
+              onClick={(e) => { e.preventDefault(); prev(); }}
+              className={`${arrowClassName} left-3`}
+              aria-label={copy.aria.previousSlide}
             >
-              <span className="material-symbols-outlined text-[20px]">
-                chevron_left
-              </span>
+              <ChevronLeft size={20} />
             </button>
             <button
               type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                next();
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
-              aria-label="Next slide"
+              onClick={(e) => { e.preventDefault(); next(); }}
+              className={`${arrowClassName} right-3`}
+              aria-label={copy.aria.nextSlide}
             >
-              <span className="material-symbols-outlined text-[20px]">
-                chevron_right
-              </span>
+              <ChevronRight size={20} />
             </button>
           </>
         )}
@@ -181,7 +198,7 @@ export function FeaturedSlideshow({ posts }: { posts: TPost[] }) {
                     ? "w-8 bg-white"
                     : "w-4 bg-white/40 hover:bg-white/60"
                 }`}
-                aria-label={`Go to slide ${i + 1}`}
+                aria-label={copy.aria.goToSlide(i + 1)}
               />
             ))}
           </div>

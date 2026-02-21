@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-display);
+  --font-sans: var(--brand-font-sans);
   --font-mono: var(--font-mono-code);
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -31,7 +31,7 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Custom shadows for toss-style cards */
+  /* Custom shadows for toss-style cards (light mode) */
   --shadow-toss: 0 4px 20px rgba(0, 0, 0, 0.05);
   --shadow-toss-hover: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
@@ -47,12 +47,19 @@
   }
   html {
     overflow-y: scroll;
+    scroll-padding-top: 5rem;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased break-keep;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-wrap: break-word;
   }
+}
+
+/* Dark mode shadow overrides */
+.dark {
+  --shadow-toss: 0 4px 20px rgba(0, 0, 0, 0.25);
+  --shadow-toss-hover: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 /* Hide scrollbar utility */

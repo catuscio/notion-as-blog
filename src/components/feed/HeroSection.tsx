@@ -9,7 +9,7 @@ export function HeroSection() {
   return (
     <section className="max-w-[1024px] mx-auto px-6 mb-24 md:mb-32">
       <div className="max-w-3xl">
-        <h1 className="text-4xl md:text-7xl font-black tracking-tight mb-6 leading-[1.1] break-words">
+        <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.15] break-words">
           {before}
           {highlight && (
             <>
@@ -33,7 +33,7 @@ export function HeroSection() {
           )}
           {after}
         </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
+        <p className="text-xl md:text-2xl text-muted-foreground font-normal leading-relaxed max-w-2xl">
           {brand.description}
         </p>
       </div>
