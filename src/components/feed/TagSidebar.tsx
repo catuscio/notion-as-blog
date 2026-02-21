@@ -6,6 +6,7 @@ import type { TagItem } from "@/types";
 
 interface TagSidebarProps {
   tags: TagItem[];
+  totalCount: number;
   activeTag: string | null;
   onTagClick: (tag: string | null) => void;
 }
@@ -47,7 +48,7 @@ export function MobileTagBar({ tags, activeTag, onTagClick }: TagSidebarProps) {
 }
 
 /** Desktop: vertical sidebar */
-export function TagSidebar({ tags, activeTag, onTagClick }: TagSidebarProps) {
+export function TagSidebar({ tags, totalCount, activeTag, onTagClick }: TagSidebarProps) {
   return (
     <aside className="hidden lg:block w-56 shrink-0">
       <div className="sticky top-28">
@@ -68,7 +69,7 @@ export function TagSidebar({ tags, activeTag, onTagClick }: TagSidebarProps) {
               variant={activeTag === null ? "default" : "secondary"}
               className="text-[11px] px-1.5 py-0 min-w-[22px] justify-center"
             >
-              {tags.reduce((sum, t) => sum + t.count, 0)}
+              {totalCount}
             </Badge>
           </button>
 

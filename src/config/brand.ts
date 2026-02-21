@@ -126,8 +126,10 @@ export const brand = {
   //   e.g. /public/logo.svg → "/logo.svg"
   // ═══════════════════════════════════════════════════════════════
   logo: {
-    /** Logo displayed in the header (SVG recommended) */
-    image: "/logo.svg",
+    /** Logo displayed in the header and footer. Set to "" to hide. */
+    image: "",
+    /** When true, only the logo is shown (blog name is hidden). Ignored if image is empty. */
+    showNameWithLogo: true,
     /** PNG logo used in JSON-LD, RSS feed, etc. */
     png: "/logo.png",
     /** White/inverted logo used as an overlay in OG image generation */
@@ -383,6 +385,19 @@ export const brand = {
      * Typical values: 200–250 for English, 500–600 for CJK languages.
      */
     wordsPerMinute: 200,
+  },
+
+  /**
+   * Post Detail Animation
+   *
+   * When enabled, post pages play a two-phase entry animation:
+   *   1. Title typewriter effect
+   *   2. Body & sidebar slide-up reveal after typing completes
+   *
+   * SSR content is always fully rendered — animation is client-side only.
+   */
+  postAnimation: {
+    enabled: true,
   },
 
   // ═══════════════════════════════════════════════════════════════

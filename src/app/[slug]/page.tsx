@@ -3,7 +3,9 @@ import { getPostDetailData, getPageBySlug, estimateReadingTime } from "@/lib/not
 import { getPublishedPosts, getPublishedPages } from "@/lib/notion/getPosts";
 import { getAuthorByPeopleIds, getAuthorByName } from "@/lib/notion/getAuthors";
 import { safeQuery } from "@/lib/notion/safeQuery";
-import { PostHeader } from "@/components/detail/PostHeader";
+import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
+import { TypewriterTitle } from "@/components/detail/TypewriterTitle";
+import { AnimatedReveal } from "@/components/detail/AnimatedReveal";
 import { HeroImage } from "@/components/detail/HeroImage";
 import { NotionRenderer } from "@/components/detail/NotionRenderer";
 import { AuthorCard } from "@/components/detail/AuthorCard";
@@ -118,6 +120,57 @@ export default async function PostPage({ params }: Props) {
   if (!data) notFound();
 
   const { post, blocks, relatedPosts, seriesPosts, readingTime, wordCount, author } = data;
+  const animate = brand.postAnimation.enabled;
+  const typingDuration = animate ? post.title.length * 40 + 200 : 0;
+
+  const bodyContent = (
+    <>
+      {post.thumbnail && (
+        <HeroImage src={post.thumbnail} alt={post.title} />
+      )}
+
+      <NotionRenderer blocks={blocks} />
+      <PostTags tags={post.tags} />
+
+      {seriesPosts.length > 0 && (
+        <SeriesCollection
+          posts={seriesPosts}
+          currentPostId={post.id}
+          seriesName={post.series ?? ""}
+        />
+      )}
+
+      <AuthorCard author={author} authorName={post.author} />
+
+      {/* Mobile: sidebar content inline */}
+      <div className="lg:hidden flex flex-col gap-8 mt-12 pt-12 border-t border-border">
+        {seriesPosts.length > 0 && (
+          <SeriesNav
+            posts={seriesPosts}
+            currentPostId={post.id}
+            seriesName={post.series ?? ""}
+          />
+        )}
+        <ReadNext posts={relatedPosts} />
+      </div>
+
+      <CommentBox />
+    </>
+  );
+
+  const sidebarContent = (
+    <>
+      <TableOfContents />
+      {seriesPosts.length > 0 && (
+        <SeriesNav
+          posts={seriesPosts}
+          currentPostId={post.id}
+          seriesName={post.series ?? ""}
+        />
+      )}
+      <ReadNext posts={relatedPosts} />
+    </>
+  );
 
   return (
     <div className="w-full max-w-[1024px] mx-auto flex flex-col lg:flex-row gap-12 px-6 py-8">
@@ -125,52 +178,29 @@ export default async function PostPage({ params }: Props) {
 
       <article className="w-full flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
         <PostBreadcrumb post={post} />
-        <PostHeader post={post} author={author} readingTime={readingTime} />
+        <PostHeader
+          post={post}
+          author={author}
+          readingTime={readingTime}
+          titleSlot={animate ? <TypewriterTitle text={post.title} /> : undefined}
+          metaSlot={animate ? <AnimatedReveal delay={typingDuration}><PostHeaderMeta post={post} author={author} readingTime={readingTime} /></AnimatedReveal> : undefined}
+        />
 
-        {post.thumbnail && (
-          <HeroImage src={post.thumbnail} alt={post.title} />
+        {animate ? (
+          <AnimatedReveal delay={typingDuration}>{bodyContent}</AnimatedReveal>
+        ) : (
+          bodyContent
         )}
-
-        <NotionRenderer blocks={blocks} />
-        <PostTags tags={post.tags} />
-
-        {seriesPosts.length > 0 && (
-          <SeriesCollection
-            posts={seriesPosts}
-            currentPostId={post.id}
-            seriesName={post.series ?? ""}
-          />
-        )}
-
-        <AuthorCard author={author} authorName={post.author} />
-
-        {/* Mobile: sidebar content inline */}
-        <div className="lg:hidden flex flex-col gap-8 mt-12 pt-12 border-t border-border">
-          {seriesPosts.length > 0 && (
-            <SeriesNav
-              posts={seriesPosts}
-              currentPostId={post.id}
-              seriesName={post.series ?? ""}
-            />
-          )}
-          <ReadNext posts={relatedPosts} />
-        </div>
-
-        <CommentBox />
       </article>
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-72 shrink-0">
         <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-8">
-          <TableOfContents />
-          {seriesPosts.length > 0 && (
-            <SeriesNav
-              posts={seriesPosts}
-              currentPostId={post.id}
-              seriesName={post.series ?? ""}
-            />
+          {animate ? (
+            <AnimatedReveal delay={typingDuration}>{sidebarContent}</AnimatedReveal>
+          ) : (
+            sidebarContent
           )}
-          <ReadNext posts={relatedPosts} />
         </div>
       </aside>
     </div>

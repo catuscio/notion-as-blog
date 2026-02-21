@@ -7,7 +7,6 @@ import {
   getDateValue,
   getPeopleNames,
   getPeopleIds,
-  getImageFileUrl,
   getProp,
 } from "./propertyHelpers";
 
@@ -38,14 +37,16 @@ export function getPageProperties(
   const date = getDateValue(get("date"));
   const tags = getMultiSelectValues(get("tags"));
   const category = getSelectValue(get("category")) || null;
-  const series = getRichTextPlain(get("series")) || null;
+  const series = getSelectValue(get("series")) || null;
 
   const authorProp = get("author");
   const author = getPeopleNames(authorProp) || getRichTextPlain(authorProp);
   const authorIds = getPeopleIds(authorProp);
 
   const summary = getRichTextPlain(get("summary"));
-  const thumbnail = getImageFileUrl(get("thumbnail"));
+  const thumbnail =
+    page.cover?.type === "file" ? page.cover.file.url :
+    page.cover?.type === "external" ? page.cover.external.url : "";
 
   const pinnedProp = get("pinned");
   const pinned =

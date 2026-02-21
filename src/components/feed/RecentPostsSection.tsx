@@ -42,6 +42,7 @@ export function RecentPostsSection({
 
       <MobileTagBar
         tags={tags}
+        totalCount={posts.length}
         activeTag={activeTag}
         onTagClick={setActiveTag}
       />
@@ -57,6 +58,7 @@ export function RecentPostsSection({
         </div>
         <TagSidebar
           tags={tags}
+          totalCount={posts.length}
           activeTag={activeTag}
           onTagClick={setActiveTag}
         />

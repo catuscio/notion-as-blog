@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Code } from "lucide-react";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
+import { BrandLogo } from "@/components/common/BrandLogo";
 import { socialIconMap } from "./SocialIcons";
 
 export function Footer() {
@@ -10,10 +10,10 @@ export function Footer() {
       <div className="max-w-[1024px] mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-foreground text-background flex items-center justify-center">
-              <Code size={16} strokeWidth={2.5} />
-            </div>
-            <span className="text-lg font-bold">{brand.name}</span>
+            {brand.logo.image && <BrandLogo size={24} />}
+            <span className={`text-lg font-bold ${brand.logo.image && brand.logo.showNameWithLogo === false ? "sr-only" : ""}`}>
+              {brand.name}
+            </span>
           </div>
           <div className="flex gap-8 text-sm font-medium text-muted-foreground">
             <Link href="/" className="hover:text-primary transition-colors">
