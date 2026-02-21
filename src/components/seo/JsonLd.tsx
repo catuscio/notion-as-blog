@@ -13,6 +13,16 @@ function JsonLdScript({ data }: JsonLdProps) {
   );
 }
 
+const publisher = {
+  "@type": "Organization" as const,
+  name: brand.name,
+  url: brand.url,
+  logo: {
+    "@type": "ImageObject" as const,
+    url: `${brand.url}${brand.logo.png}`,
+  },
+};
+
 export function WebSiteJsonLd() {
   return (
     <JsonLdScript
@@ -23,6 +33,15 @@ export function WebSiteJsonLd() {
         url: brand.url,
         description: brand.description,
         inLanguage: brand.lang,
+        ...(brand.organization.name
+          ? {
+              publisher: {
+                "@type": "Organization",
+                name: brand.organization.name,
+                ...(brand.organization.url ? { url: brand.organization.url } : {}),
+              },
+            }
+          : {}),
         potentialAction: {
           "@type": "SearchAction",
           target: {
@@ -38,17 +57,43 @@ export function WebSiteJsonLd() {
 
 export function OrganizationJsonLd() {
   const org = brand.organization;
-  if (!org.name) return null;
+
+  // Skip rendering when required fields are not configured
+  if (!org.name && !org.url) return null;
+
+  const sameAs = Object.values(brand.social).filter(Boolean);
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: org.name,
-    url: org.url || brand.url,
+    logo: `${brand.url}${brand.logo.png}`,
   };
+
+  if (org.alternateName) data.alternateName = org.alternateName;
+  if (org.url) data.url = org.url;
   if (org.description) data.description = org.description;
-  if (org.logo) data.logo = org.logo;
-  if (org.sameAs.length > 0) data.sameAs = [...org.sameAs];
+  if (org.foundingDate) data.foundingDate = org.foundingDate;
+  if (sameAs.length > 0) data.sameAs = sameAs;
+
+  const addr = org.address;
+  if (addr.streetAddress || addr.addressLocality || addr.addressCountry) {
+    const address: Record<string, unknown> = { "@type": "PostalAddress" };
+    if (addr.streetAddress) address.streetAddress = addr.streetAddress;
+    if (addr.addressLocality) address.addressLocality = addr.addressLocality;
+    if (addr.addressRegion) address.addressRegion = addr.addressRegion;
+    if (addr.addressCountry) address.addressCountry = addr.addressCountry;
+    data.address = address;
+  }
+
+  const cp = org.contactPoint;
+  if (cp.telephone || cp.contactType) {
+    const contact: Record<string, unknown> = { "@type": "ContactPoint" };
+    if (cp.telephone) contact.telephone = cp.telephone;
+    if (cp.contactType) contact.contactType = cp.contactType;
+    if (cp.availableLanguage.length > 0) contact.availableLanguage = [...cp.availableLanguage];
+    data.contactPoint = contact;
+  }
 
   return <JsonLdScript data={data} />;
 }
@@ -66,7 +111,10 @@ type ArticleJsonLdProps = {
   image?: string;
   tags?: string[];
   wordCount?: number;
-  timeRequired?: string;
+  readingTimeMinutes?: number;
+  seriesName?: string;
+  seriesUrl?: string;
+  positionInSeries?: number;
 };
 
 export function ArticleJsonLd({
@@ -82,7 +130,10 @@ export function ArticleJsonLd({
   image,
   tags,
   wordCount,
-  timeRequired,
+  readingTimeMinutes,
+  seriesName,
+  seriesUrl,
+  positionInSeries,
 }: ArticleJsonLdProps) {
   const author: Record<string, unknown> = {
     "@type": "Person",
@@ -96,22 +147,26 @@ export function ArticleJsonLd({
     <JsonLdScript
       data={{
         "@context": "https://schema.org",
-        "@type": "Article",
+        "@type": "BlogPosting",
         headline: title,
         description,
         url,
         datePublished,
         dateModified,
         author,
-        publisher: {
-          "@type": "Organization",
-          name: brand.name,
-          url: brand.url,
-        },
+        publisher,
         ...(image && { image }),
         ...(tags && tags.length > 0 && { keywords: tags.join(", ") }),
         ...(wordCount && { wordCount }),
-        ...(timeRequired && { timeRequired }),
+        ...(readingTimeMinutes && { timeRequired: `PT${readingTimeMinutes}M` }),
+        ...(seriesName && seriesUrl && {
+          isPartOf: {
+            "@type": "CreativeWorkSeries",
+            name: seriesName,
+            url: seriesUrl,
+          },
+        }),
+        ...(positionInSeries != null && { position: positionInSeries }),
         mainEntityOfPage: {
           "@type": "WebPage",
           "@id": url,
@@ -147,26 +202,25 @@ export function BreadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
   );
 }
 
-type BlogJsonLdProps = {
+export function BlogJsonLd({
+  url,
+  name,
+  description,
+}: {
+  url: string;
   name: string;
   description: string;
-  url: string;
-};
-
-export function BlogJsonLd({ name, description, url }: BlogJsonLdProps) {
+}) {
   return (
     <JsonLdScript
       data={{
         "@context": "https://schema.org",
         "@type": "Blog",
         name,
-        description,
         url,
-        publisher: {
-          "@type": "Organization",
-          name: brand.name,
-          url: brand.url,
-        },
+        description,
+        inLanguage: brand.lang,
+        publisher,
       }}
     />
   );
@@ -178,6 +232,7 @@ type PersonJsonLdProps = {
   image?: string;
   jobTitle?: string;
   description?: string;
+  sameAs?: string[];
 };
 
 export function PersonJsonLd({
@@ -186,6 +241,7 @@ export function PersonJsonLd({
   image,
   jobTitle,
   description,
+  sameAs,
 }: PersonJsonLdProps) {
   return (
     <JsonLdScript
@@ -197,6 +253,44 @@ export function PersonJsonLd({
         ...(image && { image }),
         ...(jobTitle && { jobTitle }),
         ...(description && { description }),
+        ...(sameAs && sameAs.length > 0 && { sameAs }),
+        worksFor: {
+          "@type": "Organization",
+          name: brand.name,
+          url: brand.organization.url,
+        },
+      }}
+    />
+  );
+}
+
+export function SeriesJsonLd({
+  name,
+  url,
+  description,
+  posts,
+}: {
+  name: string;
+  url: string;
+  description: string;
+  posts: { title: string; slug: string }[];
+}) {
+  return (
+    <JsonLdScript
+      data={{
+        "@context": "https://schema.org",
+        "@type": "CreativeWorkSeries",
+        name,
+        url,
+        description,
+        inLanguage: brand.lang,
+        publisher,
+        hasPart: posts.map((post, index) => ({
+          "@type": "BlogPosting",
+          headline: post.title,
+          url: `${brand.url}/${post.slug}`,
+          position: index + 1,
+        })),
       }}
     />
   );

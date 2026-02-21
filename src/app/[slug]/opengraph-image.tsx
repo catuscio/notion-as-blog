@@ -1,14 +1,54 @@
 import { ImageResponse } from "next/og";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { brand } from "@/config/brand";
 import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { safeQuery } from "@/lib/notion/safeQuery";
+
+let logoSrc: string | null = null;
+try {
+  const logoPng = readFileSync(
+    join(process.cwd(), "public", brand.logo.ogWhite.replace(/^\//, "")),
+  );
+  logoSrc = `data:image/png;base64,${logoPng.toString("base64")}`;
+} catch {
+  // logo-white.png not found — skip logo overlay
+}
+
+let fallbackPng: Buffer | null = null;
+try {
+  fallbackPng = readFileSync(
+    join(process.cwd(), "public", brand.assets.ogImage.replace(/^\//, "")),
+  );
+} catch {
+  // fallback OG image not found — will generate dynamically
+}
 
 export const revalidate = 1800;
-export const alt = "Post thumbnail";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const primary = `hsl(${brand.colors.light.primary})`;
 const primaryDark = `hsl(${brand.colors.dark.primary})`;
+
+const fontPromise = fetch(brand.fonts.og.url).then((res) => res.arrayBuffer());
+
+export async function generateStaticParams() {
+  const posts = await safeQuery(getPublishedPosts, []);
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
+async function fetchThumbnail(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(brand.assets.ogFetchTimeoutMs) });
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    const contentType = res.headers.get("content-type") ?? "image/jpeg";
+    return `data:${contentType};base64,${buf.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
 
 export default async function OgImage({
   params,
@@ -21,6 +61,12 @@ export default async function OgImage({
   const post = posts.find((p) => p.slug === slug);
 
   if (!post) {
+    if (fallbackPng) {
+      return new Response(new Uint8Array(fallbackPng), {
+        headers: { "Content-Type": "image/png" },
+      });
+    }
+    // No fallback image — generate a branded OG dynamically
     return new ImageResponse(
       (
         <div
@@ -28,19 +74,36 @@ export default async function OgImage({
             width: 1200,
             height: 630,
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            background: primary,
+            background: `linear-gradient(135deg, ${primary} 0%, ${primaryDark} 100%)`,
             color: "white",
-            fontSize: 48,
           }}
         >
-          Not Found
+          <div style={{ fontSize: 64, fontWeight: 700 }}>{brand.name}</div>
+          <div style={{ fontSize: 28, opacity: 0.8, marginTop: 16 }}>{brand.title}</div>
         </div>
       ),
-      { ...size }
+      {
+        ...size,
+        fonts: [
+          {
+            name: brand.fonts.og.family,
+            data: await fontPromise,
+            style: "normal",
+            weight: 700,
+          },
+        ],
+      },
     );
   }
+
+  const thumbnailSrc = post.thumbnail
+    ? await fetchThumbnail(post.thumbnail)
+    : null;
+
+  // If thumbnailSrc is null, generate a dynamic OG image with a gradient background
 
   const formattedDate = new Date(post.date).toLocaleDateString(brand.lang, {
     year: "numeric",
@@ -62,9 +125,10 @@ export default async function OgImage({
         }}
       >
         {/* Background: thumbnail or brand gradient */}
-        {post.thumbnail ? (
+        {thumbnailSrc ? (
           <img
-            src={post.thumbnail}
+            alt=""
+            src={thumbnailSrc}
             width={1200}
             height={630}
             style={{
@@ -86,7 +150,7 @@ export default async function OgImage({
             left: 0,
             width: 1200,
             height: 630,
-            background: post.thumbnail
+            background: thumbnailSrc
               ? "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%)"
               : `linear-gradient(135deg, ${primary} 0%, ${primaryDark} 100%)`,
           }}
@@ -131,6 +195,7 @@ export default async function OgImage({
               lineHeight: 1.3,
               marginBottom: 24,
               maxWidth: 1000,
+              wordBreak: "keep-all",
             }}
           >
             {post.title.length > 60
@@ -150,11 +215,29 @@ export default async function OgImage({
             }}
           >
             <span>{formattedDate}</span>
-            <span style={{ fontWeight: 700 }}>{brand.name}</span>
+            {logoSrc ? (
+              <img
+                alt={brand.name}
+                src={logoSrc}
+                style={{ height: 30, objectFit: "contain", opacity: 0.9 }}
+              />
+            ) : (
+              <span style={{ fontWeight: 700 }}>{brand.name}</span>
+            )}
           </div>
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        {
+          name: brand.fonts.og.family,
+          data: await fontPromise,
+          style: "normal" as const,
+          weight: 700 as const,
+        },
+      ],
+    },
   );
 }
