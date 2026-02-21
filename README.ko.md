@@ -40,9 +40,13 @@ Notion에서 글을 쓰면 블로그에 자동으로 반영됩니다.
 - **시리즈** — 연관된 포스트를 시리즈로 묶어 이전/다음 네비게이션 제공
 - **전문 검색** — 즉각적인 결과를 제공하는 내장 검색 API
 - **다크 모드** — `next-themes` 기반 시스템 연동 테마 전환
-- **SEO 최적화** — Open Graph, 사이트맵, robots.txt, RSS 피드
+- **SEO 최적화** — Open Graph, 동적 OG 이미지 생성, 사이트맵, robots.txt, RSS 피드, Organization JSON-LD
 - **Giscus 댓글** — GitHub Discussions 기반 댓글 시스템
 - **반응형 디자인** — Tailwind CSS 기반 모바일 퍼스트 레이아웃
+- **커스텀 브랜딩** — 로고, 파비콘, 푸터 링크 커스터마이징
+- **포스트 애니메이션** — 상세 페이지 타이프라이터 제목 효과 및 슬라이드업 전환
+- **뉴스레터 CTA** — 홈 피드 하단 구독 섹션 (선택사항)
+- **공유 버튼** — Web Share API 기반 네이티브 공유 (클립보드 폴백)
 - **Docker 지원** — 멀티 스테이지 빌드 프로덕션 Dockerfile 포함
 - **온디맨드 갱신** — 웹훅으로 콘텐츠를 즉시 새로고침
 
@@ -185,23 +189,54 @@ title: "A Developer Blog",
 highlight: "Developer",    // 타이틀에서 강조할 단어
 description: "Your blog description.",
 url: "https://your-domain.com",
+since: 2025,               // 푸터 저작권 시작 연도
 lang: "ko",
+```
+
+### 로고 & 파비콘
+
+```ts
+logo: {
+  image: "",               // 로고 이미지 경로 (/public 기준). "" = 텍스트만 표시
+  showNameWithLogo: true,  // 로고 옆에 블로그 이름 표시
+  png: "/logo.png",        // JSON-LD, RSS 피드에 사용
+  ogWhite: "/logo-white.png", // OG 이미지에 오버레이되는 흰색 로고
+  favicon: "",             // 커스텀 파비콘 경로. "" = 자동 생성 글자 아이콘
+},
 ```
 
 ### 색상
 
-`colors` 객체에서 HSL 값으로 색상 테마를 변경할 수 있습니다. 라이트 모드와 다크 모드 색상 모두 설정 가능합니다.
+`colors` 객체에서 HSL 값으로 색상 테마를 변경할 수 있습니다. 라이트 모드와 다크 모드 색상 모두 설정 가능합니다. 각 테마는 5가지 기본 값으로 구성됩니다:
+
+- **brand** — 강조 색상 (버튼, 링크, 포커스 링)
+- **bg** — 페이지 배경
+- **text** — 본문 텍스트
+- **surface** — 카드 및 음소거 영역 배경
+- **edge** — 테두리 및 입력 필드 외곽선
 
 ### 폰트
 
 ```ts
 fonts: {
-  display: { family: "Inter", weights: [400, 500, 600, 700] },
-  mono: { family: "JetBrains Mono", weights: [400, 500] },
+  sans: {
+    stack: 'Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+  },
+  mono: {
+    family: "JetBrains Mono",
+    cdn: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap",
+    preconnect: ["https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+  },
+  og: {
+    family: "Pretendard",
+    url: "https://cdn.jsdelivr.net/.../Pretendard-Bold.otf",
+  },
 },
 ```
 
-[Google Fonts](https://fonts.google.com/)에서 제공하는 모든 폰트를 사용할 수 있습니다.
+- **sans** — 본문 텍스트용 폰트 스택. 비라틴 언어는 웹 폰트를 앞에 추가 (예: `'Pretendard, -apple-system, ...'`)
+- **mono** — 코드 블록용 고정폭 폰트. Google Fonts CDN에서 로드
+- **og** — 동적 OG 이미지 생성에 사용하는 폰트 (`.otf` 또는 `.ttf` URL)
 
 ### 카테고리
 
@@ -209,21 +244,57 @@ fonts: {
 
 ```ts
 categories: [
-  { name: "Development", color: "orange", icon: "dns", description: "..." },
-  { name: "Design", color: "teal", icon: "palette", description: "..." },
-  { name: "Product", color: "green", icon: "work", description: "..." },
+  { name: "Development", slug: "development", color: "orange", icon: "dns", description: "..." },
+  { name: "Design", slug: "design", color: "teal", icon: "palette", description: "..." },
+  { name: "Product", slug: "product", color: "green", icon: "work", description: "..." },
 ],
 ```
 
-아이콘은 [Material Symbols](https://fonts.google.com/icons) 이름을 사용합니다.
-
 ### 소셜 링크
+
+푸터에 표시되는 소셜 미디어 아이콘 링크입니다. `""`으로 설정하면 해당 아이콘이 숨겨집니다.
 
 ```ts
 social: {
   github: "https://github.com/your-username",
+  twitter: "",
+  instagram: "",
+  facebook: "",
+  youtube: "",
   linkedin: "https://linkedin.com/in/your-profile",
-  // twitter: "https://x.com/your-handle",
+  threads: "",
+  tiktok: "",
+  naverBlog: "",
+},
+```
+
+### 푸터 링크
+
+푸터에 그룹별 커스텀 링크를 추가할 수 있습니다:
+
+```ts
+footerLinks: {
+  "Resources": [
+    { label: "Documentation", href: "/docs" },
+    { label: "GitHub", href: "https://github.com/..." },
+  ],
+  "Legal": [
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms" },
+  ],
+},
+```
+
+### SEO
+
+```ts
+keywords: ["Next.js", "blog", "frontend"],  // <meta name="keywords"> — []로 두면 태그 생략
+
+organization: {   // Google 지식 패널용 Organization JSON-LD (선택사항)
+  name: "Your Company",
+  url: "https://your-domain.com",
+  logo: "/logo.png",
+  // ... address, contactPoint, sameAs 등
 },
 ```
 
@@ -237,6 +308,57 @@ giscus: {
   repoId: "R_...",
   category: "Announcements",
   categoryId: "DIC_...",
+  mapping: "pathname",         // 포스트-디스커션 매핑 방식
+  strict: "0",                 // 엄격한 제목 매칭
+  reactionsEnabled: "1",       // 리액션 버튼 표시
+  emitMetadata: "0",           // 디스커션 메타데이터 전송
+  inputPosition: "bottom",     // 댓글 입력 위치
+},
+```
+
+### 뉴스레터 CTA
+
+`enabled`를 `true`로 설정하면 홈 피드 하단에 구독 섹션이 표시됩니다. 실제 구독 로직은 별도로 구현해야 합니다.
+
+```ts
+newsletter: {
+  enabled: false,
+  headline: "Stay ahead of the curve",
+  description: "Join developers receiving the best content...",
+  placeholder: "Enter your email address",
+  cta: "Subscribe",
+  disclaimer: "No spam, unsubscribe anytime.",
+},
+```
+
+### 포스트 애니메이션
+
+```ts
+postAnimation: {
+  enabled: true,  // 상세 페이지 타이프라이터 제목 + 슬라이드업 전환
+},
+```
+
+### 동작 설정
+
+```ts
+postsPerPage: 10,                   // 피드 페이지당 포스트 수
+slideshow: { intervalMs: 5000 },    // 고정 포스트 슬라이드쇼 자동 전환 간격 (ms)
+reading: { wordsPerMinute: 200 },   // 읽기 시간 계산 (영어 200–250, CJK 500–600)
+search: {
+  dropdownLimit: 10,                // 검색 드롭다운 최대 결과 수
+  pageLimit: 30,                    // /search 페이지 최대 결과 수
+},
+```
+
+### 캐시
+
+```ts
+cache: {
+  revalidate: 1800,       // ISR 갱신 간격 (초, 기본값: 30분)
+  feedTtl: 3600,          // RSS Cache-Control max-age (초, 기본값: 1시간)
+  imageTtl: 31536000,     // Notion 이미지 프록시 max-age (초, 기본값: 1년)
+  authorsTtlMs: 300000,   // 인메모리 저자 캐시 TTL (밀리초, 기본값: 5분)
 },
 ```
 
@@ -251,7 +373,7 @@ curl -X POST https://your-domain.com/api/revalidate \
   -H "Authorization: Bearer YOUR_TOKEN_FOR_REVALIDATE"
 ```
 
-Notion 자동화나 외부 서비스의 웹훅으로 연결할 수도 있습니다. 별도로 갱신을 트리거하지 않으면, 콘텐츠는 1시간마다 자동으로 새로고침됩니다.
+Notion 자동화나 외부 서비스의 웹훅으로 연결할 수도 있습니다. 별도로 갱신을 트리거하지 않으면, 콘텐츠는 30분마다 자동으로 새로고침됩니다.
 
 ---
 
@@ -267,11 +389,14 @@ Notion 자동화나 외부 서비스의 웹훅으로 연결할 수도 있습니�
 ### Docker
 
 ```bash
-# 빌드 및 실행
+# docker compose로 빌드 및 실행
 docker compose up -d
 
-# 또는 직접 빌드
-docker build -t notion-as-blog .
+# 또는 직접 빌드 (NOTION_API_KEY는 정적 생성을 위해 빌드 시점에 필요)
+docker build -t notion-as-blog \
+  --build-arg NOTION_API_KEY=your_key \
+  --build-arg NOTION_DATA_SOURCE_ID=your_db_id \
+  .
 docker run -p 3000:3000 \
   -e NOTION_API_KEY=your_key \
   -e NOTION_DATA_SOURCE_ID=your_db_id \

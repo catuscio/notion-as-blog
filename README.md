@@ -40,9 +40,13 @@ Write posts in Notion, and they appear on your blog automatically.
 - **Series** — Group related posts into a series with navigation
 - **Full-text search** — Built-in search API with instant results
 - **Dark mode** — System-aware theme switching via `next-themes`
-- **SEO optimized** — Open Graph, sitemap, robots.txt, and RSS feed
+- **SEO optimized** — Open Graph, dynamic OG image generation, sitemap, robots.txt, RSS feed, and Organization JSON-LD
 - **Giscus comments** — GitHub Discussions-based commenting system
 - **Responsive design** — Mobile-first layout with Tailwind CSS
+- **Custom branding** — Custom logo, favicon, and footer links
+- **Post animations** — Typewriter title effect and slide-up reveal on post detail pages
+- **Newsletter CTA** — Optional subscription section on the home feed
+- **Share button** — Native Web Share API with clipboard fallback
 - **Docker ready** — Production Dockerfile with multi-stage build
 - **On-demand revalidation** — Webhook endpoint to refresh content instantly
 
@@ -185,23 +189,54 @@ title: "A Developer Blog",
 highlight: "Developer",    // Highlighted word in the title
 description: "Your blog description.",
 url: "https://your-domain.com",
+since: 2025,               // Footer copyright start year
 lang: "en",
+```
+
+### Logo & Favicon
+
+```ts
+logo: {
+  image: "",               // Logo image path (relative to /public). "" = text-only
+  showNameWithLogo: true,  // Show blog name next to logo image
+  png: "/logo.png",        // Used in JSON-LD and RSS feed
+  ogWhite: "/logo-white.png", // White logo overlay for OG images
+  favicon: "",             // Custom favicon path. "" = auto-generated letter icon
+},
 ```
 
 ### Colors
 
-Customize the color theme using HSL values in the `colors` object. Both light and dark mode colors are configurable.
+Customize the color theme using HSL values in the `colors` object. Both light and dark mode colors are configurable. Each theme is built from 5 base values:
+
+- **brand** — Accent color (buttons, links, focus rings)
+- **bg** — Page background
+- **text** — Body text
+- **surface** — Card and muted area backgrounds
+- **edge** — Borders and input outlines
 
 ### Fonts
 
 ```ts
 fonts: {
-  display: { family: "Inter", weights: [400, 500, 600, 700] },
-  mono: { family: "JetBrains Mono", weights: [400, 500] },
+  sans: {
+    stack: 'Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+  },
+  mono: {
+    family: "JetBrains Mono",
+    cdn: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap",
+    preconnect: ["https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+  },
+  og: {
+    family: "Pretendard",
+    url: "https://cdn.jsdelivr.net/.../Pretendard-Bold.otf",
+  },
 },
 ```
 
-Any [Google Fonts](https://fonts.google.com/) family is supported.
+- **sans** — Font stack for body text. Prepend a web font for non-Latin languages (e.g. `'Pretendard, -apple-system, ...'`)
+- **mono** — Monospace font for code blocks, loaded from Google Fonts CDN
+- **og** — Font used for dynamic OG image generation (`.otf` or `.ttf` URL)
 
 ### Categories
 
@@ -209,21 +244,57 @@ Category names **must match** the Select values in your Notion Posts database:
 
 ```ts
 categories: [
-  { name: "Development", color: "orange", icon: "dns", description: "..." },
-  { name: "Design", color: "teal", icon: "palette", description: "..." },
-  { name: "Product", color: "green", icon: "work", description: "..." },
+  { name: "Development", slug: "development", color: "orange", icon: "dns", description: "..." },
+  { name: "Design", slug: "design", color: "teal", icon: "palette", description: "..." },
+  { name: "Product", slug: "product", color: "green", icon: "work", description: "..." },
 ],
 ```
 
-Icons use [Material Symbols](https://fonts.google.com/icons) names.
-
 ### Social Links
+
+Social media icon links displayed in the footer. Leave a value as `""` to hide that icon.
 
 ```ts
 social: {
   github: "https://github.com/your-username",
+  twitter: "",
+  instagram: "",
+  facebook: "",
+  youtube: "",
   linkedin: "https://linkedin.com/in/your-profile",
-  // twitter: "https://x.com/your-handle",
+  threads: "",
+  tiktok: "",
+  naverBlog: "",
+},
+```
+
+### Footer Links
+
+Group custom links in the footer:
+
+```ts
+footerLinks: {
+  "Resources": [
+    { label: "Documentation", href: "/docs" },
+    { label: "GitHub", href: "https://github.com/..." },
+  ],
+  "Legal": [
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms" },
+  ],
+},
+```
+
+### SEO
+
+```ts
+keywords: ["Next.js", "blog", "frontend"],  // <meta name="keywords"> — leave [] to omit
+
+organization: {   // Organization JSON-LD for Google Knowledge Panel (optional)
+  name: "Your Company",
+  url: "https://your-domain.com",
+  logo: "/logo.png",
+  // ... address, contactPoint, sameAs, etc.
 },
 ```
 
@@ -237,6 +308,57 @@ giscus: {
   repoId: "R_...",
   category: "Announcements",
   categoryId: "DIC_...",
+  mapping: "pathname",         // How posts map to discussions
+  strict: "0",                 // Strict title matching
+  reactionsEnabled: "1",       // Show reaction buttons
+  emitMetadata: "0",           // Emit discussion metadata
+  inputPosition: "bottom",     // Comment input position
+},
+```
+
+### Newsletter CTA
+
+Set `enabled` to `true` to show a subscription section at the bottom of the home feed. You need to implement the actual subscription logic separately.
+
+```ts
+newsletter: {
+  enabled: false,
+  headline: "Stay ahead of the curve",
+  description: "Join developers receiving the best content...",
+  placeholder: "Enter your email address",
+  cta: "Subscribe",
+  disclaimer: "No spam, unsubscribe anytime.",
+},
+```
+
+### Post Animation
+
+```ts
+postAnimation: {
+  enabled: true,  // Typewriter title + slide-up reveal on post detail pages
+},
+```
+
+### Behavior
+
+```ts
+postsPerPage: 10,                   // Posts per feed page
+slideshow: { intervalMs: 5000 },    // Pinned posts slideshow auto-advance (ms)
+reading: { wordsPerMinute: 200 },   // Reading time calculation (200–250 for English, 500–600 for CJK)
+search: {
+  dropdownLimit: 10,                // Max results in search dropdown
+  pageLimit: 30,                    // Max results on /search page
+},
+```
+
+### Cache
+
+```ts
+cache: {
+  revalidate: 1800,       // ISR interval in seconds (default: 30 min)
+  feedTtl: 3600,          // RSS Cache-Control max-age (default: 1 hour)
+  imageTtl: 31536000,     // Notion image proxy max-age (default: 1 year)
+  authorsTtlMs: 300000,   // In-memory authors cache (default: 5 min)
 },
 ```
 
@@ -251,7 +373,7 @@ curl -X POST https://your-domain.com/api/revalidate \
   -H "Authorization: Bearer YOUR_TOKEN_FOR_REVALIDATE"
 ```
 
-You can also set this up as a Notion automation or a webhook from an external service. Without triggering revalidation, content refreshes automatically every hour.
+You can also set this up as a Notion automation or a webhook from an external service. Without triggering revalidation, content refreshes automatically every 30 minutes.
 
 ---
 
@@ -267,11 +389,14 @@ You can also set this up as a Notion automation or a webhook from an external se
 ### Docker
 
 ```bash
-# Build and run
+# Build and run with docker compose
 docker compose up -d
 
-# Or build manually
-docker build -t notion-as-blog .
+# Or build manually (NOTION_API_KEY is needed at build time for static generation)
+docker build -t notion-as-blog \
+  --build-arg NOTION_API_KEY=your_key \
+  --build-arg NOTION_DATA_SOURCE_ID=your_db_id \
+  .
 docker run -p 3000:3000 \
   -e NOTION_API_KEY=your_key \
   -e NOTION_DATA_SOURCE_ID=your_db_id \
