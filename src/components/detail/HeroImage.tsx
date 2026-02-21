@@ -11,7 +11,7 @@ export function HeroImage({
 
   return (
     <figure className="mb-12 group relative overflow-hidden rounded-2xl shadow-sm">
-      <div className="aspect-[16/9] w-full bg-muted overflow-hidden">
+      <div className="aspect-[16/9] w-full bg-muted overflow-hidden relative">
         <Image
           src={src}
           alt={alt}

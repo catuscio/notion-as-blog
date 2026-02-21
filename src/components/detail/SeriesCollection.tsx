@@ -53,6 +53,7 @@ export function SeriesCollection({
                       src={post.thumbnail}
                       alt={post.title}
                       fill
+                      sizes="224px"
                       className={`object-cover transition-transform duration-700 ${
                         !isCurrent ? "group-hover:scale-110" : ""
                       }`}
