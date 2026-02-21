@@ -134,6 +134,11 @@ export const brand = {
     png: "/logo.png",
     /** White/inverted logo used as an overlay in OG image generation */
     ogWhite: "/logo-white.png",
+    /**
+     * Favicon image path (relative to /public). Set to "" to use the auto-generated letter icon.
+     * e.g. "/logo.png"
+     */
+    favicon: "",
   },
 
   assets: {
