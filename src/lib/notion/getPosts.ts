@@ -3,50 +3,58 @@ import { notionClient } from "./client";
 import { getPageProperties } from "./getPageProperties";
 import { getPublicPostsByDate } from "./filterPosts";
 import { brand } from "@/config/brand";
-import type { TPost } from "@/types";
+import type { Post } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
-async function fetchAllFromNotion(): Promise<TPost[]> {
+async function fetchAllFromNotion(): Promise<Post[]> {
   const dataSourceId = brand.notion.dataSourceId;
   if (!dataSourceId) return [];
 
-  const pages: PageObjectResponse[] = [];
-  let cursor: string | undefined = undefined;
+  try {
+    const pages: PageObjectResponse[] = [];
+    let cursor: string | undefined = undefined;
 
-  do {
-    const response = await notionClient.dataSources.query({
-      data_source_id: dataSourceId,
-      start_cursor: cursor,
-      page_size: 100,
-    });
+    do {
+      const response = await notionClient.dataSources.query({
+        data_source_id: dataSourceId,
+        start_cursor: cursor,
+        page_size: brand.notion.pageSize,
+      });
 
-    for (const page of response.results) {
-      if ("properties" in page) {
-        pages.push(page as PageObjectResponse);
+      for (const page of response?.results ?? []) {
+        if ("properties" in page) {
+          pages.push(page as PageObjectResponse);
+        }
       }
-    }
 
-    cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
-  } while (cursor);
+      cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
+    } while (cursor);
 
-  return pages.map((page) => getPageProperties(page));
+    return pages.map((page) => getPageProperties(page));
+  } catch (error) {
+    console.error("[getPosts] Failed to fetch from Notion:", error);
+    return [];
+  }
 }
 
 const getCachedPosts = unstable_cache(
   fetchAllFromNotion,
   ["all-posts"],
-  { revalidate: 1800 }
+  { revalidate: brand.cache.revalidate }
 );
 
-export async function getPublishedPosts(): Promise<TPost[]> {
+export async function getPublishedPosts(): Promise<Post[]> {
   const all = await getCachedPosts();
   return getPublicPostsByDate(all);
 }
 
-/** @deprecated Use getPublishedPosts() instead */
-export const getAllPosts = getPublishedPosts;
+/** Returns only Public posts (excludes PublicOnDetail), for feeds and sitemaps. */
+export async function getPublicPosts(): Promise<Post[]> {
+  const all = await getPublishedPosts();
+  return all.filter((p) => p.status === "Public");
+}
 
-export async function getAllPages(): Promise<TPost[]> {
+export async function getPublishedPages(): Promise<Post[]> {
   const all = await getCachedPosts();
   return all.filter(
     (item) => item.type === "Page" && (item.status === "Public" || item.status === "PublicOnDetail")

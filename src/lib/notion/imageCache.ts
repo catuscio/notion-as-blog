@@ -1,101 +1,127 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import type { NotionBlockWithChildren } from "./types";
 
-const CACHE_DIR = path.join(process.cwd(), ".cache", "notion-images");
+const CACHE_DIR = path.join(process.cwd(), ".next/cache/notion-images");
+export const NOTION_IMAGE_API_PREFIX = "/api/notion-image";
 
-function ensureCacheDir() {
-  if (!fs.existsSync(CACHE_DIR)) {
-    fs.mkdirSync(CACHE_DIR, { recursive: true });
-  }
-}
+const IMAGE_FORMATS = [
+  ["image/png", ".png"],
+  ["image/jpeg", ".jpg"],
+  ["image/gif", ".gif"],
+  ["image/webp", ".webp"],
+  ["image/svg+xml", ".svg"],
+  ["image/avif", ".avif"],
+] as const;
 
-function getCachePath(blockId: string, ext: string): string {
-  return path.join(CACHE_DIR, `${blockId}${ext}`);
-}
+const MIME_TO_EXT: Record<string, string> = Object.fromEntries(IMAGE_FORMATS);
+const EXT_TO_MIME: Record<string, string> = Object.fromEntries(
+  IMAGE_FORMATS.map(([mime, ext]) => [ext, mime])
+);
+// .jpeg is an alternate extension for image/jpeg
+EXT_TO_MIME[".jpeg"] = "image/jpeg";
 
-function getExtension(url: string): string {
+const VALID_EXTS = new Set(Object.keys(EXT_TO_MIME));
+
+function extractExtFromUrl(url: string): string {
   try {
     const pathname = new URL(url).pathname;
-    const ext = path.extname(pathname);
-    return ext || ".png";
+    const ext = path.extname(pathname).toLowerCase();
+    if (VALID_EXTS.has(ext)) return ext;
   } catch {
-    return ".png";
+    // invalid URL
   }
+  return ".png";
 }
 
-async function cacheImage(blockId: string, url: string): Promise<string> {
-  const ext = getExtension(url);
-  const cachePath = getCachePath(blockId, ext);
-
-  if (fs.existsSync(cachePath)) {
-    return `/api/notion-image/${blockId}`;
-  }
-
+async function downloadImage(
+  blockId: string,
+  url: string
+): Promise<string | null> {
   try {
-    ensureCacheDir();
+    await fs.mkdir(CACHE_DIR, { recursive: true });
+
     const response = await fetch(url);
-    if (!response.ok) return url;
+    if (!response.ok) return null;
+
+    const contentType = response.headers.get("content-type") ?? "";
+    const ext = MIME_TO_EXT[contentType] ?? extractExtFromUrl(url);
+    const filename = `${blockId}${ext}`;
+    const filepath = path.join(CACHE_DIR, filename);
 
     const buffer = Buffer.from(await response.arrayBuffer());
-    fs.writeFileSync(cachePath, buffer);
+    await fs.writeFile(filepath, buffer);
 
-    return `/api/notion-image/${blockId}`;
+    return `${NOTION_IMAGE_API_PREFIX}/${blockId}`;
   } catch {
-    return url;
+    return null;
   }
 }
 
+function getImageUrl(block: NotionBlockWithChildren): string | null {
+  if (block.type !== "image") return null;
+  return block.image.type === "file"
+    ? block.image.file.url
+    : block.image.external.url;
+}
+
+function setImageUrl(block: NotionBlockWithChildren, url: string): void {
+  if (block.type !== "image") return;
+  if (block.image.type === "file") {
+    block.image.file.url = url;
+  } else {
+    block.image.external.url = url;
+  }
+}
+
+/**
+ * Walk blocks recursively, download Notion images to local cache,
+ * and replace URLs with stable local paths.
+ * Falls back to original URL if download fails.
+ */
 export async function cacheBlockImagesInPlace(
   blocks: NotionBlockWithChildren[]
 ): Promise<void> {
-  for (const block of blocks) {
-    if (block.type === "image") {
-      const imageData = block.image;
-      const url =
-        imageData.type === "file"
-          ? imageData.file.url
-          : imageData.external.url;
+  const tasks: Promise<void>[] = [];
 
-      if (url.includes("secure.notion-static.com") || url.includes("prod-files-secure")) {
-        const cachedUrl = await cacheImage(block.id, url);
-        if (imageData.type === "file") {
-          imageData.file.url = cachedUrl;
-        } else {
-          imageData.external.url = cachedUrl;
-        }
-      }
+  for (const block of blocks) {
+    const originalUrl = getImageUrl(block);
+    if (originalUrl) {
+      tasks.push(
+        downloadImage(block.id, originalUrl).then((cachedUrl) => {
+          if (cachedUrl) setImageUrl(block, cachedUrl);
+        })
+      );
     }
 
     if (block.children) {
-      await cacheBlockImagesInPlace(block.children);
+      tasks.push(cacheBlockImagesInPlace(block.children));
     }
   }
+
+  await Promise.all(tasks);
 }
 
-export function getImageFromCache(
-  id: string
-): { buffer: Buffer; contentType: string } | null {
-  ensureCacheDir();
+/**
+ * Find a cached image file by block ID.
+ * Returns { filepath, contentType } or null if not found.
+ */
+export async function getCachedImage(
+  blockId: string
+): Promise<{ filepath: string; contentType: string } | null> {
+  try {
+    const files = await fs.readdir(CACHE_DIR);
+    const match = files.find((f) => f.startsWith(blockId));
+    if (!match) return null;
 
-  const exts = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"];
-  for (const ext of exts) {
-    const cachePath = getCachePath(id, ext);
-    if (fs.existsSync(cachePath)) {
-      const contentTypes: Record<string, string> = {
-        ".png": "image/png",
-        ".jpg": "image/jpeg",
-        ".jpeg": "image/jpeg",
-        ".gif": "image/gif",
-        ".webp": "image/webp",
-        ".svg": "image/svg+xml",
-      };
-      return {
-        buffer: fs.readFileSync(cachePath),
-        contentType: contentTypes[ext] || "application/octet-stream",
-      };
-    }
+    const filepath = path.join(CACHE_DIR, match);
+    const ext = path.extname(match).toLowerCase();
+
+    return {
+      filepath,
+      contentType: EXT_TO_MIME[ext] ?? "image/png",
+    };
+  } catch {
+    return null;
   }
-
-  return null;
 }

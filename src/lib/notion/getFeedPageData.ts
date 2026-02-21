@@ -1,19 +1,13 @@
 import { getAllTags } from "./getAllSelectItems";
-import { getAllAuthors } from "./getAuthors";
+import { getAuthorLookupMap } from "./getAuthors";
 import { safeQuery } from "./safeQuery";
-import type { TPost, AuthorSummary } from "@/types";
+import type { Post, AuthorSummary } from "@/types";
 
-export async function getFeedPageData(posts: TPost[]) {
+export async function getFeedPageData(posts: Post[]) {
   const tags = getAllTags(posts).map((t) => t.name);
-
-  const authors = await safeQuery(() => getAllAuthors(), []);
-  const authorsMap: Record<string, AuthorSummary> = {};
-  for (const a of authors) {
-    authorsMap[a.name] = { avatar: a.avatar, name: a.name };
-    for (const pid of a.peopleIds) {
-      authorsMap[pid] = { avatar: a.avatar, name: a.name };
-    }
-  }
-
+  const authorsMap = await safeQuery<Record<string, AuthorSummary>>(
+    getAuthorLookupMap,
+    {}
+  );
   return { tags, authorsMap };
 }

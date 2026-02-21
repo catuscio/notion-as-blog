@@ -1,27 +1,21 @@
+/**
+ * Simple concurrency limiter.
+ * Wraps async functions so that at most `concurrency` run simultaneously.
+ */
 export function createSemaphore(concurrency: number) {
   let running = 0;
   const queue: (() => void)[] = [];
 
-  function next() {
-    if (queue.length > 0 && running < concurrency) {
-      running++;
-      const resolve = queue.shift()!;
-      resolve();
+  return async function <T>(fn: () => Promise<T>): Promise<T> {
+    if (running >= concurrency) {
+      await new Promise<void>((resolve) => queue.push(resolve));
     }
-  }
-
-  async function withLimit<T>(fn: () => Promise<T>): Promise<T> {
-    await new Promise<void>((resolve) => {
-      queue.push(resolve);
-      next();
-    });
+    running++;
     try {
       return await fn();
     } finally {
       running--;
-      next();
+      queue.shift()?.();
     }
-  }
-
-  return { withLimit };
+  };
 }

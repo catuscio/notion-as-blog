@@ -1,5 +1,5 @@
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import type { TPost } from "@/types";
+import type { Post } from "@/types";
 import {
   getRichTextPlain,
   getSelectValue,
@@ -7,13 +7,13 @@ import {
   getDateValue,
   getPeopleNames,
   getPeopleIds,
-  getFileUrl,
+  getImageFileUrl,
   getProp,
 } from "./propertyHelpers";
 
 export function getPageProperties(
   page: PageObjectResponse
-): TPost {
+): Post {
   const props = page.properties;
   const get = (name: string) => getProp(props, name);
 
@@ -23,19 +23,29 @@ export function getPageProperties(
   const slugProp = get("slug");
   const slug = getRichTextPlain(slugProp) || page.id.replace(/-/g, "");
 
-  const status = getSelectValue(get("status")) || "Draft";
-  const type = getSelectValue(get("type")) || "Post";
+  const VALID_STATUSES: Post["status"][] = ["Public", "PublicOnDetail", "Draft", "Private"];
+  const VALID_TYPES: Post["type"][] = ["Post", "Page"];
+
+  const rawStatus = getSelectValue(get("status"));
+  const status: Post["status"] = VALID_STATUSES.includes(rawStatus as Post["status"])
+    ? (rawStatus as Post["status"])
+    : "Draft";
+
+  const rawType = getSelectValue(get("type"));
+  const type: Post["type"] = VALID_TYPES.includes(rawType as Post["type"])
+    ? (rawType as Post["type"])
+    : "Post";
   const date = getDateValue(get("date"));
   const tags = getMultiSelectValues(get("tags"));
-  const category = getSelectValue(get("category"));
-  const series = getRichTextPlain(get("series"));
+  const category = getSelectValue(get("category")) || null;
+  const series = getRichTextPlain(get("series")) || null;
 
   const authorProp = get("author");
   const author = getPeopleNames(authorProp) || getRichTextPlain(authorProp);
   const authorIds = getPeopleIds(authorProp);
 
   const summary = getRichTextPlain(get("summary"));
-  const thumbnail = getFileUrl(get("thumbnail"));
+  const thumbnail = getImageFileUrl(get("thumbnail"));
 
   const pinnedProp = get("pinned");
   const pinned =
@@ -45,8 +55,8 @@ export function getPageProperties(
     id: page.id,
     title,
     slug,
-    status: (status as TPost["status"]) || "Draft",
-    type: (type as TPost["type"]) || "Post",
+    status,
+    type,
     date,
     lastEditedTime: page.last_edited_time,
     tags,

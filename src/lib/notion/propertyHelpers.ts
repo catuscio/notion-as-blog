@@ -49,31 +49,36 @@ export function getPeopleNames(prop: PropertyValue | undefined): string {
   return "";
 }
 
-export function getFileUrl(prop: PropertyValue | undefined): string {
-  if (!prop) return "";
-  if (prop.type === "files" && prop.files.length > 0) {
-    const file = prop.files[0];
-    if (file.type === "file") return file.file.url;
-    if (file.type === "external") return file.external.url;
-  }
-  return "";
-}
-
 export function getPeopleIds(prop: PropertyValue | undefined): string[] {
   if (!prop) return [];
   if (prop.type === "people") {
-    return prop.people
-      .map((p) => ("id" in p ? p.id : ""))
-      .filter(Boolean);
+    return prop.people.map((p) => p.id);
   }
   return [];
 }
 
-export function getUrl(prop: PropertyValue | undefined): string {
+const IMAGE_EXTS = new Set([
+  ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".avif", ".ico", ".bmp", ".tiff",
+]);
+
+function isImageUrl(url: string): boolean {
+  try {
+    const ext = "." + new URL(url).pathname.split(".").pop()?.toLowerCase();
+    return IMAGE_EXTS.has(ext);
+  } catch {
+    return false;
+  }
+}
+
+/** Returns the first image file URL from a files property, or empty string if not an image. */
+export function getImageFileUrl(prop: PropertyValue | undefined): string {
   if (!prop) return "";
-  if (prop.type === "url" && prop.url) return prop.url;
-  if (prop.type === "rich_text") {
-    return prop.rich_text.map((t) => t.plain_text).join("");
+  if (prop.type === "files" && prop.files.length > 0) {
+    const file = prop.files[0];
+    const url =
+      file.type === "file" ? file.file.url :
+      file.type === "external" ? file.external.url : "";
+    if (url && isImageUrl(url)) return url;
   }
   return "";
 }

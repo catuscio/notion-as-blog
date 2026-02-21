@@ -1,6 +1,6 @@
-import type { TPost, TTagItem, TCategoryItem } from "@/types";
+import type { Post, TagItem, CategoryItem } from "@/types";
 
-export function getAllTags(posts: TPost[]): TTagItem[] {
+export function getAllTags(posts: Post[]): TagItem[] {
   const tagMap = new Map<string, number>();
   posts.forEach((post) => {
     post.tags.forEach((tag) => {
@@ -12,7 +12,7 @@ export function getAllTags(posts: TPost[]): TTagItem[] {
     .sort((a, b) => b.count - a.count);
 }
 
-export function getAllCategories(posts: TPost[]): TCategoryItem[] {
+export function getAllCategories(posts: Post[]): CategoryItem[] {
   const catMap = new Map<string, number>();
   posts.forEach((post) => {
     if (post.category) {

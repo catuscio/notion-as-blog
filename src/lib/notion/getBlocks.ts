@@ -1,32 +1,38 @@
 import { notionClient } from "./client";
 import { createSemaphore } from "./semaphore";
+import { brand } from "@/config/brand";
 import type { NotionBlock, NotionBlockWithChildren } from "./types";
 
-const sem = createSemaphore(3);
+const withLimit = createSemaphore(brand.notion.apiConcurrency);
 
 async function fetchAllBlocks(blockId: string): Promise<NotionBlock[]> {
-  const blocks: NotionBlock[] = [];
-  let cursor: string | undefined = undefined;
+  try {
+    const blocks: NotionBlock[] = [];
+    let cursor: string | undefined = undefined;
 
-  do {
-    const response = await sem.withLimit(() =>
-      notionClient.blocks.children.list({
-        block_id: blockId,
-        start_cursor: cursor,
-        page_size: 100,
-      })
-    );
+    do {
+      const response = await withLimit(() =>
+        notionClient.blocks.children.list({
+          block_id: blockId,
+          start_cursor: cursor,
+          page_size: brand.notion.pageSize,
+        })
+      );
 
-    for (const block of response.results) {
-      if ("type" in block) {
-        blocks.push(block as NotionBlock);
+      for (const block of response?.results ?? []) {
+        if ("type" in block) {
+          blocks.push(block as NotionBlock);
+        }
       }
-    }
 
-    cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
-  } while (cursor);
+      cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
+    } while (cursor);
 
-  return blocks;
+    return blocks;
+  } catch (error) {
+    console.error(`[getBlocks] Failed to fetch blocks for ${blockId}:`, error);
+    return [];
+  }
 }
 
 async function fetchChildrenRecursive(
@@ -39,9 +45,14 @@ async function fetchChildrenRecursive(
 
   await Promise.all(
     withChildren.map(async (block) => {
-      const children = await fetchAllBlocks(block.id);
-      const resolved = await fetchChildrenRecursive(children);
-      childrenMap.set(block.id, resolved);
+      try {
+        const children = await fetchAllBlocks(block.id);
+        const resolved = await fetchChildrenRecursive(children);
+        childrenMap.set(block.id, resolved);
+      } catch (error) {
+        console.warn(`[getBlocks] Failed to fetch children for ${block.id}`, error);
+        childrenMap.set(block.id, []);
+      }
     })
   );
 

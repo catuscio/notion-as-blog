@@ -1,13 +1,11 @@
-import type { TPost } from "@/types";
+import type { Post } from "@/types";
 
-export function searchPosts(posts: TPost[], query: string): TPost[] {
-  const q = query.trim().toLowerCase();
-  if (q.length < 2) return [];
-
+export function searchPosts(posts: Post[], query: string): Post[] {
+  const q = query.toLowerCase();
   return posts.filter((post) => {
     const title = post.title.toLowerCase();
     const summary = post.summary.toLowerCase();
-    const category = post.category.toLowerCase();
+    const category = post.category?.toLowerCase() ?? "";
     const tags = post.tags.map((t) => t.toLowerCase());
 
     return (
