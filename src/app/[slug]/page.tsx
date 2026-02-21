@@ -195,9 +195,9 @@ export default async function PostPage({ params }: Props) {
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-72 shrink-0">
-        <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-8">
+        <div className={`sticky top-20 max-h-[calc(100vh-6rem)] flex flex-col gap-8 ${animate ? "overflow-hidden" : "overflow-y-auto"}`}>
           {animate ? (
-            <AnimatedReveal delay={typingDuration}>{sidebarContent}</AnimatedReveal>
+            <AnimatedReveal delay={typingDuration} unlockOverflowParent>{sidebarContent}</AnimatedReveal>
           ) : (
             sidebarContent
           )}
