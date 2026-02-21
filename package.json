@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "cleancache": "rm -rf .cache/notion-images"
+    "cleancache": "rm -rf .next"
   },
   "dependencies": {
     "@next/third-parties": "^16.1.6",
