@@ -45,9 +45,10 @@ function getFileUrl(file: { type: string; file?: { url: string }; external?: { u
 
 function ParagraphBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "paragraph") return null;
+  const isEmpty = block.paragraph.rich_text.length === 0;
   return (
     <p className="my-5 leading-relaxed">
-      <RichText richText={block.paragraph.rich_text} />
+      {isEmpty ? <br /> : <RichText richText={block.paragraph.rich_text} />}
       <BlockChildren blocks={block.children} />
     </p>
   );
@@ -326,7 +327,7 @@ function PdfBlock({ block }: { block: NotionBlockWithChildren }) {
 }
 
 function DividerBlock() {
-  return <hr className="my-8 border-border" />;
+  return <hr className="my-3 border-border" />;
 }
 
 function getOgFromBlock(block: NotionBlockWithChildren) {

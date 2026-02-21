@@ -2,7 +2,7 @@ import type { Post } from "@/types";
 
 export function getPublicPostsByDate(posts: Post[]): Post[] {
   return posts
-    .filter((post) => (post.status === "Public" || post.status === "PublicOnDetail") && post.type === "Post")
+    .filter((post) => post.status === "Public" && post.type === "Post")
     .sort((a, b) => {
       if (!a.date && !b.date) return 0;
       if (!a.date) return 1;
