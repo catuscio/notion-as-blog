@@ -6,6 +6,8 @@ import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { RichText } from "./RichText";
 import { groupListItems } from "./groupListItems";
+import { EquationBlock } from "./EquationRenderer";
+import { BookmarkCard } from "./BookmarkCard";
 
 /* ------------------------------------------------------------------ */
 /*  Block Children                                                     */
@@ -30,6 +32,14 @@ function headingId(richText: NotionRichText[], blockId: string): string {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Helper: extract file URL from Notion file object                   */
+/* ------------------------------------------------------------------ */
+
+function getFileUrl(file: { type: string; file?: { url: string }; external?: { url: string } }): string | undefined {
+  return file.type === "file" ? file.file?.url : file.external?.url;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Block components                                                   */
 /* ------------------------------------------------------------------ */
 
@@ -49,12 +59,12 @@ const HEADING_CONFIG: Record<string, { tag: "h2" | "h3" | "h4"; className: strin
   heading_3: { tag: "h4", className: "text-xl font-semibold mt-8 mb-3" },
 };
 
-function getHeadingRichText(block: NotionBlockWithChildren): NotionRichText[] {
+function getHeadingData(block: NotionBlockWithChildren): { richText: NotionRichText[]; isToggleable: boolean } {
   switch (block.type) {
-    case "heading_1": return block.heading_1.rich_text;
-    case "heading_2": return block.heading_2.rich_text;
-    case "heading_3": return block.heading_3.rich_text;
-    default: return [];
+    case "heading_1": return { richText: block.heading_1.rich_text, isToggleable: block.heading_1.is_toggleable };
+    case "heading_2": return { richText: block.heading_2.rich_text, isToggleable: block.heading_2.is_toggleable };
+    case "heading_3": return { richText: block.heading_3.rich_text, isToggleable: block.heading_3.is_toggleable };
+    default: return { richText: [], isToggleable: false };
   }
 }
 
@@ -62,9 +72,25 @@ function HeadingBlock({ block }: { block: NotionBlockWithChildren }) {
   const config = HEADING_CONFIG[block.type];
   if (!config) return null;
 
-  const richText = getHeadingRichText(block);
+  const { richText, isToggleable } = getHeadingData(block);
   const Tag = config.tag;
   const id = headingId(richText, block.id);
+
+  if (isToggleable) {
+    return (
+      <details className="my-2">
+        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <Tag id={id} className={`${config.className} inline-flex items-center gap-2`}>
+            <span className="text-muted-foreground transition-transform [[open]>summary_&]:rotate-90">&#9654;</span>
+            <RichText richText={richText} />
+          </Tag>
+        </summary>
+        <div className="pl-6 mt-2">
+          <BlockChildren blocks={block.children} />
+        </div>
+      </details>
+    );
+  }
 
   return (
     <Tag id={id} className={config.className}>
@@ -103,11 +129,14 @@ function CalloutBlock({ block }: { block: NotionBlockWithChildren }) {
   const icon =
     block.callout.icon?.type === "emoji" ? block.callout.icon.emoji : "💡";
   const color = block.callout.color;
-  const bgClass = notionColorClass(color) ?? "";
+  const colorCls = notionColorClass(color);
+  const isBackground = color.endsWith("_background");
 
   return (
     <div
-      className={`my-4 flex gap-3 p-4 rounded-xl border border-border ${bgClass || "bg-muted"}`}
+      className={`my-4 flex gap-3 p-4 rounded-xl border border-border ${
+        colorCls ? (isBackground ? colorCls : `${colorCls} bg-muted`) : "bg-muted"
+      }`}
     >
       <span className="text-xl shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">
@@ -120,8 +149,10 @@ function CalloutBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function QuoteBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "quote") return null;
+  const colorCls = notionColorClass(block.quote.color) ?? "";
+
   return (
-    <blockquote className="my-4 border-l-4 border-primary pl-4 italic text-muted-foreground">
+    <blockquote className={`my-4 border-l-4 border-primary pl-4 italic text-muted-foreground ${colorCls}`}>
       <RichText richText={block.quote.rich_text} />
       <BlockChildren blocks={block.children} />
     </blockquote>
@@ -174,10 +205,7 @@ function deriveImageAlt(src: string, caption?: NotionRichText[]): string {
 
 function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "image") return null;
-  const src =
-    block.image.type === "file"
-      ? block.image.file?.url
-      : block.image.external?.url;
+  const src = getFileUrl(block.image);
   if (!src) return null;
   const caption = block.image.caption;
   const alt = deriveImageAlt(src, caption);
@@ -204,10 +232,7 @@ function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "video") return null;
-  const url =
-    block.video.type === "file"
-      ? block.video.file?.url
-      : block.video.external?.url;
+  const url = getFileUrl(block.video);
   if (!url) return null;
 
   // YouTube embed detection
@@ -235,29 +260,89 @@ function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
   );
 }
 
+function AudioBlock({ block }: { block: NotionBlockWithChildren }) {
+  if (block.type !== "audio") return null;
+  const url = getFileUrl(block.audio);
+  if (!url) return null;
+  const caption = block.audio.caption;
+
+  return (
+    <figure className="my-4">
+      <audio src={url} controls className="w-full" />
+      {caption && caption.length > 0 && (
+        <figcaption className="text-center text-sm text-muted-foreground mt-2">
+          <RichText richText={caption} />
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+function FileBlock({ block }: { block: NotionBlockWithChildren }) {
+  if (block.type !== "file") return null;
+  const url = getFileUrl(block.file);
+  if (!url) return null;
+  const caption = block.file.caption;
+  const filename = caption && caption.length > 0
+    ? caption.map((t) => t.plain_text).join("")
+    : decodeURIComponent(url.split("/").pop()?.split("?")[0] || url);
+
+  return (
+    <div className="my-4 rounded-xl border border-border p-4 hover:bg-muted/50 transition-colors">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 text-primary underline underline-offset-2"
+      >
+        <span className="shrink-0">📎</span>
+        <span className="break-all">{filename}</span>
+      </a>
+    </div>
+  );
+}
+
+function PdfBlock({ block }: { block: NotionBlockWithChildren }) {
+  if (block.type !== "pdf") return null;
+  const url = getFileUrl(block.pdf);
+  if (!url) return null;
+  const caption = block.pdf.caption;
+
+  return (
+    <figure className="my-6">
+      <iframe
+        src={url}
+        className="w-full h-[600px] rounded-xl border border-border"
+        title="PDF"
+        loading="lazy"
+      />
+      {caption && caption.length > 0 && (
+        <figcaption className="text-center text-sm text-muted-foreground mt-2">
+          <RichText richText={caption} />
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
 function DividerBlock() {
   return <hr className="my-8 border-border" />;
 }
 
+function getOgFromBlock(block: NotionBlockWithChildren) {
+  return (block as Record<string, unknown>)._ogMetadata as
+    | import("@/lib/notion/ogMetadata").OgMetadata
+    | undefined;
+}
+
 function BookmarkBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "bookmark") return null;
-  const caption = block.bookmark.caption;
-  return (
-    <div className="my-4 rounded-xl border border-border p-4 hover:bg-muted/50 transition-colors">
-      <a
-        href={block.bookmark.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-primary underline underline-offset-2 break-all"
-      >
-        {caption && caption.length > 0 ? (
-          <RichText richText={caption} />
-        ) : (
-          block.bookmark.url
-        )}
-      </a>
-    </div>
-  );
+  return <BookmarkCard url={block.bookmark.url} caption={block.bookmark.caption} og={getOgFromBlock(block)} />;
+}
+
+function LinkPreviewBlock({ block }: { block: NotionBlockWithChildren }) {
+  if (block.type !== "link_preview") return null;
+  return <BookmarkCard url={block.link_preview.url} og={getOgFromBlock(block)} />;
 }
 
 function EmbedBlock({ block }: { block: NotionBlockWithChildren }) {
@@ -281,28 +366,35 @@ function TableBlock({ block }: { block: NotionBlockWithChildren }) {
   const hasRowHeader = block.table.has_row_header;
   const rows = block.children ?? [];
 
+  const headerRow = hasColumnHeader ? rows[0] : null;
+  const bodyRows = hasColumnHeader ? rows.slice(1) : rows;
+
   return (
     <div className="my-4 overflow-x-auto rounded-xl border border-border">
       <table className="w-full text-sm">
+        {headerRow && headerRow.type === "table_row" && (
+          <thead>
+            <tr className="bg-muted font-semibold">
+              {(headerRow.table_row?.cells ?? []).map((cell, cellIdx) => (
+                <th key={cellIdx} className="px-4 py-2 text-left">
+                  <RichText richText={cell} />
+                </th>
+              ))}
+            </tr>
+          </thead>
+        )}
         <tbody>
-          {rows.map((row, rowIdx) => {
+          {bodyRows.map((row) => {
             if (row.type !== "table_row") return null;
             const cells = row.table_row?.cells ?? [];
-            const isHeaderRow = hasColumnHeader && rowIdx === 0;
 
             return (
-              <tr
-                key={row.id}
-                className={isHeaderRow ? "bg-muted font-semibold" : "border-t border-border"}
-              >
+              <tr key={row.id} className="border-t border-border">
                 {cells.map((cell, cellIdx) => {
                   const isHeaderCell = hasRowHeader && cellIdx === 0;
-                  const Tag = isHeaderRow || isHeaderCell ? "th" : "td";
+                  const Tag = isHeaderCell ? "th" : "td";
                   return (
-                    <Tag
-                      key={cellIdx}
-                      className="px-4 py-2 text-left"
-                    >
+                    <Tag key={cellIdx} className="px-4 py-2 text-left">
                       <RichText richText={cell} />
                     </Tag>
                   );
@@ -327,6 +419,24 @@ function ColumnListBlock({ block }: { block: NotionBlockWithChildren }) {
           <BlockChildren blocks={col.children} />
         </div>
       ))}
+    </div>
+  );
+}
+
+function SyncedBlock({ block }: { block: NotionBlockWithChildren }) {
+  if (block.type !== "synced_block") return null;
+  return <BlockChildren blocks={block.children} />;
+}
+
+function LinkToPageBlock({ block }: { block: NotionBlockWithChildren }) {
+  if (block.type !== "link_to_page") return null;
+  const pageId =
+    block.link_to_page.type === "page_id" ? block.link_to_page.page_id : "";
+  if (!pageId) return null;
+
+  return (
+    <div className="my-2 text-muted-foreground text-sm italic">
+      {copy.blocks.linkedPage}
     </div>
   );
 }
@@ -377,16 +487,31 @@ function renderBlock(block: NotionBlockWithChildren) {
       return <ImageBlock key={block.id} block={block} />;
     case "video":
       return <VideoBlock key={block.id} block={block} />;
+    case "audio":
+      return <AudioBlock key={block.id} block={block} />;
+    case "file":
+      return <FileBlock key={block.id} block={block} />;
+    case "pdf":
+      return <PdfBlock key={block.id} block={block} />;
     case "divider":
       return <DividerBlock key={block.id} />;
     case "bookmark":
       return <BookmarkBlock key={block.id} block={block} />;
+    case "link_preview":
+      return <LinkPreviewBlock key={block.id} block={block} />;
+    case "link_to_page":
+      return <LinkToPageBlock key={block.id} block={block} />;
     case "embed":
       return <EmbedBlock key={block.id} block={block} />;
     case "table":
       return <TableBlock key={block.id} block={block} />;
     case "column_list":
       return <ColumnListBlock key={block.id} block={block} />;
+    case "synced_block":
+      return <SyncedBlock key={block.id} block={block} />;
+    case "equation":
+      return <EquationBlock key={block.id} expression={block.equation.expression} />;
+    // table_of_contents, breadcrumb, child_page, child_database — intentionally ignored
     default:
       return null;
   }

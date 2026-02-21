@@ -1,6 +1,7 @@
 import { getPublishedPosts, getPublishedPages } from "./getPosts";
 import { getPageBlocks } from "./getBlocks";
 import { cacheBlockImagesInPlace } from "./imageCache";
+import { enrichBookmarkOgInPlace } from "./ogMetadata";
 import { getRelatedPosts, getSeriesPosts } from "./filterPosts";
 import { brand } from "@/config/brand";
 import type { Post } from "@/types";
@@ -44,7 +45,7 @@ export async function getPostDetailData(
   if (!post) return null;
 
   const blocks = await getPageBlocks(post.id);
-  await cacheBlockImagesInPlace(blocks);
+  await Promise.all([cacheBlockImagesInPlace(blocks), enrichBookmarkOgInPlace(blocks)]);
   const text = extractTextFromBlocks(blocks);
   const wordCount = text.split(/\s+/).filter(Boolean).length;
   const readingTime = estimateReadingTime(text);
@@ -64,6 +65,6 @@ export async function getPageBySlug(
   if (!page) return null;
 
   const blocks = await getPageBlocks(page.id);
-  await cacheBlockImagesInPlace(blocks);
+  await Promise.all([cacheBlockImagesInPlace(blocks), enrichBookmarkOgInPlace(blocks)]);
   return { page, blocks };
 }

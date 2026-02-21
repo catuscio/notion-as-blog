@@ -2,6 +2,7 @@ import Link from "next/link";
 import { brand } from "@/config/brand";
 import { notionColorClass } from "@/lib/notion/colorMap";
 import type { NotionRichText } from "@/lib/notion/types";
+import { InlineEquation } from "./EquationRenderer";
 
 function toInternalPath(href: string): string | null {
   if (href.startsWith("/")) return href;
@@ -20,7 +21,19 @@ export function RichText({ richText }: { richText: NotionRichText[] }) {
   return (
     <>
       {richText.map((t, i) => {
-        let node: React.ReactNode = t.plain_text;
+        // Inline equation
+        if (t.type === "equation") {
+          return <InlineEquation key={i} expression={t.equation.expression} />;
+        }
+
+        let node: React.ReactNode = t.plain_text.includes("\n")
+          ? t.plain_text.split("\n").map((line, j, arr) => (
+              <span key={j}>
+                {line}
+                {j < arr.length - 1 && <br />}
+              </span>
+            ))
+          : t.plain_text;
         const { bold, italic, strikethrough, underline, code, color } =
           t.annotations ?? {};
 

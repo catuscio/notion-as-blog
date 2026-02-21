@@ -70,6 +70,9 @@ export const copy = {
     youtubeVideo: "YouTube video",
     embeddedContent: "Embedded content",
   },
+  blocks: {
+    linkedPage: "🔗 Linked page",
+  },
   footer: {
     home: "Home",
     about: "About",

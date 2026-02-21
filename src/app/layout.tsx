@@ -5,6 +5,7 @@ import { brand } from "@/config/brand";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WebSiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
+import "katex/dist/katex.min.css";
 import "./globals.css";
 
 export const revalidate = 1800;
