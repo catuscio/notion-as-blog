@@ -1,19 +1,31 @@
+import { Fragment } from "react";
 import { brand } from "@/config/brand";
 
+/** Splits text on `\n` and joins with <br /> */
+function Multiline({ text }: { text: string }) {
+  const parts = text.split("\n");
+  return parts.map((part, i) => (
+    <Fragment key={i}>
+      {i > 0 && <br />}
+      {part}
+    </Fragment>
+  ));
+}
+
 export function HeroSection() {
-  const idx = brand.highlight ? brand.title.indexOf(brand.highlight) : -1;
-  const before = idx >= 0 ? brand.title.slice(0, idx) : brand.title;
+  const title = brand.title;
+  const idx = brand.highlight ? title.indexOf(brand.highlight) : -1;
+  const before = idx >= 0 ? title.slice(0, idx) : title;
   const highlight = idx >= 0 ? brand.highlight : "";
-  const after = idx >= 0 ? brand.title.slice(idx + brand.highlight.length) : "";
+  const after = idx >= 0 ? title.slice(idx + brand.highlight.length) : "";
 
   return (
     <section className="max-w-[1024px] mx-auto px-6 mb-24 md:mb-32">
       <div className="max-w-3xl">
         <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.15] break-words">
-          {before}
+          <Multiline text={before} />
           {highlight && (
             <>
-              <br className="hidden md:block" />
               <span className="text-primary relative inline-block">
                 {highlight}
                 <svg
@@ -31,10 +43,10 @@ export function HeroSection() {
               </span>
             </>
           )}
-          {after}
+          <Multiline text={after} />
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground font-normal leading-relaxed max-w-2xl">
-          {brand.description}
+          <Multiline text={brand.description} />
         </p>
       </div>
     </section>
