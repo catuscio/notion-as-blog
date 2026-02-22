@@ -39,6 +39,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/.next/cache/notion-images ./.next/cache/notion-images
+COPY --from=builder --chown=nextjs:nodejs /app/.next/cache/og-metadata ./.next/cache/og-metadata
 
 USER nextjs
 

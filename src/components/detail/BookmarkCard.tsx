@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { RichText } from "./RichText";
 import type { NotionRichText } from "@/lib/notion/types";
 import type { OgMetadata } from "@/lib/notion/ogMetadata";
@@ -42,26 +43,26 @@ export function BookmarkCard({
             )}
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
               {og?.favicon && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={og.favicon}
                   alt=""
                   width={14}
                   height={14}
+                  unoptimized
                   className="shrink-0 rounded-sm"
-                  loading="lazy"
                 />
               )}
               <span className="truncate">{domain}</span>
             </span>
           </div>
           {og?.image && (
-            <div className="hidden sm:block shrink-0 w-[200px] border-l border-border">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="hidden sm:relative sm:block shrink-0 w-[200px] border-l border-border">
+              <Image
                 src={og.image}
                 alt=""
-                className="w-full h-full object-cover"
+                fill
+                unoptimized
+                className="object-cover"
                 loading="lazy"
               />
             </div>
