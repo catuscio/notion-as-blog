@@ -21,7 +21,8 @@ const EXT_TO_MIME: Record<string, string> = Object.fromEntries(
 // .jpeg is an alternate extension for image/jpeg
 EXT_TO_MIME[".jpeg"] = "image/jpeg";
 
-const VALID_EXTS = new Set(Object.keys(EXT_TO_MIME));
+const ALL_EXTS = Object.keys(EXT_TO_MIME);
+const VALID_EXTS = new Set(ALL_EXTS);
 
 function extractExtFromUrl(url: string): string {
   try {
@@ -40,6 +41,14 @@ async function downloadImage(
 ): Promise<string | null> {
   try {
     await fs.mkdir(CACHE_DIR, { recursive: true });
+
+    // Cache hit guard: skip download if file already exists
+    for (const ext of ALL_EXTS) {
+      try {
+        await fs.access(path.join(CACHE_DIR, `${blockId}${ext}`));
+        return `${NOTION_IMAGE_API_PREFIX}/${blockId}`;
+      } catch { /* not found */ }
+    }
 
     const response = await fetch(url);
     if (!response.ok) return null;
@@ -109,19 +118,58 @@ export async function cacheBlockImagesInPlace(
 export async function getCachedImage(
   blockId: string
 ): Promise<{ filepath: string; contentType: string } | null> {
-  try {
-    const files = await fs.readdir(CACHE_DIR);
-    const match = files.find((f) => f.startsWith(blockId));
-    if (!match) return null;
-
-    const filepath = path.join(CACHE_DIR, match);
-    const ext = path.extname(match).toLowerCase();
-
-    return {
-      filepath,
-      contentType: EXT_TO_MIME[ext] ?? "image/png",
-    };
-  } catch {
-    return null;
+  for (const ext of ALL_EXTS) {
+    const filepath = path.join(CACHE_DIR, `${blockId}${ext}`);
+    try {
+      await fs.access(filepath);
+      return { filepath, contentType: EXT_TO_MIME[ext] ?? "image/png" };
+    } catch { /* next */ }
   }
+  return null;
+}
+
+/** Cache an image and generate a blur placeholder. Falls back to original URL on failure. */
+export async function cacheCoverImage(
+  id: string,
+  url: string
+): Promise<{ url: string; blurDataURL: string }> {
+  if (!url) return { url, blurDataURL: "" };
+  const cachedUrl = await downloadImage(id, url);
+  if (!cachedUrl) return { url, blurDataURL: "" };
+  const blurDataURL = await generateBlurDataURL(id);
+  return { url: cachedUrl, blurDataURL };
+}
+
+/** Generate a 20x20 blur thumbnail from cached image. Cached as sidecar file ({id}.blur). */
+async function generateBlurDataURL(id: string): Promise<string> {
+  const blurPath = path.join(CACHE_DIR, `${id}.blur`);
+  try {
+    return await fs.readFile(blurPath, "utf-8");
+  } catch { /* needs generation */ }
+
+  const cached = await getCachedImage(id);
+  if (!cached) return "";
+  try {
+    const sharp = (await import("sharp")).default;
+    const buffer = await sharp(cached.filepath)
+      .resize(20, 20, { fit: "cover" })
+      .blur(3)
+      .toFormat("png")
+      .toBuffer();
+    const dataURL = `data:image/png;base64,${buffer.toString("base64")}`;
+    await fs.writeFile(blurPath, dataURL);
+    return dataURL;
+  } catch {
+    return "";
+  }
+}
+
+/** Read a cached image as base64 data URL (for OG image generation). */
+export async function readCachedImageAsBase64(url: string): Promise<string | null> {
+  if (!url.startsWith(NOTION_IMAGE_API_PREFIX)) return null;
+  const id = url.slice(NOTION_IMAGE_API_PREFIX.length + 1);
+  const cached = await getCachedImage(id);
+  if (!cached) return null;
+  const buffer = await fs.readFile(cached.filepath);
+  return `data:${cached.contentType};base64,${buffer.toString("base64")}`;
 }
