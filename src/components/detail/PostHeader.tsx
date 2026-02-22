@@ -25,6 +25,7 @@ export function PostHeaderMeta({
               width={48}
               height={48}
               className="object-cover w-full h-full"
+              {...(author?.blurDataURL ? { placeholder: "blur" as const, blurDataURL: author.blurDataURL } : {})}
             />
           ) : (
             <User size={24} />

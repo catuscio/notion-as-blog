@@ -126,7 +126,7 @@ export default async function PostPage({ params }: Props) {
   const bodyContent = (
     <>
       {post.thumbnail && (
-        <HeroImage src={post.thumbnail} alt={post.title} />
+        <HeroImage src={post.thumbnail} alt={post.title} blurDataURL={post.blurDataURL} />
       )}
 
       <NotionRenderer blocks={blocks} />

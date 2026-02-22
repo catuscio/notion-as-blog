@@ -17,6 +17,7 @@ interface PostThumbnailProps {
   className?: string;
   hoverScale?: boolean;
   fill?: boolean;
+  blurDataURL?: string;
 }
 
 export function PostThumbnail({
@@ -26,6 +27,7 @@ export function PostThumbnail({
   className = "",
   hoverScale = false,
   fill = false,
+  blurDataURL,
 }: PostThumbnailProps) {
   const config = sizeMap[size];
   const roundedClass = size === "sm" ? "rounded-lg" : "rounded-xl";
@@ -51,6 +53,7 @@ export function PostThumbnail({
                 ? "transition-transform duration-700 group-hover:scale-110"
                 : ""
             }`}
+            {...(blurDataURL ? { placeholder: "blur" as const, blurDataURL } : {})}
           />
         ) : (
           <Image
@@ -63,6 +66,7 @@ export function PostThumbnail({
                 ? "transition-transform group-hover:scale-110"
                 : ""
             }`}
+            {...(blurDataURL ? { placeholder: "blur" as const, blurDataURL } : {})}
           />
         )
       ) : (

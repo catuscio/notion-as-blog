@@ -26,6 +26,7 @@ function SeriesNavItem({
         alt={post.title}
         size="sm"
         hoverScale={!isCurrent}
+        blurDataURL={post.blurDataURL}
         className="w-full h-full"
       />
       <span

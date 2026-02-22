@@ -33,6 +33,7 @@ export function PostCard({ post }: { post: Post }) {
           src={post.thumbnail}
           alt={post.title}
           size="md"
+          blurDataURL={post.blurDataURL}
           className="order-1 md:order-2 w-full md:w-48 aspect-video md:aspect-auto md:h-32"
         />
       </article>

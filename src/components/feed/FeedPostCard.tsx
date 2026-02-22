@@ -61,6 +61,7 @@ export function FeedPostCard({
                     width={32}
                     height={32}
                     className="object-cover w-full h-full"
+                    {...(author?.blurDataURL ? { placeholder: "blur" as const, blurDataURL: author.blurDataURL } : {})}
                   />
                 ) : (
                   <User size={18} />
@@ -78,6 +79,7 @@ export function FeedPostCard({
             size="lg"
             fill
             hoverScale
+            blurDataURL={post.blurDataURL}
             className="w-full md:w-48 aspect-video md:aspect-square relative"
           />
         </div>

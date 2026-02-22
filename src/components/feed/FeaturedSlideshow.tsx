@@ -135,6 +135,7 @@ export function FeaturedSlideshow({ posts }: { posts: Post[] }) {
                 sizes="(max-width: 1024px) 100vw, 1024px"
                 className="object-cover"
                 priority={i === 0}
+                {...(p.blurDataURL ? { placeholder: "blur" as const, blurDataURL: p.blurDataURL } : {})}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />

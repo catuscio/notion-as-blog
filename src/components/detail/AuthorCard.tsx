@@ -42,6 +42,7 @@ export function AuthorCard({
             width={80}
             height={80}
             className="object-cover w-full h-full"
+            {...(author?.blurDataURL ? { placeholder: "blur" as const, blurDataURL: author.blurDataURL } : {})}
           />
         ) : (
           <User size={40} className="text-muted-foreground" />

@@ -3,9 +3,11 @@ import Image from "next/image";
 export function HeroImage({
   src,
   alt,
+  blurDataURL,
 }: {
   src: string;
   alt: string;
+  blurDataURL?: string;
 }) {
   if (!src) return null;
 
@@ -18,6 +20,7 @@ export function HeroImage({
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           priority
+          {...(blurDataURL ? { placeholder: "blur" as const, blurDataURL } : {})}
         />
       </div>
     </figure>
