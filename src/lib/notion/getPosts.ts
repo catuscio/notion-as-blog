@@ -2,6 +2,8 @@ import { unstable_cache } from "next/cache";
 import { notionClient } from "./client";
 import { getPageProperties } from "./getPageProperties";
 import { getPublicPostsByDate } from "./filterPosts";
+import { cacheCoverImage } from "./imageCache";
+import { safeQuery } from "./safeQuery";
 import { brand } from "@/config/brand";
 import type { Post } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -30,7 +32,20 @@ async function fetchAllFromNotion(): Promise<Post[]> {
       cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
     } while (cursor);
 
-    return pages.map((page) => getPageProperties(page));
+    const posts = pages.map((page) => getPageProperties(page));
+    await Promise.all(
+      posts.map(async (post) => {
+        if (post.thumbnail) {
+          const result = await safeQuery(
+            () => cacheCoverImage(post.id, post.thumbnail),
+            { url: post.thumbnail, blurDataURL: "" }
+          );
+          post.thumbnail = result.url;
+          post.blurDataURL = result.blurDataURL;
+        }
+      })
+    );
+    return posts;
   } catch (error) {
     console.error("[getPosts] Failed to fetch from Notion:", error);
     return [];

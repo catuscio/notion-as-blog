@@ -1,4 +1,6 @@
 import { notionClient } from "./client";
+import { cacheCoverImage } from "./imageCache";
+import { safeQuery } from "./safeQuery";
 import { brand } from "@/config/brand";
 import type { Author, AuthorSummary } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -13,6 +15,7 @@ function parseAuthorPage(page: PageObjectResponse): Author {
     name: getRichTextPlain(get("name")),
     peopleIds: getPeopleIds(get("people")),
     avatar: getImageFileUrl(get("avatar")),
+    blurDataURL: "",
     bio: getRichTextPlain(get("bio")),
     role: getRichTextPlain(get("role")),
     socials: {
@@ -57,7 +60,20 @@ async function fetchAuthorsFromNotion(): Promise<Author[]> {
       cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
     } while (cursor);
 
-    return pages.map(parseAuthorPage);
+    const authors = pages.map(parseAuthorPage);
+    await Promise.all(
+      authors.map(async (author) => {
+        if (author.avatar) {
+          const result = await safeQuery(
+            () => cacheCoverImage(author.id, author.avatar),
+            { url: author.avatar, blurDataURL: "" }
+          );
+          author.avatar = result.url;
+          author.blurDataURL = result.blurDataURL;
+        }
+      })
+    );
+    return authors;
   } catch (error) {
     console.error("[getAuthors] Failed to fetch from Notion:", error);
     return [];
@@ -90,7 +106,7 @@ export async function getAuthorLookupMap(): Promise<Record<string, AuthorSummary
   const authors = await getAllAuthors();
   const map: Record<string, AuthorSummary> = {};
   for (const a of authors) {
-    const summary: AuthorSummary = { avatar: a.avatar, name: a.name };
+    const summary: AuthorSummary = { avatar: a.avatar, name: a.name, blurDataURL: a.blurDataURL };
     for (const pid of a.peopleIds) {
       map[pid] = summary;
     }

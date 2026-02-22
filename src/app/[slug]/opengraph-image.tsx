@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { brand } from "@/config/brand";
 import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { readCachedImageAsBase64 } from "@/lib/notion/imageCache";
 import { safeQuery } from "@/lib/notion/safeQuery";
 
 let logoSrc: string | null = null;
@@ -100,7 +101,7 @@ export default async function OgImage({
   }
 
   const thumbnailSrc = post.thumbnail
-    ? await fetchThumbnail(post.thumbnail)
+    ? (await readCachedImageAsBase64(post.thumbnail)) ?? (await fetchThumbnail(post.thumbnail))
     : null;
 
   // If thumbnailSrc is null, generate a dynamic OG image with a gradient background

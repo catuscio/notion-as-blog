@@ -67,6 +67,7 @@ export function getPageProperties(
     authorIds,
     summary,
     thumbnail,
+    blurDataURL: "",
     fullWidth: false,
     pinned,
   };
