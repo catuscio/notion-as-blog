@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
 import { getPostDetailData, getPageBySlug, estimateReadingTime } from "@/lib/notion/getPost";
 import { getPublishedPosts, getPublishedPages } from "@/lib/notion/getPosts";
-import { getAuthorByPeopleIds, getAuthorByName } from "@/lib/notion/getAuthors";
+import { getAuthorsByPeopleIds, getAuthorByName } from "@/lib/notion/getAuthors";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
 import { TypewriterTitle } from "@/components/detail/TypewriterTitle";
 import { AnimatedReveal } from "@/components/detail/AnimatedReveal";
 import { HeroImage } from "@/components/detail/HeroImage";
 import { NotionRenderer } from "@/components/detail/NotionRenderer";
-import { AuthorCard } from "@/components/detail/AuthorCard";
+import { AuthorCardList } from "@/components/detail/AuthorCard";
 import { TableOfContents } from "@/components/detail/TableOfContents";
 import { ReadNext } from "@/components/detail/ReadNext";
 import { SeriesNav } from "@/components/detail/SeriesNav";
@@ -20,24 +20,29 @@ import { PostTags } from "@/components/detail/PostTags";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import type { Author } from "@/types";
+
+async function fetchPostAuthors(authorIds: string[], authorName: string): Promise<Author[]> {
+  return safeQuery<Author[]>(
+    async () => {
+      const authors = await getAuthorsByPeopleIds(authorIds);
+      if (authors.length > 0) return authors;
+      const fallback = await getAuthorByName(authorName);
+      return fallback ? [fallback] : [];
+    },
+    []
+  );
+}
 import type { PostDetailData } from "@/lib/notion/getPost";
 import type { Metadata } from "next";
 
-async function fetchPostAuthor(authorIds: string[], authorName: string): Promise<Author | null> {
-  return safeQuery<Author | null>(
-    async () => await getAuthorByPeopleIds(authorIds) ?? await getAuthorByName(authorName),
-    null
-  );
-}
-
 async function getPostPageData(slug: string): Promise<
-  (PostDetailData & { author: Author | null }) | null
+  (PostDetailData & { authors: Author[] }) | null
 > {
   // Try Post first
   const result = await safeQuery(() => getPostDetailData(slug), null);
   if (result) {
-    const author = await fetchPostAuthor(result.post.authorIds, result.post.author);
-    return { ...result, author };
+    const authors = await fetchPostAuthors(result.post.authorIds, result.post.author);
+    return { ...result, authors };
   }
 
   // Fall back to Page type (about, etc.)
@@ -56,9 +61,9 @@ async function getPostPageData(slug: string): Promise<
     .join(" ");
   const wordCount = text.split(/\s+/).filter(Boolean).length;
   const readingTime = estimateReadingTime(text);
-  const author = await fetchPostAuthor(page.authorIds, page.author);
+  const authors = await fetchPostAuthors(page.authorIds, page.author);
 
-  return { post: page, blocks, relatedPosts: [], seriesPosts: [], readingTime, wordCount, author };
+  return { post: page, blocks, relatedPosts: [], seriesPosts: [], readingTime, wordCount, authors };
 }
 
 type Props = {
@@ -82,7 +87,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.title,
     description: post.summary,
-    authors: [{ name: post.author }],
+    authors: post.author.split(", ").filter(Boolean).map((name) => ({ name })),
     alternates: {
       canonical: postUrl,
     },
@@ -93,7 +98,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: post.date,
       modifiedTime: post.lastEditedTime,
       section: post.category || undefined,
-      authors: [post.author],
+      authors: post.author.split(", ").filter(Boolean),
       url: postUrl,
       images: [{ url: `/${post.slug}/opengraph-image`, width: 1200, height: 630, alt: post.title }],
     },
@@ -119,7 +124,7 @@ export default async function PostPage({ params }: Props) {
   const data = await getPostPageData(slug);
   if (!data) notFound();
 
-  const { post, blocks, relatedPosts, seriesPosts, readingTime, wordCount, author } = data;
+  const { post, blocks, relatedPosts, seriesPosts, readingTime, wordCount, authors } = data;
   const animate = brand.postAnimation.enabled;
   const typingDuration = animate ? post.title.length * 40 + 200 : 0;
 
@@ -140,7 +145,7 @@ export default async function PostPage({ params }: Props) {
         />
       )}
 
-      <AuthorCard author={author} authorName={post.author} />
+      <AuthorCardList authors={authors} authorNames={post.author.split(", ").filter(Boolean)} />
 
       {/* Mobile: sidebar content inline */}
       <div className="lg:hidden flex flex-col gap-8 mt-12 pt-12 border-t border-border">
@@ -174,16 +179,16 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <div className="w-full max-w-[1024px] mx-auto flex flex-col lg:flex-row gap-12 px-6 py-8">
-      <PostJsonLd post={post} author={author} wordCount={wordCount} readingTime={readingTime} seriesPosts={seriesPosts} />
+      <PostJsonLd post={post} authors={authors} wordCount={wordCount} readingTime={readingTime} seriesPosts={seriesPosts} />
 
       <article className="w-full flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
         <PostBreadcrumb post={post} />
         <PostHeader
           post={post}
-          author={author}
+          authors={authors}
           readingTime={readingTime}
           titleSlot={animate ? <TypewriterTitle text={post.title} /> : undefined}
-          metaSlot={animate ? <AnimatedReveal delay={typingDuration}><PostHeaderMeta post={post} author={author} readingTime={readingTime} /></AnimatedReveal> : undefined}
+          metaSlot={animate ? <AnimatedReveal delay={typingDuration}><PostHeaderMeta post={post} authors={authors} readingTime={readingTime} /></AnimatedReveal> : undefined}
         />
 
         {animate ? (

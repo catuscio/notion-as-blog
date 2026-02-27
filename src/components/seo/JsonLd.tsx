@@ -98,16 +98,20 @@ export function OrganizationJsonLd() {
   return <JsonLdScript data={data} />;
 }
 
+type ArticleAuthor = {
+  name: string;
+  url?: string;
+  image?: string;
+  jobTitle?: string;
+};
+
 type ArticleJsonLdProps = {
   title: string;
   description: string;
   url: string;
   datePublished: string;
   dateModified: string;
-  authorName: string;
-  authorUrl?: string;
-  authorImage?: string;
-  authorJobTitle?: string;
+  authors: ArticleAuthor[];
   image?: string;
   tags?: string[];
   wordCount?: number;
@@ -123,10 +127,7 @@ export function ArticleJsonLd({
   url,
   datePublished,
   dateModified,
-  authorName,
-  authorUrl,
-  authorImage,
-  authorJobTitle,
+  authors,
   image,
   tags,
   wordCount,
@@ -135,13 +136,15 @@ export function ArticleJsonLd({
   seriesUrl,
   positionInSeries,
 }: ArticleJsonLdProps) {
-  const author: Record<string, unknown> = {
-    "@type": "Person",
-    name: authorName,
-    ...(authorUrl && { url: authorUrl }),
-    ...(authorImage && { image: authorImage }),
-    ...(authorJobTitle && { jobTitle: authorJobTitle }),
-  };
+  const authorObjects = authors.map((a) => ({
+    "@type": "Person" as const,
+    name: a.name,
+    ...(a.url && { url: a.url }),
+    ...(a.image && { image: a.image }),
+    ...(a.jobTitle && { jobTitle: a.jobTitle }),
+  }));
+
+  const author = authorObjects.length === 1 ? authorObjects[0] : authorObjects;
 
   return (
     <JsonLdScript

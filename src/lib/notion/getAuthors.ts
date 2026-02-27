@@ -98,6 +98,23 @@ export async function getAuthorByPeopleIds(peopleIds: string[]): Promise<Author 
   return authors.find((a) => a.peopleIds.some((pid) => peopleIds.includes(pid))) ?? null;
 }
 
+export async function getAuthorsByPeopleIds(peopleIds: string[]): Promise<Author[]> {
+  if (peopleIds.length === 0) return [];
+  const authors = await getAllAuthors();
+  const pidSet = new Set(peopleIds);
+  const seen = new Set<string>();
+  const result: Author[] = [];
+  for (const pid of peopleIds) {
+    if (!pidSet.has(pid)) continue;
+    const author = authors.find((a) => a.peopleIds.includes(pid));
+    if (author && !seen.has(author.id)) {
+      seen.add(author.id);
+      result.push(author);
+    }
+  }
+  return result;
+}
+
 /**
  * Returns a lookup map keyed by both Notion peopleId and author name,
  * so callers can resolve an author summary with either key.

@@ -6,7 +6,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { EmptyState } from "@/components/common/EmptyState";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import { resolveAuthor } from "@/lib/resolveAuthor";
+import { resolveAuthors } from "@/lib/resolveAuthor";
 import { useFeedPagination } from "@/hooks/useFeedPagination";
 import type { Post, AuthorSummary } from "@/types";
 
@@ -51,7 +51,7 @@ export function FeedPostList({
           <EmptyState message={copy.noPostsFilter} />
         ) : (
           paginatedPosts.map((post) => (
-            <FeedPostCard key={post.id} post={post} author={resolveAuthor(post, authorsMap)} />
+            <FeedPostCard key={post.id} post={post} authors={resolveAuthors(post, authorsMap)} />
           ))
         )}
       </section>

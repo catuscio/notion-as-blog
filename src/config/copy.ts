@@ -38,6 +38,7 @@ export const copy = {
   author: {
     badge: "Author",
     viewAllPosts: "View all posts",
+    moreAuthors: (n: number) => `+${n}명 더보기`,
     descriptionFallback: (name: string, author: string) =>
       `Posts by ${author} on ${name}`,
   },

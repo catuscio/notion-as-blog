@@ -1,7 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
-import { User } from "lucide-react";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
+import { AvatarStack } from "@/components/common/AvatarStack";
 import { copy } from "@/config/copy";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
@@ -17,12 +16,16 @@ const cardClassName = cn(
 export function FeedPostCard({
   post,
   readingTime,
-  author,
+  authors,
 }: {
   post: Post;
   readingTime?: number;
-  author?: AuthorSummary;
+  authors?: AuthorSummary[];
 }) {
+  const authorList = authors && authors.length > 0
+    ? authors
+    : [{ name: post.author || copy.authorFallback, avatar: "", blurDataURL: "" }];
+
   return (
     <Link href={`/${post.slug}`} aria-label={post.title}>
       <article className={cardClassName}>
@@ -53,22 +56,11 @@ export function FeedPostCard({
               )}
             </div>
             <div className="flex items-center gap-3 mt-auto">
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground overflow-hidden">
-                {author?.avatar ? (
-                  <Image
-                    src={author.avatar}
-                    alt={author.name}
-                    width={32}
-                    height={32}
-                    className="object-cover w-full h-full"
-                    {...(author?.blurDataURL ? { placeholder: "blur" as const, blurDataURL: author.blurDataURL } : {})}
-                  />
-                ) : (
-                  <User size={18} />
-                )}
-              </div>
-              <div className="flex flex-col text-xs">
-                <span className="font-semibold">{author?.name || post.author || copy.authorFallback}</span>
+              <AvatarStack authors={authorList} size="sm" showNames={false} />
+              <div className="flex flex-col text-xs min-w-0">
+                <span className="font-semibold truncate">
+                  {authorList.map((a) => a.name).join(", ")}
+                </span>
                 <span className="text-muted-foreground">{formatDate(post.date, "short")}</span>
               </div>
             </div>

@@ -6,7 +6,7 @@ import { searchPosts } from "@/lib/searchPosts";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import { resolveAuthor } from "@/lib/resolveAuthor";
+import { resolveAuthors } from "@/lib/resolveAuthor";
 import type { Post, AuthorSummary } from "@/types";
 import type { Metadata } from "next";
 
@@ -52,7 +52,7 @@ async function SearchResults({ query, authorsMap }: { query: string; authorsMap:
         <FeedPostCard
           key={post.id}
           post={post}
-          author={resolveAuthor(post, authorsMap)}
+          authors={resolveAuthors(post, authorsMap)}
         />
       ))}
     </section>

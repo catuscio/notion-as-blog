@@ -5,13 +5,13 @@ import type { Post, Author } from "@/types";
 
 export function PostJsonLd({
   post,
-  author,
+  authors,
   wordCount,
   readingTime,
   seriesPosts,
 }: {
   post: Post;
-  author: Author | null;
+  authors: Author[];
   wordCount?: number;
   readingTime?: number;
   seriesPosts?: Post[];
@@ -36,6 +36,15 @@ export function PostJsonLd({
     { name: post.title, url: postUrl },
   ];
 
+  const authorData = authors.length > 0
+    ? authors.map((a) => ({
+        name: a.name,
+        url: a.socials.website || a.socials.github || undefined,
+        image: a.avatar || undefined,
+        jobTitle: a.role || undefined,
+      }))
+    : [{ name: post.author }];
+
   return (
     <>
       <ArticleJsonLd
@@ -44,10 +53,7 @@ export function PostJsonLd({
         url={postUrl}
         datePublished={post.date}
         dateModified={post.lastEditedTime}
-        authorName={post.author}
-        authorUrl={author?.socials.website || author?.socials.github || undefined}
-        authorImage={author?.avatar || undefined}
-        authorJobTitle={author?.role || undefined}
+        authors={authorData}
         image={post.thumbnail || `${brand.url}${brand.assets.ogImage}`}
         tags={post.tags}
         wordCount={wordCount}

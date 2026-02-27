@@ -15,6 +15,51 @@ const socialIcons: Record<string, { Icon: LucideIcon; label: string }> = {
   website: { Icon: Globe, label: "Website" },
 };
 
+const MAX_VISIBLE_AUTHORS = 3;
+
+export function AuthorCardList({
+  authors,
+  authorNames,
+}: {
+  authors: Author[];
+  authorNames: string[];
+}) {
+  const names = authorNames.length > 0 ? authorNames : [copy.authorFallback];
+  const items: { author: Author | null; name: string }[] = [];
+
+  if (authors.length > 0) {
+    for (const author of authors) {
+      items.push({ author, name: author.name });
+    }
+    const resolvedNames = new Set(authors.map((a) => a.name));
+    for (const name of names) {
+      if (!resolvedNames.has(name)) {
+        items.push({ author: null, name });
+      }
+    }
+  } else {
+    for (const name of names) {
+      items.push({ author: null, name });
+    }
+  }
+
+  const visible = items.slice(0, MAX_VISIBLE_AUTHORS);
+  const overflow = items.length - visible.length;
+
+  return (
+    <div className="flex flex-col gap-4">
+      {visible.map(({ author, name }) => (
+        <AuthorCard key={name} author={author} authorName={name} />
+      ))}
+      {overflow > 0 && (
+        <p className="text-sm text-muted-foreground text-center">
+          {copy.author.moreAuthors(overflow)}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function AuthorCard({
   author,
   authorName,
