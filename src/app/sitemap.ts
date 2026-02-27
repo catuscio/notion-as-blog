@@ -4,6 +4,7 @@ import { brand, getCategorySlug } from "@/config/brand";
 import { getPublicPosts, getPublishedPages } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { getAllAuthors } from "@/lib/notion/getAuthors";
+import { filterPostsByAuthor } from "@/lib/notion/filterPosts";
 import { getPostDate, latestDateAmong } from "@/lib/postDate";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -73,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Author routes with dynamic lastModified
     const authors = await getAllAuthors();
     const authorRoutes: MetadataRoute.Sitemap = authors.map((a) => {
-      const authorPosts = posts.filter((p) => p.author === a.name);
+      const authorPosts = filterPostsByAuthor(posts, a.peopleIds);
       const lastMod = latestDateAmong(authorPosts);
       return {
         url: `${baseUrl}/author/${encodeURIComponent(a.name)}`,
