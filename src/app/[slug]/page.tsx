@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPostDetailData, getPageBySlug, estimateReadingTime } from "@/lib/notion/getPost";
 import { getPublishedPosts, getPublishedPages } from "@/lib/notion/getPosts";
-import { getAuthorsByPeopleIds, getAuthorByName } from "@/lib/notion/getAuthors";
+import { getAuthorsByPeopleIds } from "@/lib/notion/getAuthors";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
 import { TypewriterTitle } from "@/components/detail/TypewriterTitle";
@@ -21,14 +21,9 @@ import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import type { Author } from "@/types";
 
-async function fetchPostAuthors(authorIds: string[], authorName: string): Promise<Author[]> {
+async function fetchPostAuthors(authorIds: string[]): Promise<Author[]> {
   return safeQuery<Author[]>(
-    async () => {
-      const authors = await getAuthorsByPeopleIds(authorIds);
-      if (authors.length > 0) return authors;
-      const fallback = await getAuthorByName(authorName);
-      return fallback ? [fallback] : [];
-    },
+    () => getAuthorsByPeopleIds(authorIds),
     []
   );
 }
@@ -41,7 +36,7 @@ async function getPostPageData(slug: string): Promise<
   // Try Post first
   const result = await safeQuery(() => getPostDetailData(slug), null);
   if (result) {
-    const authors = await fetchPostAuthors(result.post.authorIds, result.post.author);
+    const authors = await fetchPostAuthors(result.post.authorIds);
     return { ...result, authors };
   }
 
@@ -61,7 +56,7 @@ async function getPostPageData(slug: string): Promise<
     .join(" ");
   const wordCount = text.split(/\s+/).filter(Boolean).length;
   const readingTime = estimateReadingTime(text);
-  const authors = await fetchPostAuthors(page.authorIds, page.author);
+  const authors = await fetchPostAuthors(page.authorIds);
 
   return { post: page, blocks, relatedPosts: [], seriesPosts: [], readingTime, wordCount, authors };
 }
@@ -145,7 +140,7 @@ export default async function PostPage({ params }: Props) {
         />
       )}
 
-      <AuthorCardList authors={authors} authorNames={post.author.split(", ").filter(Boolean)} />
+      <AuthorCardList authors={authors} />
 
       {/* Mobile: sidebar content inline */}
       <div className="lg:hidden flex flex-col gap-8 mt-12 pt-12 border-t border-border">

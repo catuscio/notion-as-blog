@@ -32,9 +32,6 @@ export function resolveAuthors(
       if (author && !seen.has(author.name)) {
         seen.add(author.name);
         result.push(author);
-      } else if (!seen.has(name)) {
-        seen.add(name);
-        result.push({ name, avatar: "", blurDataURL: "" });
       }
     }
   }
