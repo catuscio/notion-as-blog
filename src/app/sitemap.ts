@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import type { Post } from "@/types";
 import { brand, getCategorySlug } from "@/config/brand";
-import { getPublicPosts, getPublishedPages } from "@/lib/notion/getPosts";
+import { getPublishedPosts, getPublishedPages } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { getAllAuthors } from "@/lib/notion/getAuthors";
 import { filterPostsByAuthor } from "@/lib/notion/filterPosts";
@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const posts = await getPublicPosts();
+    const posts = await getPublishedPosts();
 
     // Set homepage lastModified to latest post date
     const latestPostDate = latestDateAmong(posts);
@@ -71,17 +71,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }];
     });
 
-    // Author routes with dynamic lastModified
+    // Author routes with dynamic lastModified (exclude authors with ≤2 posts)
     const authors = await getAllAuthors();
-    const authorRoutes: MetadataRoute.Sitemap = authors.map((a) => {
+    const authorRoutes: MetadataRoute.Sitemap = authors.flatMap((a) => {
       const authorPosts = filterPostsByAuthor(posts, a.peopleIds);
+      if (authorPosts.length <= 2) return [];
       const lastMod = latestDateAmong(authorPosts);
-      return {
+      return [{
         url: `${baseUrl}/author/${encodeURIComponent(a.name)}`,
         ...(lastMod && { lastModified: lastMod }),
         changeFrequency: "weekly" as const,
         priority: 0.6,
-      };
+      }];
     });
 
     // Series routes with dynamic lastModified
