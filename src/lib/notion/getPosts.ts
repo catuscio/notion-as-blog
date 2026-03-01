@@ -58,15 +58,10 @@ const getCachedPosts = unstable_cache(
   { revalidate: brand.cache.revalidate }
 );
 
+/** Returns only Public posts (status=Public, type=Post), sorted by date. Excludes PublicOnDetail, Draft, Private. */
 export async function getPublishedPosts(): Promise<Post[]> {
   const all = await getCachedPosts();
   return getPublicPostsByDate(all);
-}
-
-/** Returns only Public posts (excludes PublicOnDetail), for feeds and sitemaps. */
-export async function getPublicPosts(): Promise<Post[]> {
-  const all = await getPublishedPosts();
-  return all.filter((p) => p.status === "Public");
 }
 
 export async function getPublishedPages(): Promise<Post[]> {
