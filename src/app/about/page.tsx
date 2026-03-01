@@ -20,6 +20,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${page.title} - ${brand.name}`,
     description: page.summary || `About ${brand.name}`,
+    alternates: {
+      canonical: `${brand.url}/about`,
+    },
   };
 }
 
