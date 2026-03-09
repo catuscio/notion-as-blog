@@ -444,6 +444,13 @@ export const brand = {
 
   /** Number of posts per feed page */
   postsPerPage: 10,
+
+  tags: {
+    /** Minimum number of posts required for a tag to appear in the sidebar */
+    minPostCount: 2,
+    /** Maximum number of tags displayed in the sidebar (sorted by post count) */
+    maxDisplayCount: 10,
+  },
 } as const;
 
 // ─── Utility functions (internal use) ─────────────────────────────
