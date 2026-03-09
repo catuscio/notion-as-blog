@@ -8,6 +8,7 @@ import { RichText } from "./RichText";
 import { groupListItems } from "./groupListItems";
 import { EquationBlock } from "./EquationRenderer";
 import { BookmarkCard } from "./BookmarkCard";
+import { MermaidRenderer } from "./MermaidRenderer";
 
 /* ------------------------------------------------------------------ */
 /*  Block Children                                                     */
@@ -105,6 +106,19 @@ function CodeBlock({ block }: { block: NotionBlockWithChildren }) {
   const language = block.code.language || "plain text";
   const text = (block.code.rich_text ?? []).map((t) => t.plain_text).join("");
   const caption = block.code.caption;
+
+  if (language === "mermaid") {
+    return (
+      <div className="my-4">
+        <MermaidRenderer code={text} />
+        {caption && caption.length > 0 && (
+          <div className="px-4 py-1 text-xs text-muted-foreground">
+            <RichText richText={caption} />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="my-4 rounded-xl border border-border overflow-hidden max-w-[calc(100vw-3rem)]">
