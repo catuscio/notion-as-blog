@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { brand } from "@/config/brand";
 import { getPublishedPosts } from "@/lib/notion/getPosts";
-import { readCachedImageAsBase64 } from "@/lib/notion/imageCache";
+import { readCachedImageResizedAsBase64 } from "@/lib/notion/imageCache";
 import { safeQuery } from "@/lib/notion/safeQuery";
 
 let logoSrc: string | null = null;
@@ -44,8 +44,12 @@ async function fetchThumbnail(url: string): Promise<string | null> {
     const res = await fetch(url, { signal: AbortSignal.timeout(brand.assets.ogFetchTimeoutMs) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    const contentType = res.headers.get("content-type") ?? "image/jpeg";
-    return `data:${contentType};base64,${buf.toString("base64")}`;
+    const sharp = (await import("sharp")).default;
+    const resized = await sharp(buf)
+      .resize(size.width, size.height, { fit: "cover" })
+      .toFormat("png")
+      .toBuffer();
+    return `data:image/png;base64,${resized.toString("base64")}`;
   } catch {
     return null;
   }
@@ -101,7 +105,8 @@ export default async function OgImage({
   }
 
   const thumbnailSrc = post.thumbnail
-    ? (await readCachedImageAsBase64(post.thumbnail)) ?? (await fetchThumbnail(post.thumbnail))
+    ? (await readCachedImageResizedAsBase64(post.thumbnail, size.width, size.height)) ??
+      (await fetchThumbnail(post.thumbnail))
     : null;
 
   // If thumbnailSrc is null, generate a dynamic OG image with a gradient background
