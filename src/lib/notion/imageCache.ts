@@ -164,12 +164,28 @@ async function generateBlurDataURL(id: string): Promise<string> {
   }
 }
 
-/** Read a cached image as base64 data URL (for OG image generation). */
-export async function readCachedImageAsBase64(url: string): Promise<string | null> {
+/**
+ * Read a cached image, resize to the given dimensions, and return as PNG base64.
+ * Used for OG image generation: keeping the embedded thumbnail small avoids
+ * libxml2's 10MB parse buffer limit when sharp parses satori's output SVG.
+ */
+export async function readCachedImageResizedAsBase64(
+  url: string,
+  width: number,
+  height: number,
+): Promise<string | null> {
   if (!url.startsWith(NOTION_IMAGE_API_PREFIX)) return null;
   const id = url.slice(NOTION_IMAGE_API_PREFIX.length + 1);
   const cached = await getCachedImage(id);
   if (!cached) return null;
-  const buffer = await fs.readFile(cached.filepath);
-  return `data:${cached.contentType};base64,${buffer.toString("base64")}`;
+  try {
+    const sharp = (await import("sharp")).default;
+    const buffer = await sharp(cached.filepath)
+      .resize(width, height, { fit: "cover" })
+      .toFormat("png")
+      .toBuffer();
+    return `data:image/png;base64,${buffer.toString("base64")}`;
+  } catch {
+    return null;
+  }
 }
