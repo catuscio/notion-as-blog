@@ -4,6 +4,7 @@ import { slugifyHeading } from "@/lib/format";
 import { notionColorClass } from "@/lib/notion/colorMap";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
+import { stableBlockFileUrl } from "@/lib/notion/imageProxy";
 import { RichText } from "./RichText";
 import { groupListItems } from "./groupListItems";
 import { EquationBlock } from "./EquationRenderer";
@@ -36,8 +37,11 @@ function headingId(richText: NotionRichText[], blockId: string): string {
 /*  Helper: extract file URL from Notion file object                   */
 /* ------------------------------------------------------------------ */
 
-function getFileUrl(file: { type: string; file?: { url: string }; external?: { url: string } }): string | undefined {
-  return file.type === "file" ? file.file?.url : file.external?.url;
+function getFileUrl(
+  file: { type: string; file?: { url: string }; external?: { url: string } },
+  blockId: string
+): string | undefined {
+  return stableBlockFileUrl(file, blockId) || undefined;
 }
 
 /* ------------------------------------------------------------------ */
@@ -220,7 +224,7 @@ function deriveImageAlt(src: string, caption?: NotionRichText[]): string {
 
 function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "image") return null;
-  const src = getFileUrl(block.image);
+  const src = getFileUrl(block.image, block.id);
   if (!src) return null;
   const caption = block.image.caption;
   const alt = deriveImageAlt(src, caption);
@@ -247,7 +251,7 @@ function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "video") return null;
-  const url = getFileUrl(block.video);
+  const url = getFileUrl(block.video, block.id);
   if (!url) return null;
 
   // YouTube embed detection
@@ -277,7 +281,7 @@ function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function AudioBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "audio") return null;
-  const url = getFileUrl(block.audio);
+  const url = getFileUrl(block.audio, block.id);
   if (!url) return null;
   const caption = block.audio.caption;
 
@@ -295,7 +299,7 @@ function AudioBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function FileBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "file") return null;
-  const url = getFileUrl(block.file);
+  const url = getFileUrl(block.file, block.id);
   if (!url) return null;
   const caption = block.file.caption;
   const filename = caption && caption.length > 0
@@ -319,7 +323,7 @@ function FileBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function PdfBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "pdf") return null;
-  const url = getFileUrl(block.pdf);
+  const url = getFileUrl(block.pdf, block.id);
   if (!url) return null;
   const caption = block.pdf.caption;
 

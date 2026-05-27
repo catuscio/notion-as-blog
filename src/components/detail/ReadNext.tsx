@@ -29,7 +29,6 @@ export function ReadNext({
               alt={post.title}
               size="sm"
               hoverScale
-              blurDataURL={post.blurDataURL}
             />
             <div>
               <h5 className="text-sm font-semibold group-hover:text-primary transition-colors line-clamp-2">

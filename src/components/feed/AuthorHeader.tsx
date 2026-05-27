@@ -16,7 +16,6 @@ export function AuthorHeader({ author }: { author: Author }) {
               width={56}
               height={56}
               className="rounded-full object-cover w-14 h-14"
-              {...(author.blurDataURL ? { placeholder: "blur" as const, blurDataURL: author.blurDataURL } : {})}
             />
           )}
           {author.name}

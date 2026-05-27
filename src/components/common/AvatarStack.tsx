@@ -45,7 +45,6 @@ export function AvatarStack({
                 width={cfg.px}
                 height={cfg.px}
                 className="object-cover w-full h-full"
-                {...(author.blurDataURL ? { placeholder: "blur" as const, blurDataURL: author.blurDataURL } : {})}
               />
             ) : (
               <User size={cfg.icon} className="text-muted-foreground" />

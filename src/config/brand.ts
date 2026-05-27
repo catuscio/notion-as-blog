@@ -431,8 +431,6 @@ export const brand = {
     revalidate: 1800,
     /** RSS feed Cache-Control max-age (seconds). Default: 3600s = 1 hour */
     feedTtl: 3600,
-    /** Proxied Notion image Cache-Control max-age (seconds). Default: 1 year */
-    imageTtl: 31536000,
     /** In-memory authors cache TTL (milliseconds). Default: 5 min */
     authorsTtlMs: 5 * 60 * 1000,
   },

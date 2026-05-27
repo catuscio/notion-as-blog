@@ -357,10 +357,26 @@ search: {
 cache: {
   revalidate: 1800,       // ISR interval in seconds (default: 30 min)
   feedTtl: 3600,          // RSS Cache-Control max-age (default: 1 hour)
-  imageTtl: 31536000,     // Notion image proxy max-age (default: 1 year)
   authorsTtlMs: 300000,   // In-memory authors cache (default: 5 min)
 },
 ```
+
+### Notion image proxy
+
+Notion-hosted file URLs expire, so uploaded Notion files are rendered through stable signed URLs under:
+
+```txt
+/api/notion-image?...
+```
+
+The API route resolves the current Notion file URL on request and proxies the bytes with CDN cache headers. The default proxy cache TTL is 3300 seconds, safely below Notion's 1-hour signed URL expiry:
+
+```env
+NOTION_IMAGE_CACHE_SECONDS=3300
+NOTION_IMAGE_SIGNING_SECRET=optional-separate-secret
+```
+
+External image URLs are rendered directly.
 
 ---
 

@@ -16,11 +16,15 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  turbopack: { root: process.cwd() },
   poweredByHeader: false,
   headers: async () => [
     { source: "/(.*)", headers: securityHeaders },
   ],
   images: {
+    localPatterns: [
+      { pathname: "/api/notion-image" },
+    ],
     remotePatterns: [
       { hostname: "www.notion.so" },
       { hostname: "images.unsplash.com" },

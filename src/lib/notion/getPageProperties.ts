@@ -9,6 +9,7 @@ import {
   getPeopleIds,
   getProp,
 } from "./propertyHelpers";
+import { stableImageFileUrl, stablePageCover } from "./imageProxy";
 
 export function getPageProperties(
   page: PageObjectResponse
@@ -45,8 +46,10 @@ export function getPageProperties(
 
   const summary = getRichTextPlain(get("summary"));
   const thumbnail =
-    page.cover?.type === "file" ? page.cover.file.url :
-    page.cover?.type === "external" ? page.cover.external.url : "";
+    stableImageFileUrl(get("thumbnail"), page.id, "thumbnail") ||
+    stableImageFileUrl(get("image"), page.id, "image") ||
+    stableImageFileUrl(get("cover"), page.id, "cover") ||
+    stablePageCover(page);
 
   const pinnedProp = get("pinned");
   const pinned =
@@ -67,7 +70,6 @@ export function getPageProperties(
     authorIds,
     summary,
     thumbnail,
-    blurDataURL: "",
     fullWidth: false,
     pinned,
   };

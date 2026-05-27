@@ -3,7 +3,6 @@ export interface Author {
   name: string;
   peopleIds: string[];
   avatar: string;
-  blurDataURL: string;
   bio: string;
   role: string;
   socials: {
@@ -30,12 +29,11 @@ export interface Post {
   authorIds: string[];
   summary: string;
   thumbnail: string;
-  blurDataURL: string;
   fullWidth: boolean;
   pinned: boolean;
 }
 
-export type AuthorSummary = Pick<Author, "avatar" | "name" | "blurDataURL">;
+export type AuthorSummary = Pick<Author, "avatar" | "name">;
 
 export interface SelectItemCount {
   name: string;

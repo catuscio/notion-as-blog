@@ -357,10 +357,26 @@ search: {
 cache: {
   revalidate: 1800,       // ISR 갱신 간격 (초, 기본값: 30분)
   feedTtl: 3600,          // RSS Cache-Control max-age (초, 기본값: 1시간)
-  imageTtl: 31536000,     // Notion 이미지 프록시 max-age (초, 기본값: 1년)
   authorsTtlMs: 300000,   // 인메모리 저자 캐시 TTL (밀리초, 기본값: 5분)
 },
 ```
+
+### Notion 이미지 프록시
+
+Notion에 업로드된 파일 URL은 만료되므로, Notion 파일은 안정적인 서명 URL로 렌더링됩니다.
+
+```txt
+/api/notion-image?...
+```
+
+API route는 요청 시점에 최신 Notion 파일 URL을 다시 확인하고 이미지 bytes를 프록시합니다. 기본 프록시 캐시 TTL은 Notion signed URL의 1시간 만료보다 짧은 3300초입니다.
+
+```env
+NOTION_IMAGE_CACHE_SECONDS=3300
+NOTION_IMAGE_SIGNING_SECRET=optional-separate-secret
+```
+
+외부 이미지 URL은 그대로 렌더링됩니다.
 
 ---
 

@@ -17,7 +17,6 @@ export function PostHeaderMeta({
   const authorSummaries = authors.map((a) => ({
     name: a.name,
     avatar: a.avatar,
-    blurDataURL: a.blurDataURL,
   }));
 
   const displayName =

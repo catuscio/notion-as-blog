@@ -9,7 +9,7 @@ import {
 } from "react";
 import { slugifyHeading } from "@/lib/format";
 import { copy } from "@/config/copy";
-import { PROSE_CONTAINER_SELECTOR } from "@/components/detail/NotionRenderer";
+import { PROSE_CONTAINER_SELECTOR } from "@/components/detail/proseSelector";
 
 interface TocItem {
   id: string;

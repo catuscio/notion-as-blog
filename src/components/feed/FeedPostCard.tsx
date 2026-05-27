@@ -24,7 +24,7 @@ export function FeedPostCard({
 }) {
   const authorList = authors && authors.length > 0
     ? authors
-    : [{ name: post.author || copy.authorFallback, avatar: "", blurDataURL: "" }];
+    : [{ name: post.author || copy.authorFallback, avatar: "" }];
 
   return (
     <Link href={`/${post.slug}`} aria-label={post.title}>
@@ -71,7 +71,6 @@ export function FeedPostCard({
             size="lg"
             fill
             hoverScale
-            blurDataURL={post.blurDataURL}
             className="w-full md:w-48 aspect-video md:aspect-square relative"
           />
         </div>

@@ -1,10 +1,9 @@
 import { notionClient } from "./client";
-import { cacheCoverImage } from "./imageCache";
-import { safeQuery } from "./safeQuery";
 import { brand } from "@/config/brand";
 import type { Author, AuthorSummary } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { getRichTextPlain, getImageFileUrl, getUrlOrText, getProp, getPeopleIds } from "./propertyHelpers";
+import { getRichTextPlain, getUrlOrText, getProp, getPeopleIds } from "./propertyHelpers";
+import { stableImageFileUrl } from "./imageProxy";
 
 function parseAuthorPage(page: PageObjectResponse): Author {
   const props = page.properties;
@@ -14,8 +13,7 @@ function parseAuthorPage(page: PageObjectResponse): Author {
     id: page.id,
     name: getRichTextPlain(get("name")),
     peopleIds: getPeopleIds(get("people")),
-    avatar: getImageFileUrl(get("avatar")),
-    blurDataURL: "",
+    avatar: stableImageFileUrl(get("avatar"), page.id, "avatar"),
     bio: getRichTextPlain(get("bio")),
     role: getRichTextPlain(get("role")),
     socials: {
@@ -60,20 +58,7 @@ async function fetchAuthorsFromNotion(): Promise<Author[]> {
       cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
     } while (cursor);
 
-    const authors = pages.map(parseAuthorPage);
-    await Promise.all(
-      authors.map(async (author) => {
-        if (author.avatar) {
-          const result = await safeQuery(
-            () => cacheCoverImage(author.id, author.avatar),
-            { url: author.avatar, blurDataURL: "" }
-          );
-          author.avatar = result.url;
-          author.blurDataURL = result.blurDataURL;
-        }
-      })
-    );
-    return authors;
+    return pages.map(parseAuthorPage);
   } catch (error) {
     console.error("[getAuthors] Failed to fetch from Notion:", error);
     return [];
@@ -123,7 +108,7 @@ export async function getAuthorLookupMap(): Promise<Record<string, AuthorSummary
   const authors = await getAllAuthors();
   const map: Record<string, AuthorSummary> = {};
   for (const a of authors) {
-    const summary: AuthorSummary = { avatar: a.avatar, name: a.name, blurDataURL: a.blurDataURL };
+    const summary: AuthorSummary = { avatar: a.avatar, name: a.name };
     for (const pid of a.peopleIds) {
       map[pid] = summary;
     }

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { brand } from "@/config/brand";
 import { getPublishedPosts } from "@/lib/notion/getPosts";
-import { readCachedImageResizedAsBase64 } from "@/lib/notion/imageCache";
+import { readNotionImageResizedAsBase64 } from "@/lib/notion/imageProxy";
 import { safeQuery } from "@/lib/notion/safeQuery";
 
 let logoSrc: string | null = null;
@@ -105,7 +105,7 @@ export default async function OgImage({
   }
 
   const thumbnailSrc = post.thumbnail
-    ? (await readCachedImageResizedAsBase64(post.thumbnail, size.width, size.height)) ??
+    ? (await readNotionImageResizedAsBase64(post.thumbnail, size.width, size.height)) ??
       (await fetchThumbnail(post.thumbnail))
     : null;
 
