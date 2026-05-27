@@ -15,6 +15,10 @@ type Props = {
   params: Promise<{ name: string }>;
 };
 
+// Series names come from Notion content and can be very long. Avoid build-time
+// static prerender output paths exceeding filesystem filename limits.
+export const dynamic = "force-dynamic";
+
 function getSeriesPostsFromAll(allPosts: Post[], seriesName: string): Post[] {
   return allPosts
     .filter((p) => p.series === seriesName)
@@ -54,18 +58,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const posts = await safeQuery(getPublishedPosts, []);
-  const seriesMap = new Map<string, number>();
-  for (const post of posts) {
-    if (post.series) {
-      seriesMap.set(post.series, (seriesMap.get(post.series) ?? 0) + 1);
-    }
-  }
-  return Array.from(seriesMap.entries())
-    .filter(([, count]) => count >= 2)
-    .map(([name]) => ({ name: encodeURIComponent(name) }));
-}
 
 export default async function SeriesPage({ params }: Props) {
   const { name } = await params;
