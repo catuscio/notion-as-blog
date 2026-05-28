@@ -1,59 +1,83 @@
-# Notion-As-Blog
+<div align="center">
+  <a href="https://notion-as-blog.vercel.app">
+    <img src="docs/screenshots/readme-hero.svg" alt="Notion-As-Blog — Notion에서 쓰고 Next.js로 배포하기" width="100%" />
+  </a>
 
-**Notion**을 CMS로 사용하는 모던 오픈소스 블로그 템플릿입니다. **Next.js 16** 기반.
-공개 Notion 템플릿을 복제하고 Integration을 연결하면, 본인 워크스페이스의 Notion DB를 빠르고 SEO 친화적인 블로그로 배포할 수 있습니다.
+  <h1>Notion-As-Blog</h1>
 
-- **공식 문서:** [notion-as-blog.vercel.app](https://notion-as-blog.vercel.app)
-- **Notion 템플릿:** [Notion-As-Blog 템플릿 복제](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)
+  <p>
+    <strong>Write in Notion. Publish with Next.js.</strong><br />
+    <strong>Notion</strong>을 CMS로 쓰고 <strong>Next.js 16</strong>, <strong>Tailwind CSS 4</strong>로 배포하는 모던 블로그 템플릿입니다.
+  </p>
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
-![License](https://img.shields.io/badge/License-MIT-green)
+  <p>
+    <a href="https://notion-as-blog.vercel.app"><strong>공식 문서</strong></a>
+    ·
+    <a href="https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link"><strong>템플릿 복제</strong></a>
+    ·
+    <a href="#빠른-시작"><strong>빠른 시작</strong></a>
+    ·
+    <a href="README.md"><strong>English</strong></a>
+  </p>
 
-**[English](README.md)** | **한국어**
+  <p>
+    <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white" />
+    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+    <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+    <img alt="Notion" src="https://img.shields.io/badge/Notion-CMS-000000?style=for-the-badge&logo=notion&logoColor=white" />
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge" />
+  </p>
+</div>
 
 ---
 
-## 스크린샷
+## 왜 Notion-As-Blog인가요?
 
-아래 이미지는 배포된 공식 문서 사이트 기준으로 새로 촬영한 스크린샷입니다.
+Notion-As-Blog는 복제한 Notion 템플릿을 빠르고 SEO 친화적인 프로덕션 블로그로 바꿔줍니다. 글 작성은 Notion 안에서 끝내고, 웹사이트는 Next.js 기반의 정적 생성, 안정적인 Notion 이미지 프록시, 검색, RSS, 사이트맵, 다크 모드, 저자 프로필까지 갖춘 형태로 배포할 수 있습니다.
 
-### 문서 홈 (라이트 / 다크)
+<table>
+  <tr>
+    <td><strong>Notion 중심 작성 경험</strong><br />포스트, 페이지, 태그, 카테고리, 시리즈, 저자, 썸네일, 요약을 Notion에서 직접 관리합니다.</td>
+    <td><strong>프로덕션 기본값</strong><br />Next.js App Router, 정적 생성, 이미지 프록시, RSS, sitemap, robots.txt, 동적 OG 이미지, Organization JSON-LD를 포함합니다.</td>
+  </tr>
+  <tr>
+    <td><strong>처음부터 보기 좋은 UI</strong><br />반응형 레이아웃, 다크 모드, 포스트 애니메이션, 핀 포스트 슬라이드쇼, Giscus 댓글, 브랜딩 커스터마이징을 제공합니다.</td>
+    <td><strong>셀프 호스팅 친화적</strong><br />Vercel, Docker, 자체 Node.js 호스트에서 필요한 환경 변수와 캐시 동작을 명시적으로 설정할 수 있습니다.</td>
+  </tr>
+</table>
+
+---
+
+## 미리보기
+
+아래 이미지는 배포된 공식 문서 사이트 기준으로 촬영한 스크린샷입니다.
 
 | 라이트 | 다크 |
 |:---:|:---:|
-| ![홈 라이트](docs/screenshots/home-desktop.png) | ![홈 다크](docs/screenshots/home-dark.png) |
-
-### 문서 상세
-
-![포스트 상세](docs/screenshots/post-desktop.png)
-
-### 모바일 문서 홈
+| ![문서 홈 라이트](docs/screenshots/home-desktop.png) | ![문서 홈 다크](docs/screenshots/home-dark.png) |
 
 <p align="center">
-  <img src="docs/screenshots/home-mobile.png" alt="모바일" width="300" />
+  <img src="docs/screenshots/post-desktop.png" alt="문서 상세" width="70%" />
+  <br />
+  <img src="docs/screenshots/home-mobile.png" alt="모바일 문서 홈" width="260" />
 </p>
 
 ---
 
 ## 주요 기능
 
-- **Notion CMS** — Notion에서 직접 글을 작성하고 관리
-- **멀티 저자 지원** — 아바타, 소개, 소셜 링크가 포함된 별도의 저자 데이터베이스
-- **카테고리 & 태그** — 커스터마이징 가능한 카테고리와 자유로운 태그 분류
-- **시리즈** — 연관된 포스트를 시리즈로 묶어 이전/다음 네비게이션 제공
-- **전문 검색** — 즉각적인 결과를 제공하는 내장 검색 API
-- **다크 모드** — 내장 theme preference hook 기반 시스템 연동 테마 전환
-- **SEO 최적화** — Open Graph, 동적 OG 이미지 생성, 사이트맵, robots.txt, RSS 피드, Organization JSON-LD
-- **Giscus 댓글** — GitHub Discussions 기반 댓글 시스템
-- **반응형 디자인** — Tailwind CSS 기반 모바일 퍼스트 레이아웃
-- **커스텀 브랜딩** — 로고, 파비콘, 푸터 링크 커스터마이징
-- **포스트 애니메이션** — 상세 페이지 타이프라이터 제목 효과 및 슬라이드업 전환
-- **뉴스레터 CTA** — 홈 피드 하단 구독 섹션 (선택사항)
-- **공유 버튼** — Web Share API 기반 네이티브 공유 (클립보드 폴백)
-- **Docker 지원** — 멀티 스테이지 빌드 프로덕션 Dockerfile 포함
-- **온디맨드 갱신** — 웹훅으로 콘텐츠를 즉시 새로고침
+- **Notion CMS** — Notion에서 직접 글을 작성하고 관리합니다.
+- **멀티 저자 지원** — 아바타, 소개, 역할, 소셜 링크가 포함된 Authors data source를 선택적으로 사용할 수 있습니다.
+- **카테고리, 태그, 시리즈** — 카테고리 페이지, 태그 필터링, 시리즈 이전/다음 내비게이션을 제공합니다.
+- **전문 검색** — 검색 API, 즉시 결과 드롭다운, 전용 검색 페이지를 포함합니다.
+- **다크 모드** — 내장 theme preference hook 기반 시스템 연동 테마 전환을 제공합니다.
+- **SEO 최적화** — Open Graph, 동적 OG 이미지, sitemap, robots.txt, RSS, canonical URL, Organization JSON-LD를 지원합니다.
+- **안정적인 Notion 이미지** — 만료되는 Notion 업로드 파일 URL을 signed image proxy로 안정적으로 렌더링합니다.
+- **Giscus 댓글** — GitHub Discussions 기반 댓글을 포스트 상세 페이지에 붙일 수 있습니다.
+- **반응형 UI** — Tailwind CSS 4 기반 모바일 퍼스트 레이아웃입니다.
+- **커스텀 브랜딩** — 이름, 로고, 파비콘, 색상, 폰트, 푸터 링크, 소셜 링크, 카테고리, 문구를 설정할 수 있습니다.
+- **Docker 지원** — 멀티 스테이지 프로덕션 Dockerfile과 compose 예시를 포함합니다.
+- **온디맨드 갱신** — 보호된 revalidation endpoint로 Notion 변경사항을 즉시 반영할 수 있습니다.
 
 ---
 
@@ -70,23 +94,26 @@
 ### 2. Notion Integration 생성
 
 1. [My Integrations](https://www.notion.so/profile/integrations)에서 **New integration** 클릭
-2. 이름을 입력하고 (예: `notion-as-blog`), 템플릿을 복제한 워크스페이스를 선택
-3. **Internal Integration Secret**을 복사 — 이것이 `NOTION_API_KEY`입니다
+2. 이름 입력, 예: `notion-as-blog`
+3. 템플릿을 복제한 워크스페이스 선택
+4. **Internal Integration Secret** 복사 — 이것이 `NOTION_API_KEY`입니다
 
 ### 3. 데이터베이스에 Integration 연결
 
-1. Notion에서 **Posts** 데이터베이스 페이지를 열기
-2. 우측 상단 **···** → **연결(Connections)** → 생성한 Integration을 찾아 **연결**
-3. **Authors** 데이터베이스에도 동일하게 반복
+1. Notion에서 **Posts** 데이터베이스 페이지 열기
+2. 우측 상단 **···** → **연결(Connections)** → 생성한 Integration 선택 후 **연결**
+3. 풍부한 저자 프로필을 쓰려면 **Authors** 데이터베이스에도 동일하게 반복
 
 ### 4. Data source ID 확인
 
-`NOTION_DATA_SOURCE_ID`에는 URL에 보이는 database ID가 아니라 **Notion data source ID**를 넣어야 합니다. 최신 Notion API에서는 database ID와 data source ID가 다를 수 있습니다. Posts data source ID를 `NOTION_DATA_SOURCE_ID`로, Authors data source ID를 `NOTION_AUTHORS_DATA_SOURCE_ID`로 설정하세요. 잘못된 ID를 넣으면 빌드 중 `object_not_found`가 발생할 수 있습니다.
+`NOTION_DATA_SOURCE_ID`에는 URL에 보이는 database ID가 아니라 **Notion data source ID**를 넣어야 합니다. 최신 Notion API에서는 database ID와 data source ID가 다를 수 있습니다.
+
+복제한 Posts 데이터베이스를 열고 Integration을 연결한 뒤 Posts data source ID를 `NOTION_DATA_SOURCE_ID`로 설정하세요. Authors data source를 쓰는 경우 Authors data source ID를 `NOTION_AUTHORS_DATA_SOURCE_ID`로 설정합니다. database ID를 잘못 넣으면 빌드 중 `object_not_found`가 발생할 수 있습니다.
 
 ### 5. 프로젝트 설치 및 설정
 
 ```bash
-git clone https://github.com/your-username/notion-as-blog.git
+git clone https://github.com/catuscio/notion-as-blog.git
 cd notion-as-blog
 npm install
 cp .env.example .env.local
@@ -102,7 +129,7 @@ TOKEN_FOR_REVALIDATE=any_random_secret_string
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
 
-### 6. 개발 서버 실행
+### 6. 로컬 실행
 
 ```bash
 npm run dev

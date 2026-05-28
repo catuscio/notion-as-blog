@@ -1,67 +1,91 @@
-# Notion-As-Blog
+<div align="center">
+  <a href="https://notion-as-blog.vercel.app">
+    <img src="docs/screenshots/readme-hero.svg" alt="Notion-As-Blog — write in Notion, publish with Next.js" width="100%" />
+  </a>
 
-A modern, open-source blog template powered by **Notion** as a CMS and **Next.js 16**.
-Duplicate the public Notion template, connect your integration, and publish a fast, SEO-friendly blog from your own workspace.
+  <h1>Notion-As-Blog</h1>
 
-- **Official docs:** [notion-as-blog.vercel.app](https://notion-as-blog.vercel.app)
-- **Notion template:** [Duplicate the Notion-As-Blog Template](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)
+  <p>
+    <strong>Write in Notion. Publish with Next.js.</strong><br />
+    A polished, self-hostable blog template powered by <strong>Notion</strong>, <strong>Next.js 16</strong>, and <strong>Tailwind CSS 4</strong>.
+  </p>
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
-![License](https://img.shields.io/badge/License-MIT-green)
+  <p>
+    <a href="https://notion-as-blog.vercel.app"><strong>Live Docs</strong></a>
+    ·
+    <a href="https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link"><strong>Duplicate Template</strong></a>
+    ·
+    <a href="#quick-start"><strong>Quick Start</strong></a>
+    ·
+    <a href="README.ko.md"><strong>한국어</strong></a>
+  </p>
 
-**English** | **[한국어](README.ko.md)**
+  <p>
+    <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white" />
+    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+    <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+    <img alt="Notion" src="https://img.shields.io/badge/Notion-CMS-000000?style=for-the-badge&logo=notion&logoColor=white" />
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge" />
+  </p>
+</div>
 
 ---
 
-## Screenshots
+## Why Notion-As-Blog?
+
+Notion-As-Blog turns a duplicated Notion template into a production-grade blog: fast pages, stable Notion image delivery, first-class SEO, dark mode, search, RSS, sitemap, author profiles, and a clean publishing workflow that stays inside Notion.
+
+<table>
+  <tr>
+    <td><strong>Notion-native writing</strong><br />Create posts, pages, tags, categories, series, authors, thumbnails, and summaries directly in Notion.</td>
+    <td><strong>Production web defaults</strong><br />Next.js App Router, static generation, image proxying, RSS, sitemap, robots.txt, dynamic OG images, and Organization JSON-LD.</td>
+  </tr>
+  <tr>
+    <td><strong>Beautiful out of the box</strong><br />Responsive layout, dark mode, post animations, pinned-post slideshow, Giscus comments, and customizable branding.</td>
+    <td><strong>Self-host friendly</strong><br />Deploy to Vercel, Docker, or your own Node.js host with explicit environment variables and cache behavior.</td>
+  </tr>
+</table>
+
+---
+
+## Preview
 
 Fresh screenshots are captured from the deployed documentation site.
 
-### Documentation home (Light / Dark)
-
 | Light | Dark |
 |:---:|:---:|
-| ![Home Light](docs/screenshots/home-desktop.png) | ![Home Dark](docs/screenshots/home-dark.png) |
-
-### Documentation article
-
-![Post Detail](docs/screenshots/post-desktop.png)
-
-### Mobile documentation home
+| ![Documentation home light](docs/screenshots/home-desktop.png) | ![Documentation home dark](docs/screenshots/home-dark.png) |
 
 <p align="center">
-  <img src="docs/screenshots/home-mobile.png" alt="Mobile" width="300" />
+  <img src="docs/screenshots/post-desktop.png" alt="Documentation article" width="70%" />
+  <br />
+  <img src="docs/screenshots/home-mobile.png" alt="Mobile documentation home" width="260" />
 </p>
 
 ---
 
 ## Features
 
-- **Notion as CMS** — Write and manage posts directly in Notion
-- **Multi-author support** — Separate authors database with avatars, bios, and social links
-- **Categories & tags** — Organize posts with customizable categories and freeform tags
-- **Series** — Group related posts into a series with navigation
-- **Full-text search** — Built-in search API with instant results
-- **Dark mode** — System-aware theme switching with a small built-in theme preference hook
-- **SEO optimized** — Open Graph, dynamic OG image generation, sitemap, robots.txt, RSS feed, and Organization JSON-LD
-- **Giscus comments** — GitHub Discussions-based commenting system
-- **Responsive design** — Mobile-first layout with Tailwind CSS
-- **Custom branding** — Custom logo, favicon, and footer links
-- **Post animations** — Typewriter title effect and slide-up reveal on post detail pages
-- **Newsletter CTA** — Optional subscription section on the home feed
-- **Share button** — Native Web Share API with clipboard fallback
-- **Docker ready** — Production Dockerfile with multi-stage build
-- **On-demand revalidation** — Webhook endpoint to refresh content instantly
+- **Notion as CMS** — Write and manage posts directly in Notion.
+- **Multi-author support** — Optional Authors data source with avatars, bios, roles, and social links.
+- **Categories, tags, and series** — Organize posts with category pages, tag filtering, and previous/next series navigation.
+- **Full-text search** — Built-in search API with instant dropdown results and a dedicated search page.
+- **Dark mode** — System-aware theme switching with a small built-in preference hook.
+- **SEO optimized** — Open Graph, dynamic OG image generation, sitemap, robots.txt, RSS feed, canonical URLs, and Organization JSON-LD.
+- **Stable Notion images** — Signed image proxy for uploaded Notion files whose source URLs expire.
+- **Giscus comments** — GitHub Discussions-based comments for post detail pages.
+- **Responsive UI** — Mobile-first layout styled with Tailwind CSS 4.
+- **Custom branding** — Configure name, logo, favicon, colors, fonts, footer links, social links, categories, and copy.
+- **Docker ready** — Multi-stage production Dockerfile and compose example.
+- **On-demand revalidation** — Refresh content immediately through a protected revalidation endpoint.
 
 ---
 
 ## Quick Start
 
-### 1. Copy the Notion template
+### 1. Duplicate the Notion template
 
-Open the public Notion page below and click **Duplicate** to copy the full template into your Notion workspace.
+Open the public Notion page below and click **Duplicate** to copy the full template into your own Notion workspace.
 
 > **[Duplicate the Notion-As-Blog Template](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)**
 
@@ -69,15 +93,16 @@ The template includes a **Posts** data source, an optional **Authors** data sour
 
 ### 2. Create a Notion integration
 
-1. Go to [My Integrations](https://www.notion.so/profile/integrations) and click **New integration**
-2. Give it a name (e.g. `notion-as-blog`) and select the workspace where you duplicated the template
-3. Copy the **Internal Integration Secret** — this is your `NOTION_API_KEY`
+1. Go to [My Integrations](https://www.notion.so/profile/integrations) and click **New integration**.
+2. Give it a name, for example `notion-as-blog`.
+3. Select the workspace where you duplicated the template.
+4. Copy the **Internal Integration Secret** — this is your `NOTION_API_KEY`.
 
 ### 3. Connect the integration to your databases
 
-1. Open the **Posts** database page in Notion
-2. Click **···** (top-right) → **Connections** → find your integration and **Connect**
-3. Repeat for the **Authors** database
+1. Open the **Posts** database page in Notion.
+2. Click **···** (top-right) → **Connections** → find your integration and **Connect**.
+3. Repeat for the **Authors** database if you want rich author profiles.
 
 ### 4. Get your data source IDs
 
@@ -88,7 +113,7 @@ Open the duplicated Posts database, connect your integration, then copy the Post
 ### 5. Clone and configure
 
 ```bash
-git clone https://github.com/your-username/notion-as-blog.git
+git clone https://github.com/catuscio/notion-as-blog.git
 cd notion-as-blog
 npm install
 cp .env.example .env.local
@@ -104,7 +129,7 @@ TOKEN_FOR_REVALIDATE=any_random_secret_string
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
 
-### 6. Run the development server
+### 6. Run locally
 
 ```bash
 npm run dev

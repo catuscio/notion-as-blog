@@ -1,0 +1,188 @@
+<svg width="2400" height="800" viewBox="0 0 2400 800" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Notion-As-Blog hero preview</title>
+  <desc id="desc">A polished product banner showing a Notion CMS database flowing into a dark mode Next.js blog on desktop and mobile.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="2400" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffaf3"/>
+      <stop offset="0.43" stop-color="#f8f1ec"/>
+      <stop offset="0.62" stop-color="#dfeffc"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <radialGradient id="glowPink" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1020 265) rotate(90) scale(260 360)">
+      <stop stop-color="#ff6b81" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ff6b81" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowBlue" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1290 260) rotate(90) scale(310 520)">
+      <stop stop-color="#38bdf8" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="screen" x1="1350" y1="120" x2="1750" y2="470" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#35b7e8"/>
+      <stop offset="0.35" stop-color="#174363"/>
+      <stop offset="0.7" stop-color="#d4c6af"/>
+      <stop offset="1" stop-color="#07111d"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#0f172a" flood-opacity="0.20"/>
+    </filter>
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.8" fill="#ffffff" opacity="0.38"/>
+    </pattern>
+  </defs>
+
+  <rect width="2400" height="800" fill="url(#bg)"/>
+  <rect x="780" y="0" width="660" height="800" fill="url(#dots)" opacity="0.72"/>
+  <rect x="660" y="0" width="740" height="650" fill="url(#glowPink)"/>
+  <rect x="1030" y="0" width="650" height="650" fill="url(#glowBlue)"/>
+
+  <!-- Notion database card -->
+  <g filter="url(#shadow)">
+    <rect x="46" y="42" width="680" height="398" rx="28" fill="#fffdf9" opacity="0.94"/>
+    <rect x="46.5" y="42.5" width="679" height="397" rx="27.5" stroke="#fff" stroke-opacity="0.9"/>
+    <g transform="translate(88 78)">
+      <rect width="32" height="32" rx="7" fill="#ffffff" stroke="#262626" stroke-width="2"/>
+      <path d="M10 8.5h12l-2.8 2.3v13L10 11.8V8.5Zm3.4 3.9 5.3 7.1v-7.1h-2.1v-1.5h5.2v1.5h-1.5v12.2h-2.1l-6.4-8.8v6.8h2.2v1.5H8.7v-1.5h1.6V12.4H8.7v-1.5h4.7v1.5Z" fill="#262626"/>
+    </g>
+    <text x="144" y="100" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="28" font-weight="800" fill="#262626">Blog Posts</text>
+    <text x="128" y="156" font-family="Inter, ui-sans-serif, system-ui" font-size="15" font-weight="700" fill="#8a817c">Aa&#160; Title</text>
+    <text x="304" y="156" font-family="Inter, ui-sans-serif, system-ui" font-size="15" font-weight="700" fill="#8a817c">◉&#160; Status</text>
+    <text x="424" y="156" font-family="Inter, ui-sans-serif, system-ui" font-size="15" font-weight="700" fill="#8a817c">☷&#160; Tags</text>
+    <text x="574" y="156" font-family="Inter, ui-sans-serif, system-ui" font-size="15" font-weight="700" fill="#8a817c">▣&#160; Date</text>
+    <line x1="82" y1="176" x2="692" y2="176" stroke="#ede7e0"/>
+    <g font-family="Inter, ui-sans-serif, system-ui" font-size="16" fill="#605a55">
+      <g transform="translate(90 203)">
+        <text y="11">▧</text><rect x="38" y="0" width="142" height="13" rx="6.5" fill="#ded9d2"/>
+        <rect x="212" y="-9" width="98" height="28" rx="14" fill="#d9f2df"/><text x="230" y="11" font-weight="700" fill="#267147">Published</text>
+        <rect x="330" y="-9" width="92" height="28" rx="14" fill="#ffe2e6"/><text x="348" y="11" fill="#a04b5a">Product</text>
+        <text x="482" y="11" fill="#605a55">May 29, 2026</text>
+      </g>
+      <g transform="translate(90 252)">
+        <text y="11">▧</text><rect x="38" y="0" width="142" height="13" rx="6.5" fill="#ded9d2"/>
+        <rect x="212" y="-9" width="70" height="28" rx="14" fill="#ffe5ba"/><text x="231" y="11" fill="#b36b1d">Draft</text>
+        <rect x="330" y="-9" width="125" height="28" rx="14" fill="#eee"/><text x="348" y="11" fill="#666">Development</text>
+        <text x="482" y="11" fill="#605a55">May 28, 2026</text>
+      </g>
+      <g transform="translate(90 301)">
+        <text y="11">▧</text><rect x="38" y="0" width="142" height="13" rx="6.5" fill="#ded9d2"/>
+        <rect x="212" y="-9" width="98" height="28" rx="14" fill="#d9f2df"/><text x="230" y="11" font-weight="700" fill="#267147">Published</text>
+        <rect x="330" y="-9" width="80" height="28" rx="14" fill="#eee"/><text x="350" y="11" fill="#666">Design</text>
+        <text x="482" y="11" fill="#605a55">May 27, 2026</text>
+      </g>
+    </g>
+    <rect x="79" y="333" width="613" height="52" rx="8" stroke="#e3ddd5" stroke-width="2" fill="#fff"/>
+    <text x="96" y="365" font-family="Inter, ui-sans-serif, system-ui" font-size="18" fill="#c3bcb4">＋ &#160; New page</text>
+    <rect x="302" y="398" width="168" height="42" rx="21" fill="#fff9f2"/>
+    <text x="332" y="424" font-family="Inter, ui-sans-serif, system-ui" font-size="18" font-weight="700" fill="#665e57">▦&#160; Notion CMS</text>
+  </g>
+
+  <!-- Middle pipeline -->
+  <g filter="url(#softShadow)">
+    <rect x="836" y="104" width="88" height="92" rx="18" fill="#fff" opacity="0.95"/>
+    <text x="866" y="152" font-family="Georgia, serif" font-size="34" font-weight="700" fill="#262626">T</text>
+    <text x="858" y="178" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="700" fill="#6b625b">Text</text>
+    <rect x="836" y="224" width="88" height="92" rx="18" fill="#fff" opacity="0.95"/>
+    <text x="862" y="274" font-family="Inter, ui-sans-serif, system-ui" font-size="34" fill="#262626">▴</text>
+    <text x="853" y="300" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="700" fill="#6b625b">Media</text>
+    <rect x="836" y="344" width="88" height="92" rx="18" fill="#fff" opacity="0.95"/>
+    <text x="861" y="392" font-family="Inter, ui-sans-serif, system-ui" font-size="34" fill="#262626">☷</text>
+    <text x="852" y="418" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="700" fill="#6b625b">Blocks</text>
+  </g>
+  <g opacity="0.54" stroke-linecap="round">
+    <path d="M724 218 C820 200, 880 206, 1010 258" stroke="#ff7a8e"/>
+    <path d="M724 282 C830 282, 910 278, 1010 258" stroke="#ff7a8e"/>
+    <path d="M724 358 C830 350, 920 324, 1010 258" stroke="#ff7a8e"/>
+    <path d="M1090 258 C1190 224, 1260 184, 1340 156" stroke="#38bdf8"/>
+    <path d="M1090 258 C1195 260, 1260 260, 1340 268" stroke="#38bdf8"/>
+    <path d="M1090 258 C1208 316, 1268 360, 1340 410" stroke="#38bdf8"/>
+  </g>
+  <g filter="url(#softShadow)">
+    <circle cx="1074" cy="264" r="48" fill="#111827" stroke="#fff" stroke-width="9"/>
+    <text x="1052" y="281" font-family="Inter, ui-sans-serif, system-ui" font-size="42" fill="#fff">→</text>
+  </g>
+
+  <!-- Desktop app -->
+  <g filter="url(#shadow)">
+    <rect x="1246" y="38" width="828" height="638" rx="28" fill="#181818"/>
+    <rect x="1247.5" y="39.5" width="825" height="635" rx="26.5" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3"/>
+    <text x="1284" y="78" font-family="Inter, ui-sans-serif, system-ui" font-size="19" font-weight="900" fill="#f8fafc">Notion-As-Blog</text>
+    <g font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="700" fill="#8f8f8f">
+      <text x="1728" y="75">About</text><text x="1784" y="75">Development</text><text x="1886" y="75">Design</text><text x="1948" y="75">Product</text><text x="2020" y="77">◔</text>
+    </g>
+    <g transform="translate(1283 118)">
+      <rect width="754" height="290" rx="12" fill="url(#screen)"/>
+      <path d="M110 0 C225 62, 325 120, 462 290" stroke="#e5edf5" stroke-width="18" opacity="0.75"/>
+      <path d="M160 0 C270 72, 386 146, 512 290" stroke="#0f2f52" stroke-width="24" opacity="0.55"/>
+      <path d="M20 0 C140 70, 265 160, 390 290" stroke="#8bd4f5" stroke-width="22" opacity="0.65"/>
+      <rect width="754" height="290" rx="12" fill="#000" opacity="0.28"/>
+      <rect x="26" y="139" width="64" height="25" rx="12" fill="#063b25"/><text x="39" y="157" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="800" fill="#86efac">Product</text>
+      <text x="26" y="206" font-family="Inter, ui-sans-serif, system-ui" font-size="29" font-weight="900" fill="#fff">Welcome to Notion-As-Blog</text>
+      <text x="26" y="239" font-family="Inter, ui-sans-serif, system-ui" font-size="16" fill="#e5e7eb">A guided overview of what Notion-As-Blog is, who it is for,</text>
+      <text x="26" y="263" font-family="Inter, ui-sans-serif, system-ui" font-size="16" fill="#e5e7eb">and how the documentation is organized.</text>
+    </g>
+    <text x="1284" y="486" font-family="Inter, ui-sans-serif, system-ui" font-size="22" font-weight="900" fill="#f8fafc">Recent Posts</text>
+    <rect x="1835" y="461" width="190" height="34" rx="17" fill="#2a2a2a"/>
+    <text x="1856" y="482" font-family="Inter, ui-sans-serif, system-ui" font-size="13" fill="#9ca3af">⌕ Search articles…</text>
+    <text x="1288" y="539" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="800" fill="#86efac">Product</text>
+    <text x="1355" y="539" font-family="Inter, ui-sans-serif, system-ui" font-size="13" fill="#a3a3a3">May 29, 2026</text>
+    <text x="1284" y="581" font-family="Inter, ui-sans-serif, system-ui" font-size="22" font-weight="900" fill="#f8fafc">Welcome to Notion-As-Blog</text>
+    <text x="1284" y="616" font-family="Inter, ui-sans-serif, system-ui" font-size="14" fill="#d1d5db">A guided overview of what Notion-As-Blog is, who it is for,</text>
+    <text x="1284" y="637" font-family="Inter, ui-sans-serif, system-ui" font-size="14" fill="#d1d5db">and how the documentation is organized.</text>
+    <rect x="1648" y="522" width="154" height="106" rx="9" fill="url(#screen)"/>
+    <rect x="1835" y="541" width="180" height="30" rx="15" fill="#7f1d1d" opacity="0.78"/>
+    <text x="1851" y="561" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="800" fill="#fff">All Posts</text>
+    <text x="1991" y="561" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="800" fill="#fff">11</text>
+    <text x="1845" y="611" font-family="Inter, ui-sans-serif, system-ui" font-size="15" fill="#d1d5db">Notion</text>
+    <text x="2011" y="611" font-family="Inter, ui-sans-serif, system-ui" font-size="14" fill="#d1d5db">2</text>
+  </g>
+
+  <!-- Mobile app -->
+  <g filter="url(#shadow)">
+    <rect x="2102" y="122" width="270" height="560" rx="28" fill="#191919"/>
+    <rect x="2104" y="124" width="266" height="556" rx="26" stroke="#fff" stroke-opacity="0.18" stroke-width="3"/>
+    <text x="2124" y="161" font-family="Inter, ui-sans-serif, system-ui" font-size="17" font-weight="900" fill="#fff">Notion-As-Blog</text>
+    <text x="2340" y="160" font-family="Inter, ui-sans-serif, system-ui" font-size="18" fill="#fff">◔</text>
+    <rect x="2124" y="195" width="232" height="212" rx="10" fill="url(#screen)"/>
+    <rect x="2124" y="195" width="232" height="212" rx="10" fill="#000" opacity="0.30"/>
+    <rect x="2140" y="232" width="54" height="22" rx="11" fill="#dcfce7"/><text x="2151" y="248" font-family="Inter, ui-sans-serif, system-ui" font-size="11" font-weight="800" fill="#15803d">Product</text>
+    <text x="2140" y="294" font-family="Inter, ui-sans-serif, system-ui" font-size="19" font-weight="900" fill="#fff">Welcome to</text>
+    <text x="2140" y="318" font-family="Inter, ui-sans-serif, system-ui" font-size="19" font-weight="900" fill="#fff">Notion-As-Blog</text>
+    <text x="2140" y="348" font-family="Inter, ui-sans-serif, system-ui" font-size="12" fill="#e5e7eb">A guided overview of what Notion-As-</text>
+    <text x="2140" y="365" font-family="Inter, ui-sans-serif, system-ui" font-size="12" fill="#e5e7eb">Blog is, who it is for, and how the</text>
+    <text x="2140" y="382" font-family="Inter, ui-sans-serif, system-ui" font-size="12" fill="#e5e7eb">documentation is organized.</text>
+    <text x="2124" y="462" font-family="Inter, ui-sans-serif, system-ui" font-size="21" font-weight="900" fill="#fff">Recent Posts</text>
+    <rect x="2124" y="486" width="232" height="35" rx="17" fill="#2a2a2a"/><text x="2147" y="508" font-family="Inter, ui-sans-serif, system-ui" font-size="13" fill="#a3a3a3">⌕ Search articles…</text>
+    <rect x="2124" y="544" width="48" height="30" rx="15" fill="#fb7185"/><text x="2140" y="564" font-family="Inter, ui-sans-serif, system-ui" font-size="13" font-weight="800" fill="#fff">All</text>
+    <rect x="2185" y="544" width="84" height="30" rx="15" fill="#3a3a3a"/><text x="2202" y="564" font-family="Inter, ui-sans-serif, system-ui" font-size="13" fill="#d1d5db">Notion&#160; 2</text>
+    <rect x="2124" y="610" width="232" height="105" rx="10" fill="url(#screen)"/>
+  </g>
+
+  <!-- Big title -->
+  <g>
+    <rect x="46" y="494" width="114" height="108" rx="25" fill="#fff" stroke="#fb7185" stroke-width="4"/>
+    <path d="M81 532h43M81 556h43M81 580h43" stroke="#fb7185" stroke-width="9" stroke-linecap="round"/>
+    <text x="188" y="564" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="92" font-weight="950" letter-spacing="-4" fill="#242424">Notion-As-Blog</text>
+    <text x="188" y="618" font-family="Inter, ui-sans-serif, system-ui" font-size="34" font-weight="900" fill="#fb7185">Write in Notion. Publish with Next.js.</text>
+    <text x="46" y="668" font-family="Inter, ui-sans-serif, system-ui" font-size="31" fill="#7c736c">A modern open-source blog template powered by Notion as a CMS.</text>
+  </g>
+
+  <!-- Feature pills -->
+  <g font-family="Inter, ui-sans-serif, system-ui" font-size="24" font-weight="800">
+    <rect x="121" y="710" width="274" height="58" rx="18" fill="#fffaf4" stroke="#efe2d5"/>
+    <text x="154" y="747" fill="#73675f">▦&#160; Notion CMS</text>
+    <rect x="449" y="710" width="250" height="58" rx="18" fill="#fff1f2" stroke="#ffd7dd"/>
+    <text x="480" y="747" fill="#8f5058">&lt;/&gt;&#160; Next.js 16</text>
+    <rect x="757" y="710" width="272" height="58" rx="18" fill="#eff8ff" stroke="#bee3ff"/>
+    <text x="799" y="747" fill="#2b74a7">▣&#160; TypeScript</text>
+    <rect x="1086" y="710" width="305" height="58" rx="18" fill="#effcfd" stroke="#b9edf0"/>
+    <text x="1128" y="747" fill="#23798b">∿&#160; Tailwind CSS</text>
+    <rect x="1448" y="710" width="180" height="58" rx="18" fill="#fbf7ff" stroke="#e5d7ff"/>
+    <text x="1488" y="747" fill="#7c5ea7">⌕&#160; SEO</text>
+    <rect x="1683" y="710" width="218" height="58" rx="18" fill="#f3fbf1" stroke="#d8efd1"/>
+    <text x="1721" y="747" fill="#357c4c">☏&#160; Giscus</text>
+    <rect x="1958" y="710" width="270" height="58" rx="18" fill="#ffffff" opacity="0.75" stroke="#ffffff"/>
+    <text x="2001" y="747" fill="#1f2937">◔&#160; Dark Mode</text>
+  </g>
+</svg>
