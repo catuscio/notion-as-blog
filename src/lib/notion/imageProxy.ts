@@ -6,6 +6,13 @@ export const NOTION_IMAGE_API_PATH = "/api/notion-image";
 
 const SIGNATURE_PARAM = "sig";
 const SIGNED_KEYS = ["blockId", "cover", "pageId", "property"] as const;
+const ALLOWED_NOTION_FILE_HOSTS = new Set([
+  "www.notion.so",
+  "notion.so",
+  "prod-files-secure.s3.us-west-2.amazonaws.com",
+  "s3.us-west-2.amazonaws.com",
+  "s3-us-west-2.amazonaws.com",
+]);
 
 type SignedKey = (typeof SIGNED_KEYS)[number];
 type ImageReference = Partial<Record<SignedKey, string>>;
@@ -62,6 +69,15 @@ export function hasValidNotionImageSignature(searchParams: URLSearchParams) {
   const suppliedSignature = searchParams.get(SIGNATURE_PARAM) || "";
 
   return Boolean(expectedSignature && suppliedSignature && safeEqual(suppliedSignature, expectedSignature));
+}
+
+export function isAllowedNotionFileUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && ALLOWED_NOTION_FILE_HOSTS.has(parsed.hostname);
+  } catch {
+    return false;
+  }
 }
 
 function notionFileUrl(file: NotionFileValue | null | undefined) {
@@ -161,7 +177,7 @@ export async function readNotionImageResizedAsBase64(
 
   try {
     const resolvedUrl = await resolveNotionImageUrl(searchParams);
-    if (!resolvedUrl) return null;
+    if (!resolvedUrl || !isAllowedNotionFileUrl(resolvedUrl)) return null;
 
     const response = await fetch(resolvedUrl);
     if (!response.ok) return null;

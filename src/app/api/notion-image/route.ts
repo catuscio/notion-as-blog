@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   hasValidNotionImageSignature,
+  isAllowedNotionFileUrl,
   resolveNotionImageUrl,
 } from "@/lib/notion/imageProxy";
 
@@ -33,6 +34,10 @@ function cacheHeaders() {
 }
 
 async function proxyFile(url: string) {
+  if (!isAllowedNotionFileUrl(url)) {
+    return new NextResponse("Unsupported Notion file URL", { status: 400 });
+  }
+
   const response = await fetch(url);
   if (!response.ok || !response.body) {
     return new NextResponse("Failed to fetch Notion file", { status: 502 });
