@@ -18,6 +18,12 @@
     <a href="#빠른-시작"><strong>빠른 시작</strong></a>
     ·
     <a href="README.md"><strong>English</strong></a>
+    ·
+    <strong>한국어</strong>
+    ·
+    <a href="README.zh-CN.md"><strong>简体中文</strong></a>
+    ·
+    <a href="README.ja.md"><strong>日本語</strong></a>
   </p>
 
   <p>
