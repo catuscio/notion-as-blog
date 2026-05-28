@@ -1,7 +1,10 @@
 # Notion-As-Blog
 
 A modern, open-source blog template powered by **Notion** as a CMS and **Next.js 16**.
-Write posts in Notion, and they appear on your blog automatically.
+Duplicate the public Notion template, connect your integration, and publish a fast, SEO-friendly blog from your own workspace.
+
+- **Official docs:** [notion-as-blog.vercel.app](https://notion-as-blog.vercel.app)
+- **Notion template:** [Duplicate the Notion-As-Blog Template](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
@@ -14,17 +17,19 @@ Write posts in Notion, and they appear on your blog automatically.
 
 ## Screenshots
 
-### Home (Light / Dark)
+Fresh screenshots are captured from the deployed documentation site.
+
+### Documentation home (Light / Dark)
 
 | Light | Dark |
 |:---:|:---:|
 | ![Home Light](docs/screenshots/home-desktop.png) | ![Home Dark](docs/screenshots/home-dark.png) |
 
-### Post Detail
+### Documentation article
 
 ![Post Detail](docs/screenshots/post-desktop.png)
 
-### Mobile
+### Mobile documentation home
 
 <p align="center">
   <img src="docs/screenshots/home-mobile.png" alt="Mobile" width="300" />
@@ -56,11 +61,11 @@ Write posts in Notion, and they appear on your blog automatically.
 
 ### 1. Copy the Notion template
 
-Open the link below and duplicate the template to your Notion workspace.
+Open the public Notion page below and click **Duplicate** to copy the full template into your Notion workspace.
 
 > **[Duplicate the Notion-As-Blog Template](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)**
 
-The template includes a **Posts** data source and an **Authors** data source with sample content, so you can start writing immediately. Make sure the public Notion page has **Duplicate as template** enabled, then duplicate it into your own workspace.
+The template includes a **Posts** data source, an optional **Authors** data source, and documentation-style sample content. After duplicating, all database rows belong to your workspace, so you can safely edit or delete them.
 
 ### 2. Create a Notion integration
 

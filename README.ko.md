@@ -1,7 +1,10 @@
 # Notion-As-Blog
 
 **Notion**을 CMS로 사용하는 모던 오픈소스 블로그 템플릿입니다. **Next.js 16** 기반.
-Notion에서 글을 쓰면 블로그에 자동으로 반영됩니다.
+공개 Notion 템플릿을 복제하고 Integration을 연결하면, 본인 워크스페이스의 Notion DB를 빠르고 SEO 친화적인 블로그로 배포할 수 있습니다.
+
+- **공식 문서:** [notion-as-blog.vercel.app](https://notion-as-blog.vercel.app)
+- **Notion 템플릿:** [Notion-As-Blog 템플릿 복제](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
@@ -14,17 +17,19 @@ Notion에서 글을 쓰면 블로그에 자동으로 반영됩니다.
 
 ## 스크린샷
 
-### 홈 (라이트 / 다크)
+아래 이미지는 배포된 공식 문서 사이트 기준으로 새로 촬영한 스크린샷입니다.
+
+### 문서 홈 (라이트 / 다크)
 
 | 라이트 | 다크 |
 |:---:|:---:|
 | ![홈 라이트](docs/screenshots/home-desktop.png) | ![홈 다크](docs/screenshots/home-dark.png) |
 
-### 포스트 상세
+### 문서 상세
 
 ![포스트 상세](docs/screenshots/post-desktop.png)
 
-### 모바일
+### 모바일 문서 홈
 
 <p align="center">
   <img src="docs/screenshots/home-mobile.png" alt="모바일" width="300" />
@@ -56,11 +61,11 @@ Notion에서 글을 쓰면 블로그에 자동으로 반영됩니다.
 
 ### 1. Notion 템플릿 복제
 
-아래 링크를 열고 템플릿을 본인의 Notion 워크스페이스에 복제하세요.
+아래 공개 Notion 페이지를 열고 **Duplicate**를 눌러 전체 템플릿을 본인의 Notion 워크스페이스로 복제하세요.
 
-> **[Notion-As-Blog 템플릿](https://www.notion.so/welcometogyuminworld/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)**
+> **[Notion-As-Blog 템플릿 복제](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)**
 
-템플릿에는 샘플 데이터가 포함된 **Posts** 데이터베이스와 **Authors** 데이터베이스가 있어 바로 글쓰기를 시작할 수 있습니다.
+템플릿에는 **Posts** data source, 선택 사항인 **Authors** data source, 문서형 샘플 콘텐츠가 포함되어 있습니다. 복제 후에는 모든 DB row가 본인 워크스페이스에 속하므로 자유롭게 수정하거나 삭제할 수 있습니다.
 
 ### 2. Notion Integration 생성
 
