@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useId } from "react";
-import { useTheme } from "next-themes";
+import { useThemePreference } from "@/hooks/useThemePreference";
 
 interface MermaidRendererProps {
   code: string;
@@ -10,7 +10,7 @@ interface MermaidRendererProps {
 export function MermaidRenderer({ code }: MermaidRendererProps) {
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState(false);
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme } = useThemePreference();
   const uniqueId = useId().replace(/:/g, "_");
 
   useEffect(() => {

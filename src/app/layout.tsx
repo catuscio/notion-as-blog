@@ -1,11 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { GoogleAnalytics } from "@next/third-parties/google";
-import { ThemeProvider } from "next-themes";
+import Script from "next/script";
 import { brand } from "@/config/brand";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WebSiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
-import "katex/dist/katex.min.css";
 import "./globals.css";
 
 export const revalidate = 1800;
@@ -17,6 +15,15 @@ function buildThemeCSS() {
       .join("\n  ");
   const fontVars = `--brand-font-sans: ${brand.fonts.sans.stack};\n  --font-mono-code: "${brand.fonts.mono.family}", monospace;`;
   return `:root {\n  ${fontVars}\n  ${toVars(brand.colors.light)}\n}\n.dark {\n  ${toVars(brand.colors.dark)}\n}`;
+}
+
+function buildThemeInitScript() {
+  return `(function(){try{var key="theme";var stored=localStorage.getItem(key);var system=window.matchMedia("(prefers-color-scheme: dark)").matches;var dark=stored==="dark"||(!stored&&system)||stored==="system"&&system;document.documentElement.classList.toggle("dark",dark);document.documentElement.style.colorScheme=dark?"dark":"light";}catch(_){}})();`;
+}
+
+function buildGoogleAnalyticsInitScript(gaId: string) {
+  const id = JSON.stringify(gaId);
+  return `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config',${id});`;
 }
 
 export const viewport: Viewport = {
@@ -77,21 +84,8 @@ export default function RootLayout({
   return (
     <html lang={brand.lang} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: buildThemeInitScript() }} />
         <style dangerouslySetInnerHTML={{ __html: buildThemeCSS() }} />
-        {brand.fonts.mono.preconnect.map((url) => (
-          <link key={url} rel="preconnect" href={url} crossOrigin="anonymous" />
-        ))}
-        <link
-          rel="preload"
-          as="style"
-          crossOrigin="anonymous"
-          href={brand.fonts.mono.cdn}
-        />
-        <link
-          rel="stylesheet"
-          crossOrigin="anonymous"
-          href={brand.fonts.mono.cdn}
-        />
         <link
           rel="alternate"
           type="application/rss+xml"
@@ -104,19 +98,26 @@ export default function RootLayout({
       <body
         className="font-sans antialiased overflow-x-clip selection:bg-primary/20 selection:text-primary"
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </ThemeProvider>
-        {brand.analytics.gaId && <GoogleAnalytics gaId={brand.analytics.gaId} />}
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
+        {brand.analytics.gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${brand.analytics.gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="google-analytics"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: buildGoogleAnalyticsInitScript(brand.analytics.gaId),
+              }}
+            />
+          </>
+        )}
       </body>
     </html>
   );

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useTheme } from "next-themes";
+import { useThemePreference } from "@/hooks/useThemePreference";
 import { brand } from "@/config/brand";
 
 export function CommentBox() {
   const ref = useRef<HTMLDivElement>(null);
-  const { theme } = useTheme();
+  const { resolvedTheme } = useThemePreference();
 
   const { repo, repoId, category, categoryId } = brand.giscus;
 
@@ -28,7 +28,7 @@ export function CommentBox() {
       "data-reactions-enabled": brand.giscus.reactionsEnabled,
       "data-emit-metadata": brand.giscus.emitMetadata,
       "data-input-position": brand.giscus.inputPosition,
-      "data-theme": theme === "dark" ? "dark" : "light",
+      "data-theme": resolvedTheme,
       "data-lang": brand.lang,
       crossorigin: "anonymous",
     };
@@ -38,7 +38,7 @@ export function CommentBox() {
 
     ref.current.innerHTML = "";
     ref.current.appendChild(script);
-  }, [repo, repoId, category, categoryId, theme]);
+  }, [repo, repoId, category, categoryId, resolvedTheme]);
 
   if (!repo || !repoId) return null;
 

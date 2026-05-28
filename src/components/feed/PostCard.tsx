@@ -6,7 +6,13 @@ import { copy } from "@/config/copy";
 import { formatDate } from "@/lib/format";
 import type { Post } from "@/types";
 
-export function PostCard({ post }: { post: Post }) {
+export function PostCard({
+  post,
+  priorityImage = false,
+}: {
+  post: Post;
+  priorityImage?: boolean;
+}) {
   return (
     <Link href={`/${post.slug}`}>
       <article className="group relative flex flex-col md:flex-row gap-6 md:gap-10 items-start p-4 -mx-4 rounded-2xl hover:bg-muted/50 transition-colors duration-300 cursor-pointer overflow-hidden">
@@ -33,6 +39,7 @@ export function PostCard({ post }: { post: Post }) {
           src={post.thumbnail}
           alt={post.title}
           size="md"
+          preload={priorityImage}
           className="order-1 md:order-2 w-full md:w-48 aspect-video md:aspect-auto md:h-32"
         />
       </article>

@@ -1,3 +1,5 @@
+import "katex/dist/katex.min.css";
+import "@/styles/jetbrains-mono.css";
 import { NotionBlockRenderer } from "@/components/detail/NotionBlockRenderer";
 import type { NotionBlockWithChildren } from "@/lib/notion/types";
 

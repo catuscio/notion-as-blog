@@ -19,6 +19,12 @@ const nextConfig: NextConfig = {
   turbopack: { root: process.cwd() },
   poweredByHeader: false,
   headers: async () => [
+    {
+      source: "/fonts/:path*",
+      headers: [
+        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+      ],
+    },
     { source: "/(.*)", headers: securityHeaders },
   ],
   images: {

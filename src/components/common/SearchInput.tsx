@@ -40,10 +40,16 @@ export function SearchInput() {
 
   const onOpen = useCallback(() => setOpen(true), []);
   const onClose = useCallback(() => setOpen(false), []);
+  const normalizedQuery = query.trim();
   const onSelect = useCallback(
     (post: Post) => router.push(`/${post.slug}`),
     [router]
   );
+  const onSubmit = useCallback(() => {
+    if (normalizedQuery.length < 2) return;
+    setOpen(false);
+    router.push(`/search?q=${encodeURIComponent(normalizedQuery)}`);
+  }, [router, normalizedQuery]);
 
   const { handleInputKeyDown } = useSearchKeyboard({
     inputRef,
@@ -53,9 +59,11 @@ export function SearchInput() {
     onOpen,
     onClose,
     onSelect,
+    onSubmit,
+    canSubmit: normalizedQuery.length >= 2,
   });
 
-  const showDropdown = open && query.trim().length >= 2;
+  const showDropdown = open && normalizedQuery.length >= 2;
 
   return (
     <div ref={containerRef} className="relative">

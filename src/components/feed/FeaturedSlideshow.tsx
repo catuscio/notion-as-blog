@@ -132,9 +132,10 @@ export function FeaturedSlideshow({ posts }: { posts: Post[] }) {
                 src={p.thumbnail}
                 alt={p.title}
                 fill
-                sizes="(max-width: 1024px) 100vw, 1024px"
+                sizes="(max-width: 1024px) calc(100vw - 48px), 1024px"
                 className="object-cover"
-                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "auto"}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
@@ -184,7 +185,7 @@ export function FeaturedSlideshow({ posts }: { posts: Post[] }) {
 
         {/* Indicators */}
         {total > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
             {posts.map((p, i) => (
               <button
                 key={p.id}
@@ -193,13 +194,17 @@ export function FeaturedSlideshow({ posts }: { posts: Post[] }) {
                   e.preventDefault();
                   goTo(i, i > current ? "next" : "prev");
                 }}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === current
-                    ? "w-8 bg-white"
-                    : "w-4 bg-white/40 hover:bg-white/60"
-                }`}
+                className="w-8 h-6 flex items-center justify-center rounded-full"
                 aria-label={copy.aria.goToSlide(i + 1)}
-              />
+              >
+                <span
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === current
+                      ? "w-8 bg-white"
+                      : "w-4 bg-white/40 group-hover:bg-white/60"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         )}

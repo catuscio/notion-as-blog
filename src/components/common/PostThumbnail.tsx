@@ -17,6 +17,10 @@ interface PostThumbnailProps {
   className?: string;
   hoverScale?: boolean;
   fill?: boolean;
+  loading?: "eager" | "lazy";
+  fetchPriority?: "high" | "low" | "auto";
+  preload?: boolean;
+  sizes?: string;
 }
 
 export function PostThumbnail({
@@ -26,6 +30,10 @@ export function PostThumbnail({
   className = "",
   hoverScale = false,
   fill = false,
+  loading,
+  fetchPriority,
+  preload = false,
+  sizes,
 }: PostThumbnailProps) {
   const config = sizeMap[size];
   const roundedClass = size === "sm" ? "rounded-lg" : "rounded-xl";
@@ -45,7 +53,9 @@ export function PostThumbnail({
             src={src}
             alt={alt}
             fill
-            sizes="(max-width: 768px) 100vw, 192px"
+            sizes={sizes ?? "(max-width: 768px) 100vw, 192px"}
+            loading={preload ? "eager" : loading}
+            fetchPriority={preload ? "high" : fetchPriority}
             className={`object-cover ${
               hoverScale
                 ? "transition-transform duration-700 group-hover:scale-110"
@@ -58,6 +68,8 @@ export function PostThumbnail({
             alt={alt}
             width={config.width}
             height={config.height}
+            loading={preload ? "eager" : loading}
+            fetchPriority={preload ? "high" : fetchPriority}
             className={`w-full h-full object-cover ${
               hoverScale
                 ? "transition-transform group-hover:scale-110"

@@ -11,6 +11,8 @@ interface UseSearchKeyboardOptions {
   onOpen: () => void;
   onClose: () => void;
   onSelect: (post: Post) => void;
+  onSubmit: () => void;
+  canSubmit: boolean;
 }
 
 export function useSearchKeyboard({
@@ -21,6 +23,8 @@ export function useSearchKeyboard({
   onOpen,
   onClose,
   onSelect,
+  onSubmit,
+  canSubmit,
 }: UseSearchKeyboardOptions) {
   // Global keyboard shortcut: Cmd/Ctrl+K to focus search
   useEffect(() => {
@@ -48,16 +52,17 @@ export function useSearchKeyboard({
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setActiveIndex((prev) => Math.max(prev - 1, -1));
-      } else if (
-        e.key === "Enter" &&
-        activeIndex >= 0 &&
-        results[activeIndex]
-      ) {
-        e.preventDefault();
-        onSelect(results[activeIndex]);
+      } else if (e.key === "Enter") {
+        if (activeIndex >= 0 && results[activeIndex]) {
+          e.preventDefault();
+          onSelect(results[activeIndex]);
+        } else if (canSubmit) {
+          e.preventDefault();
+          onSubmit();
+        }
       }
     },
-    [results, activeIndex, setActiveIndex, onSelect]
+    [results, activeIndex, setActiveIndex, onSelect, onSubmit, canSubmit]
   );
 
   return { handleInputKeyDown };

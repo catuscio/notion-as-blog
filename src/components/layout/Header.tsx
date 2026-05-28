@@ -1,22 +1,11 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { BrandLogo } from "@/components/common/BrandLogo";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
-import { getCategoryFromPath } from "@/lib/getCategoryFromPath";
-
-const navLinkClass = (active: boolean) =>
-  `text-sm font-medium whitespace-nowrap transition-colors ${
-    active ? "font-bold text-foreground" : "text-muted-foreground hover:text-foreground"
-  }`;
+import { HeaderNav } from "./HeaderNav";
 
 export function Header() {
-  const pathname = usePathname();
-  const activeCategory = getCategoryFromPath(pathname);
-
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border transition-all duration-200">
       <div className="max-w-[1024px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -26,24 +15,14 @@ export function Header() {
             {brand.name}
           </span>
         </Link>
-        <div className="flex items-center gap-4 shrink-0">
-          <nav className="hidden md:flex items-center gap-5 overflow-x-auto hide-scrollbar">
-            <Link href="/about" className={navLinkClass(pathname === "/about")}>
-              {copy.footer.about}
-            </Link>
-            {brand.categories.map((cat) => {
-              const isActive = activeCategory === cat.slug;
-              return (
-                <Link
-                  key={cat.name}
-                  href={`/category/${cat.slug}`}
-                  className={navLinkClass(isActive)}
-                >
-                  {cat.name}
-                </Link>
-              );
-            })}
-          </nav>
+        <div className="flex items-center gap-3 md:gap-4 shrink-0">
+          <HeaderNav aboutLabel={copy.footer.about} categories={brand.categories} />
+          <Link
+            href="/about"
+            className="md:hidden rounded-full px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
+            {copy.footer.about}
+          </Link>
           <ThemeToggle />
           {brand.newsletter.enabled && (
             <Link
