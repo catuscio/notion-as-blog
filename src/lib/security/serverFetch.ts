@@ -53,7 +53,7 @@ function isBlockedHostname(hostname: string) {
   );
 }
 
-async function resolvePublicUrl(value: string) {
+export async function resolvePublicUrl(value: string) {
   let url: URL;
   try {
     url = new URL(value);

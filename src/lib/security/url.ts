@@ -23,6 +23,22 @@ export function safeInternalPath(value: string, siteUrl: string): string | null 
   }
 }
 
+export function safeSameOriginPath(value: string, siteUrl: string): string | null {
+  const internalPath = safeInternalPath(value, siteUrl);
+  if (internalPath) return internalPath;
+
+  const cleaned = cleanUrl(value);
+  if (!cleaned) return null;
+
+  try {
+    const base = new URL(siteUrl);
+    const url = new URL(cleaned);
+    return url.origin === base.origin ? `${url.pathname}${url.search}${url.hash}` : null;
+  } catch {
+    return null;
+  }
+}
+
 export function safeLinkHref(value: string): string | null {
   const cleaned = cleanUrl(value);
   if (!cleaned) return null;

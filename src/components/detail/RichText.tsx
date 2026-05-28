@@ -1,21 +1,12 @@
 import Link from "next/link";
 import { brand } from "@/config/brand";
 import { notionColorClass } from "@/lib/notion/colorMap";
-import { safeInternalPath, safeLinkHref } from "@/lib/security/url";
+import { safeLinkHref, safeSameOriginPath } from "@/lib/security/url";
 import type { NotionRichText } from "@/lib/notion/types";
 import { InlineEquation } from "./EquationRenderer";
 
 function toInternalPath(href: string): string | null {
-  const internalPath = safeInternalPath(href, brand.url);
-  if (internalPath) return internalPath;
-
-  try {
-    const url = new URL(href);
-    if (url.origin === brand.url) return url.pathname + url.search + url.hash;
-  } catch {
-    // invalid URL, treat as external
-  }
-  return null;
+  return safeSameOriginPath(href, brand.url);
 }
 
 export function RichText({ richText }: { richText: NotionRichText[] }) {
