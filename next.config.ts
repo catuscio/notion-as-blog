@@ -29,6 +29,10 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=()",
   },
   {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin-allow-popups",
+  },
+  {
     key: "Content-Security-Policy-Report-Only",
     value: contentSecurityPolicyReportOnly,
   },
