@@ -5,6 +5,7 @@ import { notionColorClass } from "@/lib/notion/colorMap";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { stableBlockFileUrl } from "@/lib/notion/imageProxy";
+import { safeResourceUrl, youtubeEmbedUrl } from "@/lib/security/url";
 import { RichText } from "./RichText";
 import { groupListItems } from "./groupListItems";
 import { EquationBlock } from "./EquationRenderer";
@@ -251,21 +252,19 @@ function ImageBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "video") return null;
-  const url = getFileUrl(block.video, block.id);
+  const url = safeResourceUrl(getFileUrl(block.video, block.id) ?? "", brand.url);
   if (!url) return null;
 
-  // YouTube embed detection
-  const ytMatch = url.match(
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/
-  );
-  if (ytMatch) {
+  const youtubeUrl = youtubeEmbedUrl(url);
+  if (youtubeUrl) {
     return (
       <div className="my-6 aspect-video rounded-xl overflow-hidden">
         <iframe
-          src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+          src={youtubeUrl}
           className="w-full h-full"
           allowFullScreen
           loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
           title={copy.aria.youtubeVideo}
         />
       </div>
@@ -281,7 +280,7 @@ function VideoBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function AudioBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "audio") return null;
-  const url = getFileUrl(block.audio, block.id);
+  const url = safeResourceUrl(getFileUrl(block.audio, block.id) ?? "", brand.url);
   if (!url) return null;
   const caption = block.audio.caption;
 
@@ -299,7 +298,7 @@ function AudioBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function FileBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "file") return null;
-  const url = getFileUrl(block.file, block.id);
+  const url = safeResourceUrl(getFileUrl(block.file, block.id) ?? "", brand.url);
   if (!url) return null;
   const caption = block.file.caption;
   const filename = caption && caption.length > 0
@@ -323,7 +322,7 @@ function FileBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function PdfBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "pdf") return null;
-  const url = getFileUrl(block.pdf, block.id);
+  const url = safeResourceUrl(getFileUrl(block.pdf, block.id) ?? "", brand.url);
   if (!url) return null;
   const caption = block.pdf.caption;
 
@@ -334,6 +333,7 @@ function PdfBlock({ block }: { block: NotionBlockWithChildren }) {
         className="w-full h-[600px] rounded-xl border border-border"
         title="PDF"
         loading="lazy"
+        referrerPolicy="strict-origin-when-cross-origin"
       />
       {caption && caption.length > 0 && (
         <figcaption className="text-center text-sm text-muted-foreground mt-2">
@@ -366,13 +366,18 @@ function LinkPreviewBlock({ block }: { block: NotionBlockWithChildren }) {
 
 function EmbedBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "embed") return null;
+  const url = safeResourceUrl(block.embed.url, brand.url);
+  if (!url) return null;
+
   return (
     <div className="my-6 aspect-video rounded-xl overflow-hidden">
       <iframe
-        src={block.embed.url}
+        src={url}
         className="w-full h-full"
         allowFullScreen
         loading="lazy"
+        referrerPolicy="strict-origin-when-cross-origin"
+        sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-same-origin"
         title={copy.aria.embeddedContent}
       />
     </div>

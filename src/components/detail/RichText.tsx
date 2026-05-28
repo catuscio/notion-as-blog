@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { brand } from "@/config/brand";
 import { notionColorClass } from "@/lib/notion/colorMap";
+import { safeInternalPath, safeLinkHref } from "@/lib/security/url";
 import type { NotionRichText } from "@/lib/notion/types";
 import { InlineEquation } from "./EquationRenderer";
 
 function toInternalPath(href: string): string | null {
-  if (href.startsWith("/")) return href;
+  const internalPath = safeInternalPath(href, brand.url);
+  if (internalPath) return internalPath;
+
   try {
     const url = new URL(href);
     if (url.origin === brand.url) return url.pathname + url.search + url.hash;
@@ -66,9 +69,12 @@ export function RichText({ richText }: { richText: NotionRichText[] }) {
               </Link>
             );
           } else {
+            const externalHref = safeLinkHref(t.href);
+            if (!externalHref) return <span key={i}>{node}</span>;
+
             node = (
               <a
-                href={t.href}
+                href={externalHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary underline underline-offset-2"

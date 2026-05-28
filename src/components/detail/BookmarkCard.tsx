@@ -1,5 +1,7 @@
 import Image from "next/image";
+import { brand } from "@/config/brand";
 import { RichText } from "./RichText";
+import { safeResourceUrl } from "@/lib/security/url";
 import type { NotionRichText } from "@/lib/notion/types";
 import type { OgMetadata } from "@/lib/notion/ogMetadata";
 
@@ -20,13 +22,16 @@ export function BookmarkCard({
   caption?: NotionRichText[];
   og?: OgMetadata;
 }) {
-  const domain = getDomain(url);
+  const safeUrl = safeResourceUrl(url, brand.url);
+  if (!safeUrl) return null;
+
+  const domain = getDomain(safeUrl);
   const hasOg = !!og?.title;
 
   return (
     <div className="my-4">
       <a
-        href={url}
+        href={safeUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="group block rounded-xl border border-border overflow-hidden hover:bg-muted/50 transition-colors"
