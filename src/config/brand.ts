@@ -69,6 +69,9 @@ export const brand = {
   /** Full URL of the deployed site (no trailing slash) — used in sitemap, OG tags, etc. */
   url: "https://notion-as-blog.vercel.app",
 
+  /** Public Notion template page users can duplicate into their own workspace */
+  templateUrl: "https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link",
+
   /** Year shown in the footer copyright. e.g. "© 2025 – 2026" */
   since: 2025,
 

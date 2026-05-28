@@ -77,5 +77,6 @@ export const copy = {
   footer: {
     home: "Home",
     about: "About",
+    template: "Template",
   },
 } as const;

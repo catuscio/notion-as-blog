@@ -22,6 +22,14 @@ export function Footer() {
             <Link href="/about" className="hover:text-primary transition-colors">
               {copy.footer.about}
             </Link>
+            <a
+              href={brand.templateUrl}
+              className="hover:text-primary transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {copy.footer.template}
+            </a>
           </div>
           <div className="flex items-center gap-3">
             {socialIconMap.map(({ key, label, icon }) => {

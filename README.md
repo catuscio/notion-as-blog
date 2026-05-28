@@ -58,9 +58,9 @@ Write posts in Notion, and they appear on your blog automatically.
 
 Open the link below and duplicate the template to your Notion workspace.
 
-> **[Notion-As-Blog Template](https://www.notion.so/welcometogyuminworld/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)**
+> **[Duplicate the Notion-As-Blog Template](https://welcometogyuminworld.notion.site/Notion-As-Blog-30ab152141a480309a9ede1f8cac4cc7?source=copy_link)**
 
-The template includes a **Posts** database and an **Authors** database with sample data, so you can start writing immediately.
+The template includes a **Posts** data source and an **Authors** data source with sample content, so you can start writing immediately. Make sure the public Notion page has **Duplicate as template** enabled, then duplicate it into your own workspace.
 
 ### 2. Create a Notion integration
 
@@ -74,16 +74,11 @@ The template includes a **Posts** database and an **Authors** database with samp
 2. Click **···** (top-right) → **Connections** → find your integration and **Connect**
 3. Repeat for the **Authors** database
 
-### 4. Get your database IDs
+### 4. Get your data source IDs
 
-Each Notion database has a unique ID in its URL:
+`NOTION_DATA_SOURCE_ID` expects the **Notion data source ID**, which can be different from the database ID shown in the URL in recent Notion API versions.
 
-```
-https://www.notion.so/{workspace}/{database_id}?v=...
-                                   ^^^^^^^^^^^
-```
-
-Copy the ID for both the Posts database (`NOTION_DATA_SOURCE_ID`) and the Authors database (`NOTION_AUTHORS_DATA_SOURCE_ID`).
+Open the duplicated Posts database, connect your integration, then copy the Posts data source ID for `NOTION_DATA_SOURCE_ID`. Repeat for the Authors data source if you want author profiles. If you accidentally use the database ID, builds can fail with `object_not_found`.
 
 ### 5. Clone and configure
 
@@ -98,8 +93,8 @@ Edit `.env.local`:
 
 ```env
 NOTION_API_KEY=secret_xxxxxxxxxxxxxxxxxxxxx
-NOTION_DATA_SOURCE_ID=your_posts_database_id
-NOTION_AUTHORS_DATA_SOURCE_ID=your_authors_database_id
+NOTION_DATA_SOURCE_ID=your_posts_data_source_id
+NOTION_AUTHORS_DATA_SOURCE_ID=your_authors_data_source_id
 TOKEN_FOR_REVALIDATE=any_random_secret_string
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
@@ -411,11 +406,11 @@ docker compose up -d
 # Or build manually (NOTION_API_KEY is needed at build time for static generation)
 docker build -t notion-as-blog \
   --build-arg NOTION_API_KEY=your_key \
-  --build-arg NOTION_DATA_SOURCE_ID=your_db_id \
+  --build-arg NOTION_DATA_SOURCE_ID=your_data_source_id \
   .
 docker run -p 3000:3000 \
   -e NOTION_API_KEY=your_key \
-  -e NOTION_DATA_SOURCE_ID=your_db_id \
+  -e NOTION_DATA_SOURCE_ID=your_data_source_id \
   notion-as-blog
 ```
 
@@ -426,8 +421,8 @@ docker run -p 3000:3000 \
 | Variable | Required | Description |
 |---|---|---|
 | `NOTION_API_KEY` | Yes | Notion integration API key |
-| `NOTION_DATA_SOURCE_ID` | Yes | Notion posts database ID |
-| `NOTION_AUTHORS_DATA_SOURCE_ID` | No | Notion authors database ID |
+| `NOTION_DATA_SOURCE_ID` | Yes | Notion Posts data source ID |
+| `NOTION_AUTHORS_DATA_SOURCE_ID` | No | Notion Authors data source ID |
 | `TOKEN_FOR_REVALIDATE` | No | Secret token for on-demand revalidation (`/api/revalidate`) |
 | `NEXT_PUBLIC_GA_ID` | No | Google Analytics measurement ID |
 

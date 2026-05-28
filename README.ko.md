@@ -74,16 +74,9 @@ Notion에서 글을 쓰면 블로그에 자동으로 반영됩니다.
 2. 우측 상단 **···** → **연결(Connections)** → 생성한 Integration을 찾아 **연결**
 3. **Authors** 데이터베이스에도 동일하게 반복
 
-### 4. 데이터베이스 ID 확인
+### 4. Data source ID 확인
 
-각 Notion 데이터베이스는 URL에 고유 ID가 포함되어 있습니다:
-
-```
-https://www.notion.so/{workspace}/{database_id}?v=...
-                                   ^^^^^^^^^^^
-```
-
-Posts 데이터베이스(`NOTION_DATA_SOURCE_ID`)와 Authors 데이터베이스(`NOTION_AUTHORS_DATA_SOURCE_ID`)의 ID를 각각 복사하세요.
+`NOTION_DATA_SOURCE_ID`에는 URL에 보이는 database ID가 아니라 **Notion data source ID**를 넣어야 합니다. 최신 Notion API에서는 database ID와 data source ID가 다를 수 있습니다. Posts data source ID를 `NOTION_DATA_SOURCE_ID`로, Authors data source ID를 `NOTION_AUTHORS_DATA_SOURCE_ID`로 설정하세요. 잘못된 ID를 넣으면 빌드 중 `object_not_found`가 발생할 수 있습니다.
 
 ### 5. 프로젝트 설치 및 설정
 
@@ -98,8 +91,8 @@ cp .env.example .env.local
 
 ```env
 NOTION_API_KEY=secret_xxxxxxxxxxxxxxxxxxxxx
-NOTION_DATA_SOURCE_ID=your_posts_database_id
-NOTION_AUTHORS_DATA_SOURCE_ID=your_authors_database_id
+NOTION_DATA_SOURCE_ID=your_posts_data_source_id
+NOTION_AUTHORS_DATA_SOURCE_ID=your_authors_data_source_id
 TOKEN_FOR_REVALIDATE=any_random_secret_string
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
@@ -411,11 +404,11 @@ docker compose up -d
 # 또는 직접 빌드 (NOTION_API_KEY는 정적 생성을 위해 빌드 시점에 필요)
 docker build -t notion-as-blog \
   --build-arg NOTION_API_KEY=your_key \
-  --build-arg NOTION_DATA_SOURCE_ID=your_db_id \
+  --build-arg NOTION_DATA_SOURCE_ID=your_data_source_id \
   .
 docker run -p 3000:3000 \
   -e NOTION_API_KEY=your_key \
-  -e NOTION_DATA_SOURCE_ID=your_db_id \
+  -e NOTION_DATA_SOURCE_ID=your_data_source_id \
   notion-as-blog
 ```
 
@@ -426,8 +419,8 @@ docker run -p 3000:3000 \
 | 변수 | 필수 | 설명 |
 |---|---|---|
 | `NOTION_API_KEY` | Yes | Notion Integration API 키 |
-| `NOTION_DATA_SOURCE_ID` | Yes | Notion Posts 데이터베이스 ID |
-| `NOTION_AUTHORS_DATA_SOURCE_ID` | No | Notion Authors 데이터베이스 ID |
+| `NOTION_DATA_SOURCE_ID` | Yes | Notion Posts data source ID |
+| `NOTION_AUTHORS_DATA_SOURCE_ID` | No | Notion Authors data source ID |
 | `TOKEN_FOR_REVALIDATE` | No | 온디맨드 갱신용 시크릿 토큰 (`/api/revalidate`) |
 | `NEXT_PUBLIC_GA_ID` | No | Google Analytics 측정 ID |
 
