@@ -3,11 +3,17 @@ import { getPublishedPosts } from "@/lib/notion/getPosts";
 import { searchPosts } from "@/lib/searchPosts";
 import { brand } from "@/config/brand";
 
+const MAX_QUERY_LENGTH = 100;
+
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get("q")?.trim();
 
   if (!q || q.length < 2) {
     return NextResponse.json([]);
+  }
+
+  if (q.length > MAX_QUERY_LENGTH) {
+    return NextResponse.json({ error: "Query is too long" }, { status: 400 });
   }
 
   try {
