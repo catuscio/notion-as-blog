@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { fetchPublicHttpUrl } from "@/lib/security/serverFetch";
 import type { NotionBlockWithChildren } from "./types";
 
 const CACHE_DIR = path.join(process.cwd(), ".next/cache/og-metadata");
@@ -77,15 +78,14 @@ async function fetchOgFromUrl(url: string): Promise<OgMetadata> {
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const res = await fetch(url, {
+    const res = await fetchPublicHttpUrl(url, {
       signal: controller.signal,
       headers: {
         "User-Agent": "Mozilla/5.0 (compatible; BlogBot/1.0)",
         Accept: "text/html",
       },
-      redirect: "follow",
     });
-    if (!res.ok) return EMPTY;
+    if (!res?.ok) return EMPTY;
 
     const reader = res.body?.getReader();
     if (!reader) return EMPTY;
