@@ -67,7 +67,9 @@ function subscribe(callback: () => void) {
     }
   };
   const onStorageChange = (event: StorageEvent) => {
-    if (event.key === THEME_STORAGE_KEY) callback();
+    if (event.key !== THEME_STORAGE_KEY) return;
+    applyResolvedTheme(resolvePreference(getStoredPreference()));
+    callback();
   };
 
   window.addEventListener(THEME_EVENT, callback);
