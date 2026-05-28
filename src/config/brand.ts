@@ -57,17 +57,17 @@ export const brand = {
   name: "Notion-As-Blog",
 
   /** Hero section heading on the home page */
-  title: "A Developer Blog Template",
+  title: "Official Documentation",
 
   /** The word in the hero title to visually highlight */
-  highlight: "Blog",
+  highlight: "Documentation",
 
   /** One-line intro used in <meta name="description"> and JSON-LD */
   description:
-    "A modern blog template powered by Notion CMS and Next.js.",
+    "Official documentation for Notion-As-Blog, an open-source Notion-powered Next.js blog template.",
 
   /** Full URL of the deployed site (no trailing slash) — used in sitemap, OG tags, etc. */
-  url: "https://your-domain.com",
+  url: "https://notion-as-blog.vercel.app",
 
   /** Year shown in the footer copyright. e.g. "© 2025 – 2026" */
   since: 2025,
@@ -85,7 +85,7 @@ export const brand = {
   // Leave empty to omit the tag entirely.
   // Example: ["Next.js", "blog", "frontend", "development"]
   // ═══════════════════════════════════════════════════════════════
-  keywords: [] satisfies string[],
+  keywords: ["Notion", "Next.js", "blog template", "CMS", "documentation", "Vercel"] satisfies string[],
 
   // ═══════════════════════════════════════════════════════════════
   // Organization (JSON-LD)
@@ -248,7 +248,7 @@ export const brand = {
       color: "orange",
       icon: "dns",
       description:
-        "Server-side architecture, APIs, databases, and scalable system design patterns.",
+        "Installation, configuration, deployment, self-hosting, and runtime behavior.",
     },
     {
       name: "Design",
@@ -256,7 +256,7 @@ export const brand = {
       color: "teal",
       icon: "palette",
       description:
-        "UI/UX design principles, design systems, and the art of building beautiful interfaces.",
+        "Branding, theming, SEO presentation, images, covers, and visual customization.",
     },
     {
       name: "Product",
@@ -264,7 +264,7 @@ export const brand = {
       color: "green",
       icon: "work",
       description:
-        "Career growth, team culture, and life as a software engineer.",
+        "Publishing workflows, editorial operations, overview guides, and troubleshooting.",
     },
   ],
 
@@ -275,12 +275,12 @@ export const brand = {
   // Leave a value as an empty string ("") to hide that icon.
   // ═══════════════════════════════════════════════════════════════
   social: {
-    github: "https://github.com/your-username",
+    github: "https://github.com/catuscio/notion-as-blog",
     twitter: "",
     instagram: "",
     facebook: "",
     youtube: "",
-    linkedin: "https://linkedin.com/in/your-profile",
+    linkedin: "",
     threads: "",
     tiktok: "",
     naverBlog: "",
