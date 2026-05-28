@@ -44,7 +44,7 @@ Fresh screenshots are captured from the deployed documentation site.
 - **Categories & tags** — Organize posts with customizable categories and freeform tags
 - **Series** — Group related posts into a series with navigation
 - **Full-text search** — Built-in search API with instant results
-- **Dark mode** — System-aware theme switching via `next-themes`
+- **Dark mode** — System-aware theme switching with a small built-in theme preference hook
 - **SEO optimized** — Open Graph, dynamic OG image generation, sitemap, robots.txt, RSS feed, and Organization JSON-LD
 - **Giscus comments** — GitHub Discussions-based commenting system
 - **Responsive design** — Mobile-first layout with Tailwind CSS
@@ -134,8 +134,8 @@ Open [http://localhost:3000](http://localhost:3000) to see your blog.
 | **date** | Date | Yes | Publish date. Posts are sorted by this field |
 | **category** | Select | Yes | Must match a category name defined in `brand.ts` |
 | **tags** | Multi-select | No | Freeform tags for filtering (e.g. `Next.js`, `React`) |
-| **series** | Rich text | No | Series name. Posts sharing the same series name are grouped with navigation |
-| **author** | People | No | Notion workspace member. Matched against the Authors database by name |
+| **series** | Select | No | Series name. Posts with the same selected series are grouped with previous/next navigation |
+| **author** | People | No | Notion workspace member(s). Rich author profiles are matched through the Authors data source `people` property |
 | **summary** | Rich text | No | Short description shown in post cards and SEO meta |
 | **thumbnail** | Files & media | No | Cover image (upload or paste an external URL) |
 
@@ -157,15 +157,16 @@ Open [http://localhost:3000](http://localhost:3000) to see your blog.
 
 ### Using series
 
-To group posts into a series, set the same `series` value (e.g. `Next.js Blog Tutorial`) on multiple posts. The blog will automatically render series navigation with previous/next links on each post detail page.
+To group posts into a series, select the same `series` value (e.g. `Next.js Blog Tutorial`) on multiple posts. The blog renders series navigation with previous/next links on each post detail page and exposes `/series/[name]` pages.
 
 ### Authors database (optional)
 
-If you want richer author profiles beyond the Notion workspace member name, create (or use the template's) Authors database:
+If you want richer author profiles beyond the plain Notion People name, create (or use the template's) Authors data source. Posts are linked to author profile rows by Notion user ID: set the author row's `people` property to the same Notion user selected in a post's `author` property.
 
 | Column | Type | Description |
 |---|---|---|
-| **name** | Title | Must match the Notion People name exactly |
+| **name** | Title | Display name shown on author cards and author pages |
+| **people** | People | Notion workspace user(s) this profile represents. Used for matching posts to author profiles |
 | **role** | Rich text | Job title or role (e.g. `Frontend Engineer`) |
 | **bio** | Rich text | Short biography |
 | **avatar** | Files & media | Profile picture |
@@ -261,29 +262,23 @@ social: {
   instagram: "",
   facebook: "",
   youtube: "",
-  linkedin: "https://linkedin.com/in/your-profile",
+  linkedin: "",
   threads: "",
   tiktok: "",
   naverBlog: "",
 },
 ```
 
-### Footer Links
+### Footer links
 
-Group custom links in the footer:
+The current footer is intentionally simple and is rendered by `src/components/layout/Footer.tsx`. It shows:
 
-```ts
-footerLinks: {
-  "Resources": [
-    { label: "Documentation", href: "/docs" },
-    { label: "GitHub", href: "https://github.com/..." },
-  ],
-  "Legal": [
-    { label: "Privacy", href: "/privacy" },
-    { label: "Terms", href: "/terms" },
-  ],
-},
-```
+- Home
+- About
+- Template, linked from `brand.templateUrl`
+- Any social icons whose `brand.social` URL is not empty
+
+If you need a larger footer navigation, edit `Footer.tsx` and keep the labels in `src/config/copy.ts`.
 
 ### SEO
 
@@ -376,7 +371,7 @@ NOTION_IMAGE_CACHE_SECONDS=3300
 NOTION_IMAGE_SIGNING_SECRET=optional-separate-secret
 ```
 
-External image URLs are rendered directly.
+External image URLs are rendered directly. If you set `NOTION_IMAGE_SIGNING_SECRET`, keep the same value available anywhere pre-rendered pages and `/api/notion-image` run; otherwise signed image URLs generated at build time may not validate at runtime.
 
 ---
 
@@ -416,6 +411,10 @@ docker build -t notion-as-blog \
 docker run -p 3000:3000 \
   -e NOTION_API_KEY=your_key \
   -e NOTION_DATA_SOURCE_ID=your_data_source_id \
+  -e NOTION_AUTHORS_DATA_SOURCE_ID=your_authors_data_source_id \
+  -e TOKEN_FOR_REVALIDATE=your_revalidate_token \
+  -e NOTION_IMAGE_SIGNING_SECRET=your_image_signing_secret \
+  -e NOTION_IMAGE_CACHE_SECONDS=3300 \
   notion-as-blog
 ```
 
@@ -429,6 +428,8 @@ docker run -p 3000:3000 \
 | `NOTION_DATA_SOURCE_ID` | Yes | Notion Posts data source ID |
 | `NOTION_AUTHORS_DATA_SOURCE_ID` | No | Notion Authors data source ID |
 | `TOKEN_FOR_REVALIDATE` | No | Secret token for on-demand revalidation (`/api/revalidate`) |
+| `NOTION_IMAGE_SIGNING_SECRET` | No | HMAC secret for stable Notion image proxy URLs. Defaults to `NOTION_API_KEY` when omitted |
+| `NOTION_IMAGE_CACHE_SECONDS` | No | CDN cache TTL for proxied Notion files. Capped at 3300 seconds |
 | `NEXT_PUBLIC_GA_ID` | No | Google Analytics measurement ID |
 
 ---

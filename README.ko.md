@@ -44,7 +44,7 @@
 - **카테고리 & 태그** — 커스터마이징 가능한 카테고리와 자유로운 태그 분류
 - **시리즈** — 연관된 포스트를 시리즈로 묶어 이전/다음 네비게이션 제공
 - **전문 검색** — 즉각적인 결과를 제공하는 내장 검색 API
-- **다크 모드** — `next-themes` 기반 시스템 연동 테마 전환
+- **다크 모드** — 내장 theme preference hook 기반 시스템 연동 테마 전환
 - **SEO 최적화** — Open Graph, 동적 OG 이미지 생성, 사이트맵, robots.txt, RSS 피드, Organization JSON-LD
 - **Giscus 댓글** — GitHub Discussions 기반 댓글 시스템
 - **반응형 디자인** — Tailwind CSS 기반 모바일 퍼스트 레이아웃
@@ -132,8 +132,8 @@ npm run dev
 | **date** | Date | Yes | 발행일. 이 필드를 기준으로 포스트가 정렬됩니다 |
 | **category** | Select | Yes | `brand.ts`에 정의된 카테고리 이름과 일치해야 합니다 |
 | **tags** | Multi-select | No | 자유 태그 (예: `Next.js`, `React`) |
-| **series** | Rich text | No | 시리즈 이름. 같은 시리즈 이름을 가진 포스트들은 이전/다음 네비게이션으로 연결됩니다 |
-| **author** | People | No | Notion 워크스페이스 멤버. Authors 데이터베이스의 이름과 매칭됩니다 |
+| **series** | Select | No | 시리즈 이름. 같은 series 값을 선택한 포스트들은 이전/다음 네비게이션으로 연결됩니다 |
+| **author** | People | No | Notion 워크스페이스 멤버. Authors data source의 `people` 속성과 Notion user ID로 매칭됩니다 |
 | **summary** | Rich text | No | 포스트 카드와 SEO 메타에 표시되는 짧은 설명 |
 | **thumbnail** | Files & media | No | 커버 이미지 (업로드 또는 외부 URL 붙여넣기) |
 
@@ -155,15 +155,16 @@ npm run dev
 
 ### 시리즈 사용법
 
-여러 포스트를 시리즈로 묶으려면, 각 포스트의 `series` 값을 동일하게 설정하세요 (예: `Next.js 블로그 만들기`). 블로그가 자동으로 포스트 상세 페이지에 시리즈 네비게이션(이전/다음)을 렌더링합니다.
+여러 포스트를 시리즈로 묶으려면, 각 포스트에서 같은 `series` 값을 선택하세요 (예: `Next.js Blog Tutorial`). 블로그는 포스트 상세 페이지에 이전/다음 링크를 렌더링하고 `/series/[name]` 페이지도 제공합니다.
 
-### Authors 데이터베이스 (선택사항)
+### Authors data source (선택사항)
 
-Notion 워크스페이스 멤버 이름 외에 더 풍부한 저자 프로필을 원한다면, Authors 데이터베이스를 사용하세요 (템플릿에 포함되어 있습니다):
+Notion 워크스페이스 멤버 이름 외에 더 풍부한 저자 프로필을 원한다면, 템플릿에 포함된 Authors data source를 사용하세요. 포스트의 `author` People 값과 Authors row의 `people` People 값이 같은 Notion user ID를 가질 때 프로필이 매칭됩니다.
 
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
-| **name** | Title | Notion People 이름과 정확히 일치해야 합니다 |
+| **name** | Title | 저자 카드와 저자 페이지에 표시할 이름 |
+| **people** | People | 이 프로필이 나타내는 Notion 워크스페이스 사용자. 포스트와 저자 프로필 매칭에 사용됩니다 |
 | **role** | Rich text | 직함 또는 역할 (예: `프론트엔드 엔지니어`) |
 | **bio** | Rich text | 짧은 소개글 |
 | **avatar** | Files & media | 프로필 사진 |
@@ -259,7 +260,7 @@ social: {
   instagram: "",
   facebook: "",
   youtube: "",
-  linkedin: "https://linkedin.com/in/your-profile",
+  linkedin: "",
   threads: "",
   tiktok: "",
   naverBlog: "",
@@ -268,20 +269,14 @@ social: {
 
 ### 푸터 링크
 
-푸터에 그룹별 커스텀 링크를 추가할 수 있습니다:
+현재 푸터는 `src/components/layout/Footer.tsx`에서 단순하게 렌더링됩니다. 표시되는 항목은 다음과 같습니다.
 
-```ts
-footerLinks: {
-  "Resources": [
-    { label: "Documentation", href: "/docs" },
-    { label: "GitHub", href: "https://github.com/..." },
-  ],
-  "Legal": [
-    { label: "Privacy", href: "/privacy" },
-    { label: "Terms", href: "/terms" },
-  ],
-},
-```
+- Home
+- About
+- `brand.templateUrl`로 연결되는 Template
+- `brand.social`에서 URL이 비어 있지 않은 소셜 아이콘
+
+더 큰 푸터 네비게이션이 필요하면 `Footer.tsx`를 수정하고, 라벨은 `src/config/copy.ts`에서 함께 관리하세요.
 
 ### SEO
 
@@ -374,7 +369,7 @@ NOTION_IMAGE_CACHE_SECONDS=3300
 NOTION_IMAGE_SIGNING_SECRET=optional-separate-secret
 ```
 
-외부 이미지 URL은 그대로 렌더링됩니다.
+외부 이미지 URL은 그대로 렌더링됩니다. `NOTION_IMAGE_SIGNING_SECRET`을 설정한다면, 정적 페이지가 생성되는 환경과 `/api/notion-image`가 실행되는 런타임 환경에서 같은 값을 사용해야 합니다. 그렇지 않으면 빌드 시 생성된 signed image URL이 런타임에서 검증되지 않을 수 있습니다.
 
 ---
 
@@ -414,6 +409,10 @@ docker build -t notion-as-blog \
 docker run -p 3000:3000 \
   -e NOTION_API_KEY=your_key \
   -e NOTION_DATA_SOURCE_ID=your_data_source_id \
+  -e NOTION_AUTHORS_DATA_SOURCE_ID=your_authors_data_source_id \
+  -e TOKEN_FOR_REVALIDATE=your_revalidate_token \
+  -e NOTION_IMAGE_SIGNING_SECRET=your_image_signing_secret \
+  -e NOTION_IMAGE_CACHE_SECONDS=3300 \
   notion-as-blog
 ```
 
@@ -427,6 +426,8 @@ docker run -p 3000:3000 \
 | `NOTION_DATA_SOURCE_ID` | Yes | Notion Posts data source ID |
 | `NOTION_AUTHORS_DATA_SOURCE_ID` | No | Notion Authors data source ID |
 | `TOKEN_FOR_REVALIDATE` | No | 온디맨드 갱신용 시크릿 토큰 (`/api/revalidate`) |
+| `NOTION_IMAGE_SIGNING_SECRET` | No | 안정적인 Notion 이미지 프록시 URL을 위한 HMAC secret. 생략하면 `NOTION_API_KEY`를 사용합니다 |
+| `NOTION_IMAGE_CACHE_SECONDS` | No | 프록시된 Notion 파일의 CDN 캐시 TTL. 최대 3300초로 제한됩니다 |
 | `NEXT_PUBLIC_GA_ID` | No | Google Analytics 측정 ID |
 
 ---
