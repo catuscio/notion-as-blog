@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { FeedPostCard } from "@/components/feed/FeedPostCard";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAuthorLookupMap } from "@/lib/notion/getAuthors";
 import { searchPosts } from "@/lib/searchPosts";
 import { safeQuery } from "@/lib/notion/safeQuery";
@@ -27,7 +27,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 async function SearchResults({ query, authorsMap }: { query: string; authorsMap: Record<string, AuthorSummary> }) {
-  const allPosts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
   const results = query.length >= 2 ? searchPosts(allPosts, query).slice(0, brand.search.pageLimit) : [];
 
   if (query.length < 2) {

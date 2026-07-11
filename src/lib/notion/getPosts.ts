@@ -1,10 +1,18 @@
 import { unstable_cache } from "next/cache";
+import { createSingleFlight } from "@/lib/singleFlight";
 import { notionClient } from "./client";
 import { getPageProperties } from "./getPageProperties";
-import { getPublicPostsByDate } from "./filterPosts";
+import {
+  getListedPostsByDate,
+  selectDetailAccessiblePages,
+  selectDetailAccessiblePosts,
+  selectListedPages,
+} from "./filterPosts";
 import { brand } from "@/config/brand";
 import type { Post } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+
+export const NOTION_CONTENT_CACHE_TAG = "notion-content";
 
 async function fetchAllFromNotion(): Promise<Post[]> {
   const dataSourceId = brand.notion.dataSourceId;
@@ -40,18 +48,31 @@ async function fetchAllFromNotion(): Promise<Post[]> {
 const getCachedPosts = unstable_cache(
   fetchAllFromNotion,
   ["all-posts"],
-  { revalidate: brand.cache.revalidate }
+  {
+    revalidate: brand.cache.revalidate,
+    tags: [NOTION_CONTENT_CACHE_TAG],
+  }
 );
 
-/** Returns only Public posts (status=Public, type=Post), sorted by date. Excludes PublicOnDetail, Draft, Private. */
-export async function getPublishedPosts(): Promise<Post[]> {
-  const all = await getCachedPosts();
-  return getPublicPostsByDate(all);
+export interface ContentCatalog {
+  listedPosts: Post[];
+  detailAccessiblePosts: Post[];
+  listedPages: Post[];
+  detailAccessiblePages: Post[];
 }
 
-export async function getPublishedPages(): Promise<Post[]> {
+/** Fetches the shared Notion dataset once and derives every visibility view from it. */
+export const getContentCatalog = createSingleFlight(async (): Promise<ContentCatalog> => {
   const all = await getCachedPosts();
-  return all.filter(
-    (item) => item.type === "Page" && (item.status === "Public" || item.status === "PublicOnDetail")
-  );
+  return {
+    listedPosts: getListedPostsByDate(all),
+    detailAccessiblePosts: selectDetailAccessiblePosts(all),
+    listedPages: selectListedPages(all),
+    detailAccessiblePages: selectDetailAccessiblePages(all),
+  };
+});
+
+/** Content that may appear in feeds, search, navigation, and discovery surfaces. */
+export async function getListedPosts(): Promise<Post[]> {
+  return (await getContentCatalog()).listedPosts;
 }

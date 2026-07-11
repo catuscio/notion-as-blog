@@ -1,6 +1,7 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/config/env";
+import { NOTION_CONTENT_CACHE_TAG } from "@/lib/notion/getPosts";
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get("authorization") ?? "";
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    revalidateTag(NOTION_CONTENT_CACHE_TAG, { expire: 0 });
     revalidatePath("/", "layout");
     return NextResponse.json({ revalidated: true, now: Date.now() });
   } catch (error) {

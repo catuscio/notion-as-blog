@@ -175,9 +175,11 @@ npm run dev
 | 值 | 显示在列表中 | 可通过直接 URL 访问 |
 |---|---|---|
 | `Public` | 是 | 是 |
-| `PublicOnDetail` | 否 | 是 — 适合通过链接分享的非公开列表文章 |
+| `PublicOnDetail` | 否 | 是 — 同时排除搜索索引的 unlisted 内容，并不提供访问控制 |
 | `Draft` | 否 | 否 |
 | `Private` | 否 | 否 |
+
+`PublicOnDetail` 对 `Post` 和 `Page` 使用相同规则。它不会出现在信息流、搜索、分类、标签、系列、作者页面、RSS、站点地图、结构化数据、评论或构建时路由生成中。任何知道 URL 的人仍可访问和分享；敏感内容请使用身份验证。
 
 ### Type 值
 

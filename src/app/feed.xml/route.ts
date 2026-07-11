@@ -1,6 +1,6 @@
 import { Feed } from "feed";
 import { brand } from "@/config/brand";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { getPostDate } from "@/lib/postDate";
 
 export async function GET() {
@@ -17,7 +17,7 @@ export async function GET() {
   });
 
   try {
-    const posts = await getPublishedPosts();
+    const posts = await getListedPosts();
     posts.forEach((post) => {
       feed.addItem({
         title: post.title,

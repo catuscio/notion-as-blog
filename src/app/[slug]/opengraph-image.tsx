@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { brand } from "@/config/brand";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getContentCatalog } from "@/lib/notion/getPosts";
 import { readNotionImageResizedAsBase64 } from "@/lib/notion/imageProxy";
 import { safeQuery } from "@/lib/notion/safeQuery";
 
@@ -16,18 +16,10 @@ try {
   // logo-white.png not found — skip logo overlay
 }
 
-let fallbackPng: Buffer | null = null;
-try {
-  fallbackPng = readFileSync(
-    join(process.cwd(), "public", brand.assets.ogImage.replace(/^\//, "")),
-  );
-} catch {
-  // fallback OG image not found — will generate dynamically
-}
-
 export const revalidate = 1800;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+export const dynamicParams = true;
 
 const primary = `hsl(${brand.colors.light.primary})`;
 const primaryDark = `hsl(${brand.colors.dark.primary})`;
@@ -35,8 +27,11 @@ const primaryDark = `hsl(${brand.colors.dark.primary})`;
 const fontPromise = fetch(brand.fonts.og.url).then((res) => res.arrayBuffer());
 
 export async function generateStaticParams() {
-  const posts = await safeQuery(getPublishedPosts, []);
-  return posts.map((post) => ({ slug: post.slug }));
+  const catalog = await safeQuery(getContentCatalog, null);
+  if (!catalog) return [];
+  return [...catalog.listedPosts, ...catalog.listedPages].map((item) => ({
+    slug: item.slug,
+  }));
 }
 
 async function fetchThumbnail(url: string): Promise<string | null> {
@@ -62,46 +57,12 @@ export default async function OgImage({
 }) {
   const { slug } = await params;
 
-  const posts = await getPublishedPosts();
-  const post = posts.find((p) => p.slug === slug);
+  const catalog = await getContentCatalog();
+  const post = catalog.detailAccessiblePosts.find((item) => item.slug === slug)
+    ?? catalog.detailAccessiblePages.find((item) => item.slug === slug);
 
   if (!post) {
-    if (fallbackPng) {
-      return new Response(new Uint8Array(fallbackPng), {
-        headers: { "Content-Type": "image/png" },
-      });
-    }
-    // No fallback image — generate a branded OG dynamically
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: 1200,
-            height: 630,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            background: `linear-gradient(135deg, ${primary} 0%, ${primaryDark} 100%)`,
-            color: "white",
-          }}
-        >
-          <div style={{ fontSize: 64, fontWeight: 700 }}>{brand.name}</div>
-          <div style={{ fontSize: 28, opacity: 0.8, marginTop: 16 }}>{brand.title}</div>
-        </div>
-      ),
-      {
-        ...size,
-        fonts: [
-          {
-            name: brand.fonts.og.family,
-            data: await fontPromise,
-            style: "normal",
-            weight: 700,
-          },
-        ],
-      },
-    );
+    return new Response(null, { status: 404 });
   }
 
   const thumbnailSrc = post.thumbnail
@@ -111,11 +72,13 @@ export default async function OgImage({
 
   // If thumbnailSrc is null, generate a dynamic OG image with a gradient background
 
-  const formattedDate = new Date(post.date).toLocaleDateString(brand.lang, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedDate = post.date
+    ? new Date(post.date).toLocaleDateString(brand.lang, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "";
 
   return new ImageResponse(
     (
@@ -236,6 +199,9 @@ export default async function OgImage({
     ),
     {
       ...size,
+      ...(post.status === "PublicOnDetail" && {
+        headers: { "X-Robots-Tag": "noindex, noimageindex, noarchive" },
+      }),
       fonts: [
         {
           name: brand.fonts.og.family,

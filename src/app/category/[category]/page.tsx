@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { CategoryHeader } from "@/components/feed/CategoryHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { filterPostsByCategory } from "@/lib/notion/filterPosts";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
 import { safeQuery } from "@/lib/notion/safeQuery";
@@ -57,7 +57,7 @@ export default async function CategoryPage({ params }: Props) {
   const cat = getCategoryBySlug(category);
   if (!cat) notFound();
 
-  const allPosts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
   const posts = filterPostsByCategory(allPosts, cat.name);
   const { tags, authorsMap } = await getFeedPageData(posts);
 

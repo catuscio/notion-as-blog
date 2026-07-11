@@ -175,9 +175,11 @@ npm run dev
 | 값 | 목록에 표시 | URL로 직접 접근 |
 |---|---|---|
 | `Public` | O | O |
-| `PublicOnDetail` | X | O — 링크로만 공유하는 비공개 포스트에 유용 |
+| `PublicOnDetail` | X | O — 검색 색인에서도 제외되는 unlisted 콘텐츠이며 접근 제어 기능은 아님 |
 | `Draft` | X | X |
 | `Private` | X | X |
+
+`PublicOnDetail`은 `Post`와 `Page`에 동일하게 적용됩니다. 피드, 검색, 카테고리·태그·시리즈·작성자 페이지, RSS, 사이트맵, 구조화 데이터, 댓글, 빌드 시점 경로 생성에서 제외됩니다. URL을 아는 사람은 누구나 접근하고 공유할 수 있으므로 민감한 콘텐츠에는 인증을 사용하세요.
 
 ### Type 값
 

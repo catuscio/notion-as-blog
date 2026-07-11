@@ -1,14 +1,34 @@
 import type { Post } from "@/types";
 
-export function getPublicPostsByDate(posts: Post[]): Post[] {
+export function isListed(item: Post): boolean {
+  return item.status === "Public";
+}
+
+export function isDetailAccessible(item: Post): boolean {
+  return item.status === "Public" || item.status === "PublicOnDetail";
+}
+
+export function getListedPostsByDate(posts: Post[]): Post[] {
   return posts
-    .filter((post) => post.status === "Public" && post.type === "Post")
+    .filter((post) => post.type === "Post" && isListed(post))
     .sort((a, b) => {
       if (!a.date && !b.date) return 0;
       if (!a.date) return 1;
       if (!b.date) return -1;
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
+}
+
+export function selectDetailAccessiblePosts(items: Post[]): Post[] {
+  return items.filter((item) => item.type === "Post" && isDetailAccessible(item));
+}
+
+export function selectListedPages(items: Post[]): Post[] {
+  return items.filter((item) => item.type === "Page" && isListed(item));
+}
+
+export function selectDetailAccessiblePages(items: Post[]): Post[] {
+  return items.filter((item) => item.type === "Page" && isDetailAccessible(item));
 }
 
 export function getRelatedPosts(

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import type { Post } from "@/types";
 import { brand, getCategorySlug } from "@/config/brand";
-import { getPublishedPosts, getPublishedPages } from "@/lib/notion/getPosts";
+import { getContentCatalog } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { getAllAuthors } from "@/lib/notion/getAuthors";
 import { filterPostsByAuthor } from "@/lib/notion/filterPosts";
@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const posts = await getPublishedPosts();
+    const { listedPosts: posts, listedPages: pages } = await getContentCatalog();
 
     // Set homepage lastModified to latest post date
     const latestPostDate = latestDateAmong(posts);
@@ -28,7 +28,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     // Page routes (about, etc.) from Notion — no hardcoded paths
-    const pages = await getPublishedPages().catch(() => []);
     const pageRoutes: MetadataRoute.Sitemap = pages.map((p) => ({
       url: `${baseUrl}/${p.slug}`,
       lastModified: getPostDate(p),
