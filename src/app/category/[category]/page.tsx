@@ -6,10 +6,8 @@ import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { getListedPosts } from "@/lib/notion/getPosts";
 import { filterPostsByCategory } from "@/lib/notion/filterPosts";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
-import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand, getCategoryBySlug } from "@/config/brand";
 import { copy } from "@/config/copy";
-import type { Post } from "@/types";
 import type { Metadata } from "next";
 
 type Props = {
@@ -57,7 +55,7 @@ export default async function CategoryPage({ params }: Props) {
   const cat = getCategoryBySlug(category);
   if (!cat) notFound();
 
-  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const posts = filterPostsByCategory(allPosts, cat.name);
   const { tags, authorsMap } = await getFeedPageData(posts);
 

@@ -16,7 +16,7 @@ const getServerIsMac = () => false;
 
 export function SearchInput() {
   const router = useRouter();
-  const { query, setQuery, results, loading, activeIndex, setActiveIndex } =
+  const { query, setQuery, results, loading, error, activeIndex, setActiveIndex } =
     useSearch();
   const [open, setOpen] = useState(false);
   const isMac = useSyncExternalStore(noop, getIsMac, getServerIsMac);
@@ -95,6 +95,7 @@ export function SearchInput() {
             <SearchResults
               results={results}
               loading={loading}
+              error={error}
               activeIndex={activeIndex}
               onClose={() => setOpen(false)}
             />
@@ -108,11 +109,13 @@ export function SearchInput() {
 function SearchResults({
   results,
   loading,
+  error,
   activeIndex,
   onClose,
 }: {
   results: Post[];
   loading: boolean;
+  error: boolean;
   activeIndex: number;
   onClose: () => void;
 }) {
@@ -121,6 +124,15 @@ function SearchResults({
       <div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
         <Loader2 size={20} className="animate-spin mr-2" />
         {copy.search.searching}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 text-destructive text-sm">
+        <SearchX size={28} className="mb-2 opacity-70" />
+        {copy.search.unavailable}
       </div>
     );
   }

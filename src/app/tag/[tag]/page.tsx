@@ -5,11 +5,9 @@ import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
-import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { safeDecode } from "@/lib/safeDecode";
-import type { Post } from "@/types";
 import type { Metadata } from "next";
 
 type Props = {
@@ -21,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const decoded = safeDecode(tag);
   const tagUrl = `${brand.url}/tag/${encodeURIComponent(decoded)}`;
 
-  const allPosts = await safeQuery(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const count = allPosts.filter((p) => p.tags.includes(decoded)).length;
   const description = copy.tag.description(brand.name, decoded, count);
 
@@ -50,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const posts = await safeQuery(getListedPosts, []);
+  const posts = await getListedPosts();
   const tags = getAllTags(posts);
   return tags
     .filter((t) => posts.filter((p) => p.tags.includes(t.name)).length > 2)
@@ -61,7 +59,7 @@ export default async function TagPage({ params }: Props) {
   const { tag } = await params;
   const decoded = safeDecode(tag);
 
-  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const posts = allPosts.filter((post) => post.tags.includes(decoded));
   const { tags, authorsMap } = await getFeedPageData(allPosts);
 

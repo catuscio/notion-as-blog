@@ -1,4 +1,4 @@
-import type { Post, TagItem, CategoryItem } from "@/types";
+import type { Post, TagItem } from "@/types";
 import { brand } from "@/config/brand";
 
 export function getAllTags(posts: Post[]): TagItem[] {
@@ -13,16 +13,4 @@ export function getAllTags(posts: Post[]): TagItem[] {
     .sort((a, b) => b.count - a.count)
     .filter((tag) => tag.count >= brand.tags.minPostCount)
     .slice(0, brand.tags.maxDisplayCount);
-}
-
-export function getAllCategories(posts: Post[]): CategoryItem[] {
-  const catMap = new Map<string, number>();
-  posts.forEach((post) => {
-    if (post.category) {
-      catMap.set(post.category, (catMap.get(post.category) || 0) + 1);
-    }
-  });
-  return Array.from(catMap.entries())
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
 }

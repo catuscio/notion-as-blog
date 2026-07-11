@@ -10,7 +10,8 @@
     "cleancache": "rm -rf .next",
     "test:security": "node --no-warnings --experimental-loader ./scripts/typescript-loader.mjs scripts/security-helpers.test.mjs",
     "test:visibility": "node --no-warnings --experimental-loader ./scripts/typescript-loader.mjs scripts/content-visibility.test.mjs",
-    "test": "npm run test:security && npm run test:visibility"
+    "test:mapping": "node --no-warnings --experimental-loader ./scripts/typescript-loader.mjs scripts/content-mapping.test.mjs",
+    "test": "npm run test:security && npm run test:visibility && npm run test:mapping"
   },
   "dependencies": {
     "@notionhq/client": "^5.9.0",

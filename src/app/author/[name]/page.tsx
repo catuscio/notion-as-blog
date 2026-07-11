@@ -7,11 +7,9 @@ import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAllAuthors } from "@/lib/notion/getAuthors";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
 import { filterPostsByAuthor } from "@/lib/notion/filterPosts";
-import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { safeDecode } from "@/lib/safeDecode";
-import type { Post } from "@/types";
 import type { Metadata } from "next";
 
 type Props = {
@@ -20,7 +18,7 @@ type Props = {
 
 async function resolveAuthor(name: string) {
   const decoded = safeDecode(name);
-  const authors = await safeQuery(getAllAuthors, []);
+  const authors = await getAllAuthors();
   return authors.find((a) => a.name === decoded) ?? null;
 }
 
@@ -29,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const author = await resolveAuthor(name);
   if (!author) return { title: copy.notFound.title };
 
-  const allPosts = await safeQuery(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const count = filterPostsByAuthor(allPosts, author.peopleIds).length;
 
   const authorUrl = `${brand.url}/author/${encodeURIComponent(author.name)}`;
@@ -60,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const authors = await safeQuery(getAllAuthors, []);
+  const authors = await getAllAuthors();
   return authors.map((a) => ({ name: encodeURIComponent(a.name) }));
 }
 
@@ -69,7 +67,7 @@ export default async function AuthorPage({ params }: Props) {
   const author = await resolveAuthor(name);
   if (!author) notFound();
 
-  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const posts = filterPostsByAuthor(allPosts, author.peopleIds);
   const { tags, authorsMap } = await getFeedPageData(posts);
 

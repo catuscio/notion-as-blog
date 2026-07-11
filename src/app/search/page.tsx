@@ -3,11 +3,10 @@ import { FeedPostCard } from "@/components/feed/FeedPostCard";
 import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAuthorLookupMap } from "@/lib/notion/getAuthors";
 import { searchPosts } from "@/lib/searchPosts";
-import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { resolveAuthors } from "@/lib/resolveAuthor";
-import type { Post, AuthorSummary } from "@/types";
+import type { AuthorSummary } from "@/types";
 import type { Metadata } from "next";
 
 type Props = {
@@ -27,7 +26,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 async function SearchResults({ query, authorsMap }: { query: string; authorsMap: Record<string, AuthorSummary> }) {
-  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const results = query.length >= 2 ? searchPosts(allPosts, query).slice(0, brand.search.pageLimit) : [];
 
   if (query.length < 2) {
@@ -62,7 +61,7 @@ async function SearchResults({ query, authorsMap }: { query: string; authorsMap:
 export default async function SearchPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
-  const authorsMap = await safeQuery(getAuthorLookupMap, {});
+  const authorsMap = await getAuthorLookupMap();
 
   return (
     <div className="max-w-[1024px] mx-auto px-6 py-12">

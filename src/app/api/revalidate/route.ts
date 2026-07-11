@@ -8,8 +8,17 @@ export async function POST(request: NextRequest) {
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
   const expected = env.revalidateToken;
-  if (!expected || token !== expected) {
-    return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+  if (!expected) {
+    return NextResponse.json(
+      { error: { code: "REVALIDATION_DISABLED", message: "Revalidation token is not configured" } },
+      { status: 503 },
+    );
+  }
+  if (token !== expected) {
+    return NextResponse.json(
+      { error: { code: "UNAUTHORIZED", message: "Invalid token" } },
+      { status: 401 },
+    );
   }
 
   try {
@@ -17,8 +26,9 @@ export async function POST(request: NextRequest) {
     revalidatePath("/", "layout");
     return NextResponse.json({ revalidated: true, now: Date.now() });
   } catch (error) {
+    console.error("[api/revalidate] Error:", error);
     return NextResponse.json(
-      { message: "Error revalidating", error: String(error) },
+      { error: { code: "REVALIDATION_FAILED", message: "Failed to revalidate content" } },
       { status: 500 }
     );
   }

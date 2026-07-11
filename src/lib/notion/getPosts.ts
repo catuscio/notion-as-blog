@@ -16,33 +16,30 @@ export const NOTION_CONTENT_CACHE_TAG = "notion-content";
 
 async function fetchAllFromNotion(): Promise<Post[]> {
   const dataSourceId = brand.notion.dataSourceId;
-  if (!dataSourceId) return [];
-
-  try {
-    const pages: PageObjectResponse[] = [];
-    let cursor: string | undefined = undefined;
-
-    do {
-      const response = await notionClient.dataSources.query({
-        data_source_id: dataSourceId,
-        start_cursor: cursor,
-        page_size: brand.notion.pageSize,
-      });
-
-      for (const page of response?.results ?? []) {
-        if ("properties" in page) {
-          pages.push(page as PageObjectResponse);
-        }
-      }
-
-      cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
-    } while (cursor);
-
-    return pages.map((page) => getPageProperties(page));
-  } catch (error) {
-    console.error("[getPosts] Failed to fetch from Notion:", error);
-    return [];
+  if (!dataSourceId) {
+    throw new Error("NOTION_DATA_SOURCE_ID environment variable is required");
   }
+
+  const pages: PageObjectResponse[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const response = await notionClient.dataSources.query({
+      data_source_id: dataSourceId,
+      start_cursor: cursor,
+      page_size: brand.notion.pageSize,
+    });
+
+    for (const page of response.results) {
+      if ("properties" in page) {
+        pages.push(page as PageObjectResponse);
+      }
+    }
+
+    cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
+  } while (cursor);
+
+  return pages.map((page) => getPageProperties(page));
 }
 
 const getCachedPosts = unstable_cache(

@@ -5,12 +5,7 @@ import { brand } from "@/config/brand";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  let result;
-  try {
-    result = await getPageBySlug("about");
-  } catch {
-    result = null;
-  }
+  const result = await getPageBySlug("about");
 
   if (!result) {
     return { title: `About - ${brand.name}` };
@@ -27,12 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  let result;
-  try {
-    result = await getPageBySlug("about");
-  } catch {
-    result = null;
-  }
+  const result = await getPageBySlug("about");
 
   if (!result) notFound();
 

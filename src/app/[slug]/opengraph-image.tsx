@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { brand } from "@/config/brand";
 import { getContentCatalog } from "@/lib/notion/getPosts";
 import { readNotionImageResizedAsBase64 } from "@/lib/notion/imageProxy";
-import { safeQuery } from "@/lib/notion/safeQuery";
 
 let logoSrc: string | null = null;
 try {
@@ -27,8 +26,7 @@ const primaryDark = `hsl(${brand.colors.dark.primary})`;
 const fontPromise = fetch(brand.fonts.og.url).then((res) => res.arrayBuffer());
 
 export async function generateStaticParams() {
-  const catalog = await safeQuery(getContentCatalog, null);
-  if (!catalog) return [];
+  const catalog = await getContentCatalog();
   return [...catalog.listedPosts, ...catalog.listedPages].map((item) => ({
     slug: item.slug,
   }));

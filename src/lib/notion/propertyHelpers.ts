@@ -57,32 +57,6 @@ export function getPeopleIds(prop: PropertyValue | undefined): string[] {
   return [];
 }
 
-const IMAGE_EXTS = new Set([
-  ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".avif", ".ico", ".bmp", ".tiff",
-]);
-
-function isImageUrl(url: string): boolean {
-  try {
-    const ext = "." + new URL(url).pathname.split(".").pop()?.toLowerCase();
-    return IMAGE_EXTS.has(ext);
-  } catch {
-    return false;
-  }
-}
-
-/** Returns the first image file URL from a files property, or empty string if not an image. */
-export function getImageFileUrl(prop: PropertyValue | undefined): string {
-  if (!prop) return "";
-  if (prop.type === "files" && prop.files.length > 0) {
-    const file = prop.files[0];
-    const url =
-      file.type === "file" ? file.file.url :
-      file.type === "external" ? file.external.url : "";
-    if (url && isImageUrl(url)) return url;
-  }
-  return "";
-}
-
 export function getUrlOrText(prop: PropertyValue | undefined): string {
   if (!prop) return "";
   if (prop.type === "url" && prop.url) return prop.url;

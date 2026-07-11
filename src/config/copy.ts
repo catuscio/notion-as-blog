@@ -18,6 +18,7 @@ export const copy = {
     description: (name: string) => `Search ${name} blog`,
     placeholder: "Search articles...",
     searching: "Searching...",
+    unavailable: "Search is temporarily unavailable.",
     noResultsShort: "No results found",
     minLength: "Please enter at least 2 characters.",
     noResults: (q: string) => `No results found for "${q}".`,

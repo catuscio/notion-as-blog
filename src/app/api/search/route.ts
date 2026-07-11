@@ -13,7 +13,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (q.length > MAX_QUERY_LENGTH) {
-    return NextResponse.json({ error: "Query is too long" }, { status: 400 });
+    return NextResponse.json(
+      { error: { code: "QUERY_TOO_LONG", message: "Query is too long" } },
+      { status: 400 },
+    );
   }
 
   try {
@@ -22,6 +25,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(results.slice(0, brand.search.dropdownLimit));
   } catch (error) {
     console.error("[api/search] Error:", error);
-    return NextResponse.json({ error: "Search failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: { code: "SEARCH_UNAVAILABLE", message: "Search is temporarily unavailable" } },
+      { status: 503 },
+    );
   }
 }

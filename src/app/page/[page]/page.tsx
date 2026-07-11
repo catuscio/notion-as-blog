@@ -3,10 +3,8 @@ import { RecentPostsSection } from "@/components/feed/RecentPostsSection";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
-import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import type { Post } from "@/types";
 import type { Metadata } from "next";
 
 export const revalidate = 1800;
@@ -21,7 +19,7 @@ function parsePage(value: string) {
 }
 
 async function getPageCount() {
-  const posts = await safeQuery<Post[]>(getListedPosts, []);
+  const posts = await getListedPosts();
   return {
     posts,
     totalPages: Math.max(1, Math.ceil(posts.length / brand.postsPerPage)),

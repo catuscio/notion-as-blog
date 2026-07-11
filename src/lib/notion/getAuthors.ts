@@ -38,31 +38,26 @@ async function fetchAuthorsFromNotion(): Promise<Author[]> {
   const dataSourceId = brand.notion.authorsDataSourceId;
   if (!dataSourceId) return [];
 
-  try {
-    const pages: PageObjectResponse[] = [];
-    let cursor: string | undefined = undefined;
+  const pages: PageObjectResponse[] = [];
+  let cursor: string | undefined;
 
-    do {
-      const response = await notionClient.dataSources.query({
-        data_source_id: dataSourceId,
-        start_cursor: cursor,
-        page_size: brand.notion.pageSize,
-      });
+  do {
+    const response = await notionClient.dataSources.query({
+      data_source_id: dataSourceId,
+      start_cursor: cursor,
+      page_size: brand.notion.pageSize,
+    });
 
-      for (const page of response?.results ?? []) {
-        if ("properties" in page) {
-          pages.push(page as PageObjectResponse);
-        }
+    for (const page of response.results) {
+      if ("properties" in page) {
+        pages.push(page as PageObjectResponse);
       }
+    }
 
-      cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
-    } while (cursor);
+    cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
+  } while (cursor);
 
-    return pages.map(parseAuthorPage);
-  } catch (error) {
-    console.error("[getAuthors] Failed to fetch from Notion:", error);
-    return [];
-  }
+  return pages.map(parseAuthorPage);
 }
 
 export async function getAllAuthors(): Promise<Author[]> {
@@ -77,20 +72,12 @@ export async function getAllAuthors(): Promise<Author[]> {
   return authors;
 }
 
-export async function getAuthorByPeopleIds(peopleIds: string[]): Promise<Author | null> {
-  if (peopleIds.length === 0) return null;
-  const authors = await getAllAuthors();
-  return authors.find((a) => a.peopleIds.some((pid) => peopleIds.includes(pid))) ?? null;
-}
-
 export async function getAuthorsByPeopleIds(peopleIds: string[]): Promise<Author[]> {
   if (peopleIds.length === 0) return [];
   const authors = await getAllAuthors();
-  const pidSet = new Set(peopleIds);
   const seen = new Set<string>();
   const result: Author[] = [];
   for (const pid of peopleIds) {
-    if (!pidSet.has(pid)) continue;
     const author = authors.find((a) => a.peopleIds.includes(pid));
     if (author && !seen.has(author.id)) {
       seen.add(author.id);
@@ -115,9 +102,4 @@ export async function getAuthorLookupMap(): Promise<Record<string, AuthorSummary
     map[a.name] = summary;
   }
   return map;
-}
-
-export async function getAuthorByName(name: string): Promise<Author | null> {
-  const authors = await getAllAuthors();
-  return authors.find((a) => a.name === name) ?? null;
 }

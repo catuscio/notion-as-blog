@@ -41,4 +41,3 @@ export interface SelectItemCount {
 }
 
 export type TagItem = SelectItemCount;
-export type CategoryItem = SelectItemCount;

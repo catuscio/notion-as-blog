@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { getPostDetailData, getPageBySlug, estimateReadingTime } from "@/lib/notion/getPost";
 import { getContentCatalog } from "@/lib/notion/getPosts";
 import { getAuthorsByPeopleIds } from "@/lib/notion/getAuthors";
-import { safeQuery } from "@/lib/notion/safeQuery";
 import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
 import { TypewriterTitle } from "@/components/detail/TypewriterTitle";
 import { AnimatedReveal } from "@/components/detail/AnimatedReveal";
@@ -22,10 +21,7 @@ import { copy } from "@/config/copy";
 import type { Author } from "@/types";
 
 async function fetchPostAuthors(authorIds: string[]): Promise<Author[]> {
-  return safeQuery<Author[]>(
-    () => getAuthorsByPeopleIds(authorIds),
-    []
-  );
+  return getAuthorsByPeopleIds(authorIds);
 }
 import type { PostDetailData } from "@/lib/notion/getPost";
 import type { Metadata } from "next";
@@ -34,14 +30,14 @@ async function getPostPageData(slug: string): Promise<
   (PostDetailData & { authors: Author[] }) | null
 > {
   // Try Post first
-  const result = await safeQuery(() => getPostDetailData(slug), null);
+  const result = await getPostDetailData(slug);
   if (result) {
     const authors = await fetchPostAuthors(result.post.authorIds);
     return { ...result, authors };
   }
 
   // Fall back to Page type (about, etc.)
-  const pageResult = await safeQuery(() => getPageBySlug(slug), null);
+  const pageResult = await getPageBySlug(slug);
   if (!pageResult) return null;
 
   const { page, blocks } = pageResult;
@@ -68,8 +64,7 @@ type Props = {
 export const dynamicParams = true;
 
 async function findPostOrPage(slug: string) {
-  const catalog = await safeQuery(getContentCatalog, null);
-  if (!catalog) return null;
+  const catalog = await getContentCatalog();
   return catalog.detailAccessiblePosts.find((p) => p.slug === slug)
     ?? catalog.detailAccessiblePages.find((p) => p.slug === slug)
     ?? null;
@@ -122,8 +117,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const catalog = await safeQuery(getContentCatalog, null);
-  if (!catalog) return [];
+  const catalog = await getContentCatalog();
   return [...catalog.listedPosts, ...catalog.listedPages].map((p) => ({
     slug: p.slug,
   }));

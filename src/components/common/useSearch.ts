@@ -10,23 +10,26 @@ export function useSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const fetchResults = useCallback(async (q: string) => {
     if (q.trim().length < 2) {
       setResults([]);
+      setError(false);
       return;
     }
     setLoading(true);
+    setError(false);
     try {
       const res = await fetch(`${SEARCH_API}?q=${encodeURIComponent(q.trim())}`);
-      if (res.ok) {
-        setResults(await res.json());
-      } else {
-        setResults([]);
+      if (!res.ok) {
+        throw new Error(`Search request failed with status ${res.status}`);
       }
+      setResults(await res.json());
     } catch {
       setResults([]);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -43,5 +46,5 @@ export function useSearch() {
     setActiveIndex(-1);
   }, [results]);
 
-  return { query, setQuery, results, loading, activeIndex, setActiveIndex };
+  return { query, setQuery, results, loading, error, activeIndex, setActiveIndex };
 }
