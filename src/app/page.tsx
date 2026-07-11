@@ -2,14 +2,14 @@ import { Suspense, type ReactNode } from "react";
 import { RecentPostsSection } from "@/components/feed/RecentPostsSection";
 import { NewsletterCTA } from "@/components/feed/NewsletterCTA";
 import { BlogJsonLd } from "@/components/seo/JsonLd";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
 import type { Post } from "@/types";
 
 export default async function HomePage() {
-  const posts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const posts = await safeQuery<Post[]>(getListedPosts, []);
   const tags = getAllTags(posts);
   const pinnedPosts = posts.filter((p) => p.pinned);
   const hasPinnedPosts = pinnedPosts.length > 0;

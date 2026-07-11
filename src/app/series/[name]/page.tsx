@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { SeriesHeader } from "@/components/feed/SeriesHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BreadcrumbJsonLd, SeriesJsonLd } from "@/components/seo/JsonLd";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const decoded = safeDecode(name);
   const seriesUrl = `${brand.url}/series/${encodeURIComponent(decoded)}`;
 
-  const allPosts = await safeQuery(getPublishedPosts, []);
+  const allPosts = await safeQuery(getListedPosts, []);
   const posts = getSeriesPostsFromAll(allPosts, decoded);
   const description = copy.series.description(decoded, brand.name, posts.length);
 
@@ -63,7 +63,7 @@ export default async function SeriesPage({ params }: Props) {
   const { name } = await params;
   const decoded = safeDecode(name);
 
-  const allPosts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
   const posts = getSeriesPostsFromAll(allPosts, decoded);
   const { tags, authorsMap } = await getFeedPageData(posts);
 

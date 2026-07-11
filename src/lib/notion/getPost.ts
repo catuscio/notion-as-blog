@@ -1,4 +1,4 @@
-import { getPublishedPosts, getPublishedPages } from "./getPosts";
+import { getContentCatalog } from "./getPosts";
 import { getPageBlocks } from "./getBlocks";
 import { enrichBookmarkOgInPlace } from "./ogMetadata";
 import { getRelatedPosts, getSeriesPosts } from "./filterPosts";
@@ -38,8 +38,8 @@ export interface PostDetailData {
 export async function getPostDetailData(
   slug: string
 ): Promise<PostDetailData | null> {
-  const allPosts = await getPublishedPosts();
-  const post = allPosts.find((p) => p.slug === slug);
+  const { detailAccessiblePosts, listedPosts } = await getContentCatalog();
+  const post = detailAccessiblePosts.find((p) => p.slug === slug);
 
   if (!post) return null;
 
@@ -49,8 +49,8 @@ export async function getPostDetailData(
   const wordCount = text.split(/\s+/).filter(Boolean).length;
   const readingTime = estimateReadingTime(text);
 
-  const relatedPosts = getRelatedPosts(post, allPosts);
-  const seriesPosts = getSeriesPosts(post, allPosts);
+  const relatedPosts = getRelatedPosts(post, listedPosts);
+  const seriesPosts = post.status === "Public" ? getSeriesPosts(post, listedPosts) : [];
 
   return { post, blocks, relatedPosts, seriesPosts, readingTime, wordCount };
 }
@@ -58,8 +58,8 @@ export async function getPostDetailData(
 export async function getPageBySlug(
   slug: string
 ): Promise<{ page: Post; blocks: NotionBlockWithChildren[] } | null> {
-  const pages = await getPublishedPages();
-  const page = pages.find((p) => p.slug === slug);
+  const { detailAccessiblePages } = await getContentCatalog();
+  const page = detailAccessiblePages.find((p) => p.slug === slug);
 
   if (!page) return null;
 

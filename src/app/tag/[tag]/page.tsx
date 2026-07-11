@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { TagHeader } from "@/components/feed/TagHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
 import { safeQuery } from "@/lib/notion/safeQuery";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const decoded = safeDecode(tag);
   const tagUrl = `${brand.url}/tag/${encodeURIComponent(decoded)}`;
 
-  const allPosts = await safeQuery(getPublishedPosts, []);
+  const allPosts = await safeQuery(getListedPosts, []);
   const count = allPosts.filter((p) => p.tags.includes(decoded)).length;
   const description = copy.tag.description(brand.name, decoded, count);
 
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const posts = await safeQuery(getPublishedPosts, []);
+  const posts = await safeQuery(getListedPosts, []);
   const tags = getAllTags(posts);
   return tags
     .filter((t) => posts.filter((p) => p.tags.includes(t.name)).length > 2)
@@ -61,7 +61,7 @@ export default async function TagPage({ params }: Props) {
   const { tag } = await params;
   const decoded = safeDecode(tag);
 
-  const allPosts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
   const posts = allPosts.filter((post) => post.tags.includes(decoded));
   const { tags, authorsMap } = await getFeedPageData(allPosts);
 

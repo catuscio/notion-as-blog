@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { searchPosts } from "@/lib/searchPosts";
 import { brand } from "@/config/brand";
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const posts = await getPublishedPosts();
+    const posts = await getListedPosts();
     const results = searchPosts(posts, q);
     return NextResponse.json(results.slice(0, brand.search.dropdownLimit));
   } catch (error) {

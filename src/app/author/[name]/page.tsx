@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { AuthorHeader } from "@/components/feed/AuthorHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { PersonJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAllAuthors } from "@/lib/notion/getAuthors";
 import { getFeedPageData } from "@/lib/notion/getFeedPageData";
 import { filterPostsByAuthor } from "@/lib/notion/filterPosts";
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const author = await resolveAuthor(name);
   if (!author) return { title: copy.notFound.title };
 
-  const allPosts = await safeQuery(getPublishedPosts, []);
+  const allPosts = await safeQuery(getListedPosts, []);
   const count = filterPostsByAuthor(allPosts, author.peopleIds).length;
 
   const authorUrl = `${brand.url}/author/${encodeURIComponent(author.name)}`;
@@ -69,7 +69,7 @@ export default async function AuthorPage({ params }: Props) {
   const author = await resolveAuthor(name);
   if (!author) notFound();
 
-  const allPosts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
   const posts = filterPostsByAuthor(allPosts, author.peopleIds);
   const { tags, authorsMap } = await getFeedPageData(posts);
 

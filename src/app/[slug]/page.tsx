@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPostDetailData, getPageBySlug, estimateReadingTime } from "@/lib/notion/getPost";
-import { getPublishedPosts, getPublishedPages } from "@/lib/notion/getPosts";
+import { getContentCatalog } from "@/lib/notion/getPosts";
 import { getAuthorsByPeopleIds } from "@/lib/notion/getAuthors";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
@@ -65,12 +65,14 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+export const dynamicParams = true;
+
 async function findPostOrPage(slug: string) {
-  const posts = await safeQuery(getPublishedPosts, []);
-  const post = posts.find((p) => p.slug === slug);
-  if (post) return post;
-  const pages = await safeQuery(getPublishedPages, []);
-  return pages.find((p) => p.slug === slug) ?? null;
+  const catalog = await safeQuery(getContentCatalog, null);
+  if (!catalog) return null;
+  return catalog.detailAccessiblePosts.find((p) => p.slug === slug)
+    ?? catalog.detailAccessiblePages.find((p) => p.slug === slug)
+    ?? null;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -79,6 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: copy.notFound.title };
 
   const postUrl = `${brand.url}/${post.slug}`;
+  const isUnlisted = post.status === "PublicOnDetail";
   return {
     title: post.title,
     description: post.summary,
@@ -103,15 +106,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       images: [`/${post.slug}/opengraph-image`],
     },
+    ...(isUnlisted && {
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+        },
+      },
+    }),
   };
 }
 
 export async function generateStaticParams() {
-  const [posts, pages] = await Promise.all([
-    safeQuery(getPublishedPosts, []),
-    safeQuery(getPublishedPages, []),
-  ]);
-  return [...posts, ...pages].map((p) => ({ slug: p.slug }));
+  const catalog = await safeQuery(getContentCatalog, null);
+  if (!catalog) return [];
+  return [...catalog.listedPosts, ...catalog.listedPages].map((p) => ({
+    slug: p.slug,
+  }));
 }
 
 export default async function PostPage({ params }: Props) {
@@ -154,7 +169,7 @@ export default async function PostPage({ params }: Props) {
         <ReadNext posts={relatedPosts} />
       </div>
 
-      <CommentBox />
+      {post.status === "Public" && <CommentBox />}
     </>
   );
 
@@ -174,7 +189,9 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <div className="w-full max-w-[1024px] mx-auto flex flex-col lg:flex-row gap-12 px-6 py-8">
-      <PostJsonLd post={post} authors={authors} wordCount={wordCount} readingTime={readingTime} seriesPosts={seriesPosts} />
+      {post.status === "Public" && (
+        <PostJsonLd post={post} authors={authors} wordCount={wordCount} readingTime={readingTime} seriesPosts={seriesPosts} />
+      )}
 
       <article className="w-full flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
         <PostBreadcrumb post={post} />

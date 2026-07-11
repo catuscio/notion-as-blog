@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { RecentPostsSection } from "@/components/feed/RecentPostsSection";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
-import { getPublishedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/getPosts";
 import { getAllTags } from "@/lib/notion/getAllSelectItems";
 import { safeQuery } from "@/lib/notion/safeQuery";
 import { brand } from "@/config/brand";
@@ -21,7 +21,7 @@ function parsePage(value: string) {
 }
 
 async function getPageCount() {
-  const posts = await safeQuery<Post[]>(getPublishedPosts, []);
+  const posts = await safeQuery<Post[]>(getListedPosts, []);
   return {
     posts,
     totalPages: Math.max(1, Math.ceil(posts.length / brand.postsPerPage)),
