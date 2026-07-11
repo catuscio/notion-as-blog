@@ -175,9 +175,11 @@ Open [http://localhost:3000](http://localhost:3000) to see your blog.
 | Value | Shown in listings | Accessible via direct URL |
 |---|---|---|
 | `Public` | Yes | Yes |
-| `PublicOnDetail` | No | Yes — useful for unlisted posts shared via link |
+| `PublicOnDetail` | No | Yes — unlisted and excluded from search indexing, but not access-controlled |
 | `Draft` | No | No |
 | `Private` | No | No |
+
+`PublicOnDetail` applies to both `Post` and `Page` content. It is excluded from feeds, search, category/tag/series/author pages, RSS, sitemap, structured data, comments, and build-time route generation. Anyone who knows the URL can still access and share it; use authentication for sensitive content.
 
 ### Type values
 
