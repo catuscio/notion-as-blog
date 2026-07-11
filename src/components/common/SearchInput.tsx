@@ -8,7 +8,12 @@ import { Search, Loader2, SearchX, FileText } from "lucide-react";
 import { copy } from "@/config/copy";
 import { useSearch } from "./useSearch";
 import { useSearchKeyboard } from "./useSearchKeyboard";
-import type { Post } from "@/types";
+import {
+  MAX_SEARCH_QUERY_LENGTH,
+  MIN_SEARCH_QUERY_LENGTH,
+  type SearchErrorCode,
+  type SearchResult,
+} from "@/lib/searchContract";
 
 const noop = () => () => {};
 const getIsMac = () => navigator.platform.toUpperCase().includes("MAC");
@@ -16,7 +21,7 @@ const getServerIsMac = () => false;
 
 export function SearchInput() {
   const router = useRouter();
-  const { query, setQuery, results, loading, activeIndex, setActiveIndex } =
+  const { query, setQuery, results, loading, error, activeIndex, setActiveIndex } =
     useSearch();
   const [open, setOpen] = useState(false);
   const isMac = useSyncExternalStore(noop, getIsMac, getServerIsMac);
@@ -42,11 +47,14 @@ export function SearchInput() {
   const onClose = useCallback(() => setOpen(false), []);
   const normalizedQuery = query.trim();
   const onSelect = useCallback(
-    (post: Post) => router.push(`/${post.slug}`),
+    (post: SearchResult) => router.push(`/${post.slug}`),
     [router]
   );
   const onSubmit = useCallback(() => {
-    if (normalizedQuery.length < 2) return;
+    if (
+      normalizedQuery.length < MIN_SEARCH_QUERY_LENGTH
+      || normalizedQuery.length > MAX_SEARCH_QUERY_LENGTH
+    ) return;
     setOpen(false);
     router.push(`/search?q=${encodeURIComponent(normalizedQuery)}`);
   }, [router, normalizedQuery]);
@@ -60,10 +68,11 @@ export function SearchInput() {
     onClose,
     onSelect,
     onSubmit,
-    canSubmit: normalizedQuery.length >= 2,
+    canSubmit: normalizedQuery.length >= MIN_SEARCH_QUERY_LENGTH
+      && normalizedQuery.length <= MAX_SEARCH_QUERY_LENGTH,
   });
 
-  const showDropdown = open && normalizedQuery.length >= 2;
+  const showDropdown = open && normalizedQuery.length >= MIN_SEARCH_QUERY_LENGTH;
 
   return (
     <div ref={containerRef} className="relative">
@@ -75,6 +84,7 @@ export function SearchInput() {
           aria-label={copy.search.placeholder}
           placeholder={copy.search.placeholder}
           type="text"
+          maxLength={MAX_SEARCH_QUERY_LENGTH}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -95,6 +105,7 @@ export function SearchInput() {
             <SearchResults
               results={results}
               loading={loading}
+              error={error}
               activeIndex={activeIndex}
               onClose={() => setOpen(false)}
             />
@@ -108,11 +119,13 @@ export function SearchInput() {
 function SearchResults({
   results,
   loading,
+  error,
   activeIndex,
   onClose,
 }: {
-  results: Post[];
+  results: SearchResult[];
   loading: boolean;
+  error: SearchErrorCode | null;
   activeIndex: number;
   onClose: () => void;
 }) {
@@ -121,6 +134,15 @@ function SearchResults({
       <div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
         <Loader2 size={20} className="animate-spin mr-2" />
         {copy.search.searching}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 text-destructive text-sm">
+        <SearchX size={28} className="mb-2 opacity-70" />
+        {error === "QUERY_TOO_LONG" ? copy.search.queryTooLong : copy.search.unavailable}
       </div>
     );
   }
@@ -137,7 +159,7 @@ function SearchResults({
   return (
     <ul>
       {results.map((post, i) => (
-        <li key={post.id}>
+        <li key={post.slug}>
           <Link
             href={`/${post.slug}`}
             onClick={onClose}

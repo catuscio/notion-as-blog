@@ -2,14 +2,13 @@ import { Suspense } from "react";
 import { TagHeader } from "@/components/feed/TagHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
-import { getListedPosts } from "@/lib/notion/getPosts";
-import { getAllTags } from "@/lib/notion/getAllSelectItems";
-import { getFeedPageData } from "@/lib/notion/getFeedPageData";
-import { safeQuery } from "@/lib/notion/safeQuery";
+import { getListedPosts } from "@/lib/notion/contentCatalog";
+import { getVisibleTagCounts } from "@/lib/notion/getTagCounts";
+import { getFeedData } from "@/lib/notion/getFeedData";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { safeDecode } from "@/lib/safeDecode";
-import type { Post } from "@/types";
+import { createListingMetadata } from "@/lib/listingMetadata";
 import type { Metadata } from "next";
 
 type Props = {
@@ -21,37 +20,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const decoded = safeDecode(tag);
   const tagUrl = `${brand.url}/tag/${encodeURIComponent(decoded)}`;
 
-  const allPosts = await safeQuery(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const count = allPosts.filter((p) => p.tags.includes(decoded)).length;
   const description = copy.tag.description(brand.name, decoded, count);
 
-  return {
+  return createListingMetadata({
     title: `#${decoded}`,
+    socialTitle: `#${decoded} — ${brand.name}`,
     description,
-    alternates: {
-      canonical: tagUrl,
-    },
-    openGraph: {
-      title: `#${decoded} — ${brand.name}`,
-      description,
-      url: tagUrl,
-      siteName: brand.name,
-      type: "website",
-      images: [{ url: brand.assets.ogImage, width: brand.assets.ogWidth, height: brand.assets.ogHeight }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `#${decoded} — ${brand.name}`,
-      description,
-      images: [brand.assets.ogImage],
-    },
-    ...(count <= 2 && { robots: { index: false, follow: true } }),
-  };
+    url: tagUrl,
+    robots: count <= 2 ? { index: false, follow: true } : undefined,
+  });
 }
 
 export async function generateStaticParams() {
-  const posts = await safeQuery(getListedPosts, []);
-  const tags = getAllTags(posts);
+  const posts = await getListedPosts();
+  const tags = getVisibleTagCounts(posts);
   return tags
     .filter((t) => posts.filter((p) => p.tags.includes(t.name)).length > 2)
     .map((t) => ({ tag: encodeURIComponent(t.name) }));
@@ -61,9 +45,9 @@ export default async function TagPage({ params }: Props) {
   const { tag } = await params;
   const decoded = safeDecode(tag);
 
-  const allPosts = await safeQuery<Post[]>(getListedPosts, []);
+  const allPosts = await getListedPosts();
   const posts = allPosts.filter((post) => post.tags.includes(decoded));
-  const { tags, authorsMap } = await getFeedPageData(allPosts);
+  const { tags, authorsMap } = await getFeedData(allPosts);
 
   const tagUrl = `${brand.url}/tag/${encodeURIComponent(decoded)}`;
   const description = copy.tag.description(brand.name, decoded, posts.length);

@@ -3,9 +3,9 @@
 import { useMemo, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { brand } from "@/config/brand";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
-export function useFeedPagination(posts: Post[]) {
+export function useFeedPagination(posts: ContentItem[]) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

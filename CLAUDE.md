@@ -40,7 +40,7 @@ No test runner is configured. Playwright is installed as a devDependency but has
 
 - **Client:** `client.ts` — singleton using `@notionhq/client`. Uses `dataSources.query()` (not `databases.query()`).
 - **Posts:** `getPosts.ts` — paginated fetch wrapped in `unstable_cache` (30min TTL, key `["all-posts"]`)
-- **Authors:** `getAuthors.ts` — manual in-memory TTL cache (5min) to avoid serialization overhead
+- **Authors:** `getAuthors.ts` — tagged Next.js cache (5min), strict for author routes and optional for presentation enrichment
 - **Blocks:** `getBlocks.ts` — recursive block fetching with semaphore (3 concurrent requests)
 - **Image proxy:** `imageCache.ts` downloads Notion images to `.next/cache/notion-images/` and rewrites URLs to `/api/notion-image/[id]` (1-year cache header) since Notion S3 URLs expire
 - **Error handling:** `safeQuery.ts` wraps all data fetches — returns fallback value on error instead of crashing

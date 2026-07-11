@@ -4,13 +4,13 @@ import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
 import { copy } from "@/config/copy";
 import { formatDate } from "@/lib/format";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 export function PostCard({
   post,
   priorityImage = false,
 }: {
-  post: Post;
+  post: ContentItem;
   priorityImage?: boolean;
 }) {
   return (

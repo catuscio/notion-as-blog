@@ -1,18 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Github, Twitter, Linkedin, Globe, Mail, User } from "lucide-react";
+import type { ReactNode } from "react";
+import { Globe, Mail, User } from "lucide-react";
+import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons/BrandIcons";
 import { copy } from "@/config/copy";
 import type { Author } from "@/types";
-import type { LucideIcon } from "lucide-react";
 
 const socialOrder = ["email", "github", "x", "linkedin", "website"] as const;
 
-const socialIcons: Record<string, { Icon: LucideIcon; label: string }> = {
-  email: { Icon: Mail, label: "Email" },
-  github: { Icon: Github, label: "GitHub" },
-  x: { Icon: Twitter, label: "X" },
-  linkedin: { Icon: Linkedin, label: "LinkedIn" },
-  website: { Icon: Globe, label: "Website" },
+const socialIcons: Record<string, { icon: ReactNode; label: string }> = {
+  email: { icon: <Mail size={20} />, label: "Email" },
+  github: { icon: <GitHubIcon className="size-5" />, label: "GitHub" },
+  x: { icon: <XIcon className="size-5" />, label: "X" },
+  linkedin: { icon: <LinkedInIcon className="size-5" />, label: "LinkedIn" },
+  website: { icon: <Globe size={20} />, label: "Website" },
 };
 
 const MAX_VISIBLE_AUTHORS = 3;
@@ -105,7 +106,6 @@ export function AuthorCard({
             {activeSocials.map(([key, url]) => {
               const config = socialIcons[key];
               if (!config) return null;
-              const { Icon } = config;
               const href = key === "email" && !url.startsWith("mailto:") ? `mailto:${url}` : url;
               return (
                 <a
@@ -116,7 +116,7 @@ export function AuthorCard({
                   aria-label={config.label}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <Icon size={20} />
+                  {config.icon}
                 </a>
               );
             })}

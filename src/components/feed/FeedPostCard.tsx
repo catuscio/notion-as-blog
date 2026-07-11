@@ -4,7 +4,7 @@ import { AvatarStack } from "@/components/common/AvatarStack";
 import { copy } from "@/config/copy";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
-import type { Post, AuthorSummary } from "@/types";
+import type { ContentItem, AuthorSummary } from "@/types";
 
 const cardClassName = cn(
   "group relative bg-card rounded-2xl p-6 md:p-8 overflow-hidden cursor-pointer",
@@ -18,7 +18,7 @@ export function FeedPostCard({
   readingTime,
   authors,
 }: {
-  post: Post;
+  post: ContentItem;
   readingTime?: number;
   authors?: AuthorSummary[];
 }) {

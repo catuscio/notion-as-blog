@@ -14,7 +14,7 @@ export interface Author {
   };
 }
 
-export interface Post {
+export interface ContentItem {
   id: string;
   title: string;
   slug: string;
@@ -41,4 +41,3 @@ export interface SelectItemCount {
 }
 
 export type TagItem = SelectItemCount;
-export type CategoryItem = SelectItemCount;

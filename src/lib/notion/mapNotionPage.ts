@@ -1,5 +1,5 @@
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 import {
   getRichTextPlain,
   getSelectValue,
@@ -11,9 +11,29 @@ import {
 } from "./propertyHelpers";
 import { stableImageFileUrl, stablePageCover } from "./imageProxy";
 
-export function getPageProperties(
+const VALID_STATUSES: ContentItem["status"][] = [
+  "Public",
+  "PublicOnDetail",
+  "Draft",
+  "Private",
+];
+const VALID_TYPES: ContentItem["type"][] = ["Post", "Page"];
+
+function parseEnum<T extends string>(
+  pageId: string,
+  field: string,
+  value: string,
+  validValues: readonly T[],
+  defaultValue: T,
+): T {
+  if (!value) return defaultValue;
+  if (validValues.includes(value as T)) return value as T;
+  throw new Error(`Notion content mapping error for page ${pageId}: invalid ${field} "${value}"`);
+}
+
+export function mapNotionPageToContent(
   page: PageObjectResponse
-): Post {
+): ContentItem {
   const props = page.properties;
   const get = (name: string) => getProp(props, name);
 
@@ -23,18 +43,11 @@ export function getPageProperties(
   const slugProp = get("slug");
   const slug = getRichTextPlain(slugProp) || page.id.replace(/-/g, "");
 
-  const VALID_STATUSES: Post["status"][] = ["Public", "PublicOnDetail", "Draft", "Private"];
-  const VALID_TYPES: Post["type"][] = ["Post", "Page"];
-
   const rawStatus = getSelectValue(get("status"));
-  const status: Post["status"] = VALID_STATUSES.includes(rawStatus as Post["status"])
-    ? (rawStatus as Post["status"])
-    : "Draft";
+  const status = parseEnum(page.id, "status", rawStatus, VALID_STATUSES, "Draft");
 
   const rawType = getSelectValue(get("type"));
-  const type: Post["type"] = VALID_TYPES.includes(rawType as Post["type"])
-    ? (rawType as Post["type"])
-    : "Post";
+  const type = parseEnum(page.id, "type", rawType, VALID_TYPES, "Post");
   const date = getDateValue(get("date"));
   const tags = getMultiSelectValues(get("tags"));
   const category = getSelectValue(get("category")) || null;
@@ -54,6 +67,19 @@ export function getPageProperties(
   const pinnedProp = get("pinned");
   const pinned =
     pinnedProp?.type === "checkbox" ? pinnedProp.checkbox : false;
+
+  if (status === "Public" || status === "PublicOnDetail") {
+    const missingFields = [
+      !title && "title",
+      type === "Post" && !date && "date",
+      type === "Post" && !category && "category",
+    ].filter(Boolean);
+    if (missingFields.length > 0) {
+      throw new Error(
+        `Notion content mapping error for page ${page.id}: public ${type} is missing ${missingFields.join(", ")}`,
+      );
+    }
+  }
 
   return {
     id: page.id,

@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
 import { copy } from "@/config/copy";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 export function ReadNext({
   posts,
   readingTimeMap,
 }: {
-  posts: Post[];
+  posts: ContentItem[];
   readingTimeMap?: Record<string, number>;
 }) {
   if (posts.length === 0) return null;

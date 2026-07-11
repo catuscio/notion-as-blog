@@ -385,7 +385,7 @@ search: {
 cache: {
   revalidate: 1800,       // ISR 间隔秒数（默认 30 分钟）
   feedTtl: 3600,          // RSS Cache-Control max-age（默认 1 小时）
-  authorsTtlMs: 300000,   // 内存中的作者缓存（默认 5 分钟）
+  authorsRevalidate: 300, // 作者缓存重新验证（秒，默认 5 分钟）
 },
 ```
 

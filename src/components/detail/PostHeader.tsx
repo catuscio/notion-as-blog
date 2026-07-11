@@ -1,7 +1,7 @@
 import { User } from "lucide-react";
 import { copy } from "@/config/copy";
 import { AvatarStack } from "@/components/common/AvatarStack";
-import type { Post, Author } from "@/types";
+import type { ContentItem, Author } from "@/types";
 import { formatDate } from "@/lib/format";
 import { ShareButton } from "./ShareButton";
 
@@ -10,7 +10,7 @@ export function PostHeaderMeta({
   authors,
   readingTime,
 }: {
-  post: Post;
+  post: ContentItem;
   authors: Author[];
   readingTime: number;
 }) {
@@ -55,7 +55,7 @@ export function PostHeader({
   titleSlot,
   metaSlot,
 }: {
-  post: Post;
+  post: ContentItem;
   authors: Author[];
   readingTime: number;
   titleSlot?: React.ReactNode;

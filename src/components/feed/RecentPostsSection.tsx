@@ -1,10 +1,10 @@
 import { PostList } from "./PostList";
 import { TagSidebar, MobileTagBar } from "./TagSidebar";
-import { StaticPagination } from "@/components/common/StaticPagination";
+import { PaginationNav } from "@/components/common/PaginationNav";
 import { SearchInputLoader } from "@/components/common/SearchInputLoader";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import type { Post, TagItem } from "@/types";
+import type { ContentItem, TagItem } from "@/types";
 
 export function RecentPostsSection({
   posts,
@@ -12,7 +12,7 @@ export function RecentPostsSection({
   currentPage = 1,
   prioritizeFirstImage = true,
 }: {
-  posts: Post[];
+  posts: ContentItem[];
   tags: TagItem[];
   currentPage?: number;
   prioritizeFirstImage?: boolean;
@@ -34,7 +34,7 @@ export function RecentPostsSection({
       <div className="flex gap-10 mt-8 lg:mt-0">
         <div className="flex-1 min-w-0">
           <PostList posts={paginatedPosts} prioritizeFirstImage={prioritizeFirstImage} />
-          <StaticPagination
+          <PaginationNav
             totalItems={posts.length}
             itemsPerPage={brand.postsPerPage}
             currentPage={currentPage}

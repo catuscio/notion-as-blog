@@ -2,13 +2,13 @@ import { FileText } from "lucide-react";
 import { PostCard } from "./PostCard";
 import { EmptyState } from "@/components/common/EmptyState";
 import { copy } from "@/config/copy";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 export function PostList({
   posts,
   prioritizeFirstImage = false,
 }: {
-  posts: Post[];
+  posts: ContentItem[];
   prioritizeFirstImage?: boolean;
 }) {
   if (posts.length === 0) {

@@ -1,9 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { extname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import ts from "typescript";
 
 export async function resolve(specifier, context, nextResolve) {
+  if (specifier.startsWith("@/")) {
+    const sourcePath = new URL(`../src/${specifier.slice(2)}.ts`, import.meta.url);
+    return { shortCircuit: true, url: pathToFileURL(fileURLToPath(sourcePath)).href };
+  }
+
   try {
     return await nextResolve(specifier, context);
   } catch (error) {

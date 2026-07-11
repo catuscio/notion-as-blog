@@ -1,12 +1,11 @@
 import { notFound } from "next/navigation";
 import { RecentPostsSection } from "@/components/feed/RecentPostsSection";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
-import { getListedPosts } from "@/lib/notion/getPosts";
-import { getAllTags } from "@/lib/notion/getAllSelectItems";
-import { safeQuery } from "@/lib/notion/safeQuery";
+import { getListedPosts } from "@/lib/notion/contentCatalog";
+import { getVisibleTagCounts } from "@/lib/notion/getTagCounts";
+import { createListingMetadata } from "@/lib/listingMetadata";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import type { Post } from "@/types";
 import type { Metadata } from "next";
 
 export const revalidate = 1800;
@@ -21,7 +20,7 @@ function parsePage(value: string) {
 }
 
 async function getPageCount() {
-  const posts = await safeQuery<Post[]>(getListedPosts, []);
+  const posts = await getListedPosts();
   return {
     posts,
     totalPages: Math.max(1, Math.ceil(posts.length / brand.postsPerPage)),
@@ -35,31 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const url = `${brand.url}/page/${page}`;
 
-  return {
+  return createListingMetadata({
     title: `${copy.recentPosts} ${page}`,
+    socialTitle: `${copy.recentPosts} ${page} — ${brand.name}`,
     description: brand.description,
-    alternates: {
-      canonical: url,
-    },
-    robots: {
-      index: false,
-      follow: true,
-    },
-    openGraph: {
-      title: `${copy.recentPosts} ${page} — ${brand.name}`,
-      description: brand.description,
-      url,
-      siteName: brand.name,
-      type: "website",
-      images: [{ url: brand.assets.ogImage, width: brand.assets.ogWidth, height: brand.assets.ogHeight }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${copy.recentPosts} ${page} — ${brand.name}`,
-      description: brand.description,
-      images: [brand.assets.ogImage],
-    },
-  };
+    url,
+    robots: { index: false, follow: true },
+  });
 }
 
 export async function generateStaticParams() {
@@ -77,7 +58,7 @@ export default async function PaginatedPostsPage({ params }: Props) {
   const { posts, totalPages } = await getPageCount();
   if (page > totalPages) notFound();
 
-  const tags = getAllTags(posts);
+  const tags = getVisibleTagCounts(posts);
   const url = `${brand.url}/page/${page}`;
 
   return (

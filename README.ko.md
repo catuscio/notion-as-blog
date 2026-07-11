@@ -385,7 +385,7 @@ search: {
 cache: {
   revalidate: 1800,       // ISR 갱신 간격 (초, 기본값: 30분)
   feedTtl: 3600,          // RSS Cache-Control max-age (초, 기본값: 1시간)
-  authorsTtlMs: 300000,   // 인메모리 저자 캐시 TTL (밀리초, 기본값: 5분)
+  authorsRevalidate: 300, // 저자 캐시 재검증 주기 (초, 기본값: 5분)
 },
 ```
 
