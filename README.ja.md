@@ -385,7 +385,7 @@ search: {
 cache: {
   revalidate: 1800,       // ISR 間隔（秒）。デフォルト 30 分
   feedTtl: 3600,          // RSS Cache-Control max-age。デフォルト 1 時間
-  authorsTtlMs: 300000,   // メモリ上の著者キャッシュ。デフォルト 5 分
+  authorsRevalidate: 300, // 著者キャッシュの再検証（秒、デフォルト 5 分）
 },
 ```
 

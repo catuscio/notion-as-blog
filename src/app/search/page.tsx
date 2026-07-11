@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import { FeedPostCard } from "@/components/feed/FeedPostCard";
 import { getListedPosts } from "@/lib/notion/contentCatalog";
-import { getAuthorLookupMap } from "@/lib/notion/getAuthors";
+import { getOptionalAuthorLookupMap } from "@/lib/notion/getAuthors";
 import { searchPosts } from "@/lib/searchPosts";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import { resolveAuthors } from "@/lib/resolveAuthors";
-import type { AuthorSummary } from "@/types";
+import { MAX_SEARCH_QUERY_LENGTH, MIN_SEARCH_QUERY_LENGTH } from "@/lib/searchContract";
 import type { Metadata } from "next";
 
 type Props = {
@@ -25,17 +25,26 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
 }
 
-async function SearchResults({ query, authorsMap }: { query: string; authorsMap: Record<string, AuthorSummary> }) {
-  const allPosts = await getListedPosts();
-  const results = query.length >= 2 ? searchPosts(allPosts, query).slice(0, brand.search.pageLimit) : [];
-
-  if (query.length < 2) {
+async function SearchResults({ query }: { query: string }) {
+  if (query.length < MIN_SEARCH_QUERY_LENGTH) {
     return (
       <div className="text-center py-16 text-muted-foreground">
         <p className="text-lg">{copy.search.minLength}</p>
       </div>
     );
   }
+
+  if (query.length > MAX_SEARCH_QUERY_LENGTH) {
+    return (
+      <div className="text-center py-16 text-destructive">
+        <p className="text-lg">{copy.search.queryTooLong}</p>
+      </div>
+    );
+  }
+
+  const allPosts = await getListedPosts();
+  const authorsMap = await getOptionalAuthorLookupMap();
+  const results = searchPosts(allPosts, query).slice(0, brand.search.pageLimit);
 
   if (results.length === 0) {
     return (
@@ -61,8 +70,6 @@ async function SearchResults({ query, authorsMap }: { query: string; authorsMap:
 export default async function SearchPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
-  const authorsMap = await getAuthorLookupMap();
-
   return (
     <div className="max-w-[1024px] mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold tracking-tight mb-2">
@@ -73,7 +80,7 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
       </h1>
       <Suspense>
-        <SearchResults query={query} authorsMap={authorsMap} />
+        <SearchResults query={query} />
       </Suspense>
     </div>
   );

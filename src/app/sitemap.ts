@@ -3,7 +3,7 @@ import type { ContentItem } from "@/types";
 import { brand, getCategorySlug } from "@/config/brand";
 import { getContentCatalog } from "@/lib/notion/contentCatalog";
 import { getVisibleTagCounts } from "@/lib/notion/getTagCounts";
-import { getAllAuthors } from "@/lib/notion/getAuthors";
+import { getOptionalAllAuthors } from "@/lib/notion/getAuthors";
 import { filterPostsByAuthor } from "@/lib/notion/contentQueries";
 import { getContentDate, latestDateAmong } from "@/lib/contentDate";
 
@@ -70,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   // Author routes with dynamic lastModified (exclude authors with ≤2 posts)
-  const authors = await getAllAuthors();
+  const authors = await getOptionalAllAuthors();
   const authorRoutes: MetadataRoute.Sitemap = authors.flatMap((a) => {
     const authorPosts = filterPostsByAuthor(posts, a.peopleIds);
     if (authorPosts.length <= 2) return [];

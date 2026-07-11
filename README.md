@@ -385,7 +385,7 @@ search: {
 cache: {
   revalidate: 1800,       // ISR interval in seconds (default: 30 min)
   feedTtl: 3600,          // RSS Cache-Control max-age (default: 1 hour)
-  authorsTtlMs: 300000,   // In-memory authors cache (default: 5 min)
+  authorsRevalidate: 300, // Authors cache revalidation (seconds, default: 5 min)
 },
 ```
 

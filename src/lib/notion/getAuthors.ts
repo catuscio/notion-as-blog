@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { notionClient } from "./client";
 import { brand } from "@/config/brand";
 import type { Author, AuthorSummary } from "@/types";
@@ -26,13 +27,7 @@ function parseAuthorPage(page: PageObjectResponse): Author {
   };
 }
 
-// Manual in-memory TTL cache instead of unstable_cache:
-// Authors DB is small and rarely changes, so a lightweight in-process cache
-// avoids Next.js cache serialization overhead. In serverless environments,
-// each instance maintains its own cache — acceptable given the short TTL.
-let cachedAuthors: Author[] | null = null;
-let cacheTimestamp = 0;
-const CACHE_TTL = brand.cache.authorsTtlMs;
+export const NOTION_AUTHORS_CACHE_TAG = "notion-authors";
 
 async function fetchAuthorsFromNotion(): Promise<Author[]> {
   const dataSourceId = brand.notion.authorsDataSourceId;
@@ -60,46 +55,65 @@ async function fetchAuthorsFromNotion(): Promise<Author[]> {
   return pages.map(parseAuthorPage);
 }
 
-export async function getAllAuthors(): Promise<Author[]> {
-  const now = Date.now();
-  if (cachedAuthors && now - cacheTimestamp < CACHE_TTL) {
-    return cachedAuthors;
-  }
+const getCachedAuthors = unstable_cache(fetchAuthorsFromNotion, ["all-authors"], {
+  revalidate: brand.cache.authorsRevalidate,
+  tags: [NOTION_AUTHORS_CACHE_TAG],
+});
 
-  const authors = await fetchAuthorsFromNotion();
-  cachedAuthors = authors;
-  cacheTimestamp = now;
-  return authors;
+/** Strict author access for routes whose primary resource is the Authors data source. */
+export async function getAllAuthors(): Promise<Author[]> {
+  return getCachedAuthors();
 }
 
-export async function getAuthorsByPeopleIds(peopleIds: string[]): Promise<Author[]> {
-  if (peopleIds.length === 0) return [];
-  const authors = await getAllAuthors();
-  const seen = new Set<string>();
-  const result: Author[] = [];
-  for (const pid of peopleIds) {
-    const author = authors.find((a) => a.peopleIds.includes(pid));
-    if (author && !seen.has(author.id)) {
-      seen.add(author.id);
-      result.push(author);
-    }
+/**
+ * Optional presentation enrichment. Primary content must remain available when
+ * the separately configured Authors data source is unavailable.
+ */
+async function getOptionalAuthors(): Promise<Author[]> {
+  try {
+    return await getAllAuthors();
+  } catch (error) {
+    console.error("[notion/authors] Optional author enrichment unavailable:", error);
+    return [];
   }
-  return result;
+}
+
+export async function getOptionalAuthorsByPeopleIds(peopleIds: string[]): Promise<Author[]> {
+  if (peopleIds.length === 0) return [];
+  return selectAuthorsByPeopleIds(await getOptionalAuthors(), peopleIds);
+}
+
+function selectAuthorsByPeopleIds(authors: Author[], peopleIds: string[]): Author[] {
+  const authorsByPeopleId = new Map(
+    authors.flatMap((author) => author.peopleIds.map((peopleId) => [peopleId, author] as const)),
+  );
+  const seen = new Set<string>();
+  return peopleIds.flatMap((peopleId) => {
+    const author = authorsByPeopleId.get(peopleId);
+    if (!author || seen.has(author.id)) return [];
+    seen.add(author.id);
+    return [author];
+  });
 }
 
 /**
  * Returns a lookup map keyed by both Notion peopleId and author name,
  * so callers can resolve an author summary with either key.
  */
-export async function getAuthorLookupMap(): Promise<Record<string, AuthorSummary>> {
-  const authors = await getAllAuthors();
+export async function getOptionalAuthorLookupMap(): Promise<Record<string, AuthorSummary>> {
+  return createAuthorLookupMap(await getOptionalAuthors());
+}
+
+export async function getOptionalAllAuthors(): Promise<Author[]> {
+  return getOptionalAuthors();
+}
+
+function createAuthorLookupMap(authors: Author[]): Record<string, AuthorSummary> {
   const map: Record<string, AuthorSummary> = {};
-  for (const a of authors) {
-    const summary: AuthorSummary = { avatar: a.avatar, name: a.name };
-    for (const pid of a.peopleIds) {
-      map[pid] = summary;
-    }
-    map[a.name] = summary;
+  for (const author of authors) {
+    const summary: AuthorSummary = { avatar: author.avatar, name: author.name };
+    for (const peopleId of author.peopleIds) map[peopleId] = summary;
+    map[author.name] = summary;
   }
   return map;
 }

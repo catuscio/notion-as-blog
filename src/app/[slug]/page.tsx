@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getContentDetail } from "@/lib/notion/contentDetail";
 import { getContentCatalog } from "@/lib/notion/contentCatalog";
-import { getAuthorsByPeopleIds } from "@/lib/notion/getAuthors";
+import { getOptionalAuthorsByPeopleIds } from "@/lib/notion/getAuthors";
 import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
 import { TypewriterTitle } from "@/components/detail/TypewriterTitle";
 import { AnimatedReveal } from "@/components/detail/AnimatedReveal";
@@ -23,7 +23,7 @@ import type { ContentDetailData } from "@/lib/notion/contentDetail";
 import type { Metadata } from "next";
 
 async function getContentAuthors(authorIds: string[]): Promise<Author[]> {
-  return getAuthorsByPeopleIds(authorIds);
+  return getOptionalAuthorsByPeopleIds(authorIds);
 }
 
 async function getContentPageData(slug: string): Promise<

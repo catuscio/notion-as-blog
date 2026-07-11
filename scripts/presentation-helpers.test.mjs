@@ -4,6 +4,7 @@ import test from "node:test";
 import { getPaginationItems } from "../src/lib/pagination.ts";
 import { createListingMetadata } from "../src/lib/listingMetadata.ts";
 import { brand } from "../src/config/brand.ts";
+import { toSearchResult } from "../src/lib/searchContract.ts";
 
 test("pagination shows every page for short ranges", () => {
   assert.deepEqual(getPaginationItems(3, 5), [1, 2, 3, 4, 5]);
@@ -29,4 +30,36 @@ test("listing metadata shares canonical and social fields without changing page 
   assert.equal(metadata.openGraph.title, `Development — ${brand.name}`);
   assert.equal(metadata.twitter.title, `Development — ${brand.name}`);
   assert.deepEqual(metadata.robots, { index: false, follow: true });
+});
+
+test("search responses expose only the public dropdown contract", () => {
+  const result = toSearchResult({
+    id: "private-notion-id",
+    slug: "hello",
+    title: "Hello",
+    summary: "Summary",
+    thumbnail: "",
+    category: "Development",
+    tags: ["TypeScript"],
+    status: "Public",
+    type: "Post",
+    date: "2026-01-01",
+    lastEditedTime: "2026-01-02",
+    series: null,
+    author: "Ada",
+    authorIds: ["private-person-id"],
+    fullWidth: false,
+    pinned: false,
+  });
+
+  assert.deepEqual(result, {
+    slug: "hello",
+    title: "Hello",
+    summary: "Summary",
+    thumbnail: "",
+    category: "Development",
+    tags: ["TypeScript"],
+  });
+  assert.equal("id" in result, false);
+  assert.equal("authorIds" in result, false);
 });

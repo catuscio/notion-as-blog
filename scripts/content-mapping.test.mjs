@@ -52,10 +52,9 @@ test("maps a valid Notion row to the content contract", () => {
   assert.equal(content.pinned, true);
 });
 
-test("keeps documented and fail-closed defaults for optional type and invalid status", () => {
+test("defaults only absent workflow fields", () => {
   const page = notionPage({
     Name: property("title", [{ plain_text: "Fallbacks", type: "text", text: { content: "Fallbacks", link: null }, annotations: {} }]),
-    status: property("select", { id: "unknown", name: "Unknown", color: "default" }),
   });
 
   const content = mapNotionPageToContent(page);
@@ -63,4 +62,37 @@ test("keeps documented and fail-closed defaults for optional type and invalid st
   assert.equal(content.slug, "11111111222233334444555555555555");
   assert.equal(content.status, "Draft");
   assert.equal(content.type, "Post");
+});
+
+test("rejects non-empty unknown status and type values", () => {
+  const invalidStatus = notionPage({
+    title: property("title", [{ plain_text: "Invalid", type: "text", text: { content: "Invalid", link: null }, annotations: {} }]),
+    status: property("select", { id: "unknown", name: "Publc", color: "default" }),
+  });
+  assert.throws(
+    () => mapNotionPageToContent(invalidStatus),
+    /page 11111111-2222-3333-4444-555555555555: invalid status "Publc"/,
+  );
+
+  const invalidType = notionPage({
+    title: property("title", [{ plain_text: "Invalid", type: "text", text: { content: "Invalid", link: null }, annotations: {} }]),
+    type: property("select", { id: "unknown", name: "Article", color: "default" }),
+  });
+  assert.throws(
+    () => mapNotionPageToContent(invalidType),
+    /page 11111111-2222-3333-4444-555555555555: invalid type "Article"/,
+  );
+});
+
+test("rejects incomplete publicly visible posts", () => {
+  const page = notionPage({
+    title: property("title", [{ plain_text: "Incomplete", type: "text", text: { content: "Incomplete", link: null }, annotations: {} }]),
+    status: property("select", { id: "public", name: "Public", color: "green" }),
+    type: property("select", { id: "post", name: "Post", color: "blue" }),
+  });
+
+  assert.throws(
+    () => mapNotionPageToContent(page),
+    /page 11111111-2222-3333-4444-555555555555: public Post is missing date, category/,
+  );
 });

@@ -11,6 +11,26 @@ import {
 } from "./propertyHelpers";
 import { stableImageFileUrl, stablePageCover } from "./imageProxy";
 
+const VALID_STATUSES: ContentItem["status"][] = [
+  "Public",
+  "PublicOnDetail",
+  "Draft",
+  "Private",
+];
+const VALID_TYPES: ContentItem["type"][] = ["Post", "Page"];
+
+function parseEnum<T extends string>(
+  pageId: string,
+  field: string,
+  value: string,
+  validValues: readonly T[],
+  defaultValue: T,
+): T {
+  if (!value) return defaultValue;
+  if (validValues.includes(value as T)) return value as T;
+  throw new Error(`Notion content mapping error for page ${pageId}: invalid ${field} "${value}"`);
+}
+
 export function mapNotionPageToContent(
   page: PageObjectResponse
 ): ContentItem {
@@ -23,18 +43,11 @@ export function mapNotionPageToContent(
   const slugProp = get("slug");
   const slug = getRichTextPlain(slugProp) || page.id.replace(/-/g, "");
 
-  const VALID_STATUSES: ContentItem["status"][] = ["Public", "PublicOnDetail", "Draft", "Private"];
-  const VALID_TYPES: ContentItem["type"][] = ["Post", "Page"];
-
   const rawStatus = getSelectValue(get("status"));
-  const status: ContentItem["status"] = VALID_STATUSES.includes(rawStatus as ContentItem["status"])
-    ? (rawStatus as ContentItem["status"])
-    : "Draft";
+  const status = parseEnum(page.id, "status", rawStatus, VALID_STATUSES, "Draft");
 
   const rawType = getSelectValue(get("type"));
-  const type: ContentItem["type"] = VALID_TYPES.includes(rawType as ContentItem["type"])
-    ? (rawType as ContentItem["type"])
-    : "Post";
+  const type = parseEnum(page.id, "type", rawType, VALID_TYPES, "Post");
   const date = getDateValue(get("date"));
   const tags = getMultiSelectValues(get("tags"));
   const category = getSelectValue(get("category")) || null;
@@ -54,6 +67,19 @@ export function mapNotionPageToContent(
   const pinnedProp = get("pinned");
   const pinned =
     pinnedProp?.type === "checkbox" ? pinnedProp.checkbox : false;
+
+  if (type === "Post" && (status === "Public" || status === "PublicOnDetail")) {
+    const missingFields = [
+      !title && "title",
+      !date && "date",
+      !category && "category",
+    ].filter(Boolean);
+    if (missingFields.length > 0) {
+      throw new Error(
+        `Notion content mapping error for page ${page.id}: public Post is missing ${missingFields.join(", ")}`,
+      );
+    }
+  }
 
   return {
     id: page.id,
