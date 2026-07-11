@@ -5,6 +5,7 @@ import type { Author, AuthorSummary } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { getRichTextPlain, getUrlOrText, getProp, getPeopleIds } from "./propertyHelpers";
 import { stableImageFileUrl } from "./imageProxy";
+import { loadOptionalAuthors } from "./optionalAuthors";
 
 function parseAuthorPage(page: PageObjectResponse): Author {
   const props = page.properties;
@@ -70,12 +71,7 @@ export async function getAllAuthors(): Promise<Author[]> {
  * the separately configured Authors data source is unavailable.
  */
 async function getOptionalAuthors(): Promise<Author[]> {
-  try {
-    return await getAllAuthors();
-  } catch (error) {
-    console.error("[notion/authors] Optional author enrichment unavailable:", error);
-    return [];
-  }
+  return loadOptionalAuthors(getAllAuthors);
 }
 
 export async function getOptionalAuthorsByPeopleIds(peopleIds: string[]): Promise<Author[]> {

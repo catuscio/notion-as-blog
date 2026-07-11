@@ -4,7 +4,7 @@ import { AuthorHeader } from "@/components/feed/AuthorHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { PersonJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { getListedPosts } from "@/lib/notion/contentCatalog";
-import { getAllAuthors } from "@/lib/notion/getAuthors";
+import { getAllAuthors, getOptionalAllAuthors } from "@/lib/notion/getAuthors";
 import { getFeedData } from "@/lib/notion/getFeedData";
 import { filterPostsByAuthor } from "@/lib/notion/contentQueries";
 import { brand } from "@/config/brand";
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const authors = await getAllAuthors();
+  const authors = await getOptionalAllAuthors();
   return authors.map((a) => ({ name: encodeURIComponent(a.name) }));
 }
 

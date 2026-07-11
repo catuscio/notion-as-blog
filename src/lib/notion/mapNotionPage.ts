@@ -68,15 +68,15 @@ export function mapNotionPageToContent(
   const pinned =
     pinnedProp?.type === "checkbox" ? pinnedProp.checkbox : false;
 
-  if (type === "Post" && (status === "Public" || status === "PublicOnDetail")) {
+  if (status === "Public" || status === "PublicOnDetail") {
     const missingFields = [
       !title && "title",
-      !date && "date",
-      !category && "category",
+      type === "Post" && !date && "date",
+      type === "Post" && !category && "category",
     ].filter(Boolean);
     if (missingFields.length > 0) {
       throw new Error(
-        `Notion content mapping error for page ${page.id}: public Post is missing ${missingFields.join(", ")}`,
+        `Notion content mapping error for page ${page.id}: public ${type} is missing ${missingFields.join(", ")}`,
       );
     }
   }

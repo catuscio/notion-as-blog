@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { mapNotionPageToContent } from "../src/lib/notion/mapNotionPage.ts";
+import { loadOptionalAuthors } from "../src/lib/notion/optionalAuthors.ts";
 
 function property(type, value) {
   return { id: type, type, [type]: value };
@@ -95,4 +96,34 @@ test("rejects incomplete publicly visible posts", () => {
     () => mapNotionPageToContent(page),
     /page 11111111-2222-3333-4444-555555555555: public Post is missing date, category/,
   );
+});
+
+for (const status of ["Public", "PublicOnDetail"]) {
+  test(`rejects a titleless ${status} Page`, () => {
+    const page = notionPage({
+      status: property("select", { id: status.toLowerCase(), name: status, color: "green" }),
+      type: property("select", { id: "page", name: "Page", color: "blue" }),
+    });
+
+    assert.throws(
+      () => mapNotionPageToContent(page),
+      new RegExp(`page 11111111-2222-3333-4444-555555555555: public Page is missing title`),
+    );
+  });
+}
+
+test("optional author loading degrades without changing strict loader semantics", async () => {
+  const failure = new Error("Authors unavailable");
+  const strictLoader = async () => { throw failure; };
+  const logs = [];
+
+  await assert.rejects(strictLoader, failure);
+  assert.deepEqual(
+    await loadOptionalAuthors(strictLoader, (message, error) => logs.push({ message, error })),
+    [],
+  );
+  assert.deepEqual(logs, [{
+    message: "[notion/authors] Optional author enrichment unavailable:",
+    error: failure,
+  }]);
 });
