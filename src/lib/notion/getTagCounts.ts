@@ -1,7 +1,7 @@
-import type { Post, TagItem } from "@/types";
+import type { ContentItem, TagItem } from "@/types";
 import { brand } from "@/config/brand";
 
-export function getAllTags(posts: Post[]): TagItem[] {
+export function getVisibleTagCounts(posts: ContentItem[]): TagItem[] {
   const tagMap = new Map<string, number>();
   posts.forEach((post) => {
     post.tags.forEach((tag) => {

@@ -14,7 +14,7 @@ export interface Author {
   };
 }
 
-export interface Post {
+export interface ContentItem {
   id: string;
   title: string;
   slug: string;

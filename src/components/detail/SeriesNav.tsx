@@ -2,10 +2,10 @@ import Link from "next/link";
 import { PostThumbnail } from "@/components/common/PostThumbnail";
 import { copy } from "@/config/copy";
 import { formatDate } from "@/lib/format";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 interface SeriesNavProps {
-  posts: Post[];
+  posts: ContentItem[];
   currentPostId: string;
   seriesName: string;
 }
@@ -15,7 +15,7 @@ function SeriesNavItem({
   index,
   isCurrent,
 }: {
-  post: Post;
+  post: ContentItem;
   index: number;
   isCurrent: boolean;
 }) {

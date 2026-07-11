@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { CategoryHeader } from "@/components/feed/CategoryHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
-import { getListedPosts } from "@/lib/notion/getPosts";
-import { filterPostsByCategory } from "@/lib/notion/filterPosts";
-import { getFeedPageData } from "@/lib/notion/getFeedPageData";
+import { getListedPosts } from "@/lib/notion/contentCatalog";
+import { filterPostsByCategory } from "@/lib/notion/contentQueries";
+import { getFeedData } from "@/lib/notion/getFeedData";
+import { createListingMetadata } from "@/lib/listingMetadata";
 import { brand, getCategoryBySlug } from "@/config/brand";
 import { copy } from "@/config/copy";
 import type { Metadata } from "next";
@@ -21,27 +22,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const categoryUrl = `${brand.url}/category/${cat.slug}`;
   const description = cat.description;
-  return {
+  return createListingMetadata({
     title: cat.name,
+    socialTitle: `${cat.name} — ${brand.name}`,
     description,
-    alternates: {
-      canonical: categoryUrl,
-    },
-    openGraph: {
-      title: `${cat.name} — ${brand.name}`,
-      description,
-      url: categoryUrl,
-      siteName: brand.name,
-      type: "website",
-      images: [{ url: brand.assets.ogImage, width: brand.assets.ogWidth, height: brand.assets.ogHeight }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${cat.name} — ${brand.name}`,
-      description,
-      images: [brand.assets.ogImage],
-    },
-  };
+    url: categoryUrl,
+  });
 }
 
 export async function generateStaticParams() {
@@ -57,7 +43,7 @@ export default async function CategoryPage({ params }: Props) {
 
   const allPosts = await getListedPosts();
   const posts = filterPostsByCategory(allPosts, cat.name);
-  const { tags, authorsMap } = await getFeedPageData(posts);
+  const { tags, authorsMap } = await getFeedData(posts);
 
   const categoryUrl = `${brand.url}/category/${cat.slug}`;
 

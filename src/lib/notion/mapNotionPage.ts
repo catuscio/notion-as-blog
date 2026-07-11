@@ -1,5 +1,5 @@
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 import {
   getRichTextPlain,
   getSelectValue,
@@ -11,9 +11,9 @@ import {
 } from "./propertyHelpers";
 import { stableImageFileUrl, stablePageCover } from "./imageProxy";
 
-export function getPageProperties(
+export function mapNotionPageToContent(
   page: PageObjectResponse
-): Post {
+): ContentItem {
   const props = page.properties;
   const get = (name: string) => getProp(props, name);
 
@@ -23,17 +23,17 @@ export function getPageProperties(
   const slugProp = get("slug");
   const slug = getRichTextPlain(slugProp) || page.id.replace(/-/g, "");
 
-  const VALID_STATUSES: Post["status"][] = ["Public", "PublicOnDetail", "Draft", "Private"];
-  const VALID_TYPES: Post["type"][] = ["Post", "Page"];
+  const VALID_STATUSES: ContentItem["status"][] = ["Public", "PublicOnDetail", "Draft", "Private"];
+  const VALID_TYPES: ContentItem["type"][] = ["Post", "Page"];
 
   const rawStatus = getSelectValue(get("status"));
-  const status: Post["status"] = VALID_STATUSES.includes(rawStatus as Post["status"])
-    ? (rawStatus as Post["status"])
+  const status: ContentItem["status"] = VALID_STATUSES.includes(rawStatus as ContentItem["status"])
+    ? (rawStatus as ContentItem["status"])
     : "Draft";
 
   const rawType = getSelectValue(get("type"));
-  const type: Post["type"] = VALID_TYPES.includes(rawType as Post["type"])
-    ? (rawType as Post["type"])
+  const type: ContentItem["type"] = VALID_TYPES.includes(rawType as ContentItem["type"])
+    ? (rawType as ContentItem["type"])
     : "Post";
   const date = getDateValue(get("date"));
   const tags = getMultiSelectValues(get("tags"));

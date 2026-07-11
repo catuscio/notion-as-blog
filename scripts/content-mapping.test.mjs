@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getPageProperties } from "../src/lib/notion/getPageProperties.ts";
+import { mapNotionPageToContent } from "../src/lib/notion/mapNotionPage.ts";
 
 function property(type, value) {
   return { id: type, type, [type]: value };
@@ -39,7 +39,7 @@ test("maps a valid Notion row to the content contract", () => {
     pinned: property("checkbox", true),
   });
 
-  const content = getPageProperties(page);
+  const content = mapNotionPageToContent(page);
 
   assert.equal(content.title, "Hello");
   assert.equal(content.slug, "hello");
@@ -58,7 +58,7 @@ test("keeps documented and fail-closed defaults for optional type and invalid st
     status: property("select", { id: "unknown", name: "Unknown", color: "default" }),
   });
 
-  const content = getPageProperties(page);
+  const content = mapNotionPageToContent(page);
 
   assert.equal(content.slug, "11111111222233334444555555555555");
   assert.equal(content.status, "Draft");

@@ -1,7 +1,7 @@
 import { Feed } from "feed";
 import { brand } from "@/config/brand";
-import { getListedPosts } from "@/lib/notion/getPosts";
-import { getPostDate } from "@/lib/postDate";
+import { getListedPosts } from "@/lib/notion/contentCatalog";
+import { getContentDate } from "@/lib/contentDate";
 
 export async function GET() {
   const feed = new Feed({
@@ -24,7 +24,7 @@ export async function GET() {
       link: `${brand.url}/${post.slug}`,
       description: post.summary,
       content: post.summary,
-      date: getPostDate(post),
+      date: getContentDate(post),
       category: post.category
         ? [{ name: post.category }]
         : [],

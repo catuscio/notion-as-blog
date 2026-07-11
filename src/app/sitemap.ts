@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 import { brand, getCategorySlug } from "@/config/brand";
-import { getContentCatalog } from "@/lib/notion/getPosts";
-import { getAllTags } from "@/lib/notion/getAllSelectItems";
+import { getContentCatalog } from "@/lib/notion/contentCatalog";
+import { getVisibleTagCounts } from "@/lib/notion/getTagCounts";
 import { getAllAuthors } from "@/lib/notion/getAuthors";
-import { filterPostsByAuthor } from "@/lib/notion/filterPosts";
-import { getPostDate, latestDateAmong } from "@/lib/postDate";
+import { filterPostsByAuthor } from "@/lib/notion/contentQueries";
+import { getContentDate, latestDateAmong } from "@/lib/contentDate";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = brand.url;
@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Page routes (about, etc.) from Notion — no hardcoded paths
   const pageRoutes: MetadataRoute.Sitemap = pages.map((p) => ({
     url: `${baseUrl}/${p.slug}`,
-    lastModified: getPostDate(p),
+    lastModified: getContentDate(p),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
@@ -50,13 +50,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${baseUrl}/${post.slug}`,
-    lastModified: getPostDate(post),
+    lastModified: getContentDate(post),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
   // Tag routes with dynamic lastModified
-  const tags = getAllTags(posts);
+  const tags = getVisibleTagCounts(posts);
   const tagRoutes: MetadataRoute.Sitemap = tags.flatMap((tag) => {
     const tagPosts = posts.filter((p) => p.tags.includes(tag.name));
     if (tagPosts.length <= 2) return [];
@@ -84,7 +84,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   // Series routes with dynamic lastModified
-  const seriesMap = new Map<string, Post[]>();
+  const seriesMap = new Map<string, ContentItem[]>();
   for (const post of posts) {
     if (post.series) {
       const arr = seriesMap.get(post.series) ?? [];

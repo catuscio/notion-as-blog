@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 interface UseSearchKeyboardOptions {
   inputRef: React.RefObject<HTMLInputElement | null>;
-  results: Post[];
+  results: ContentItem[];
   activeIndex: number;
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
   onOpen: () => void;
   onClose: () => void;
-  onSelect: (post: Post) => void;
+  onSelect: (post: ContentItem) => void;
   onSubmit: () => void;
   canSubmit: boolean;
 }

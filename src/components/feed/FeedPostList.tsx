@@ -2,13 +2,13 @@
 
 import { FeedPostCard } from "./FeedPostCard";
 import { TagFilter } from "./TagFilter";
-import { Pagination } from "@/components/common/Pagination";
+import { QueryPagination } from "@/components/common/QueryPagination";
 import { EmptyState } from "@/components/common/EmptyState";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import { resolveAuthors } from "@/lib/resolveAuthor";
+import { resolveAuthors } from "@/lib/resolveAuthors";
 import { useFeedPagination } from "@/hooks/useFeedPagination";
-import type { Post, AuthorSummary } from "@/types";
+import type { ContentItem, AuthorSummary } from "@/types";
 
 export function FeedPostList({
   posts,
@@ -18,7 +18,7 @@ export function FeedPostList({
   allHref,
   initialTag,
 }: {
-  posts: Post[];
+  posts: ContentItem[];
   tags: string[];
   authorsMap?: Record<string, AuthorSummary>;
   asLinks?: boolean;
@@ -55,7 +55,7 @@ export function FeedPostList({
           ))
         )}
       </section>
-      <Pagination
+      <QueryPagination
         totalItems={filteredPosts.length}
         itemsPerPage={brand.postsPerPage}
         currentPage={currentPage}

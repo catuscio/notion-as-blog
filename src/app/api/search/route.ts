@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getListedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/contentCatalog";
 import { searchPosts } from "@/lib/searchPosts";
 import { brand } from "@/config/brand";
 

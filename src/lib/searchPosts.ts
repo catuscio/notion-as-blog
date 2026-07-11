@@ -1,6 +1,6 @@
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
-export function searchPosts(posts: Post[], query: string): Post[] {
+export function searchPosts(posts: ContentItem[], query: string): ContentItem[] {
   const q = query.toLowerCase();
   return posts.filter((post) => {
     const title = post.title.toLowerCase();

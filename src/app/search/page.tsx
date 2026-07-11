@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import { FeedPostCard } from "@/components/feed/FeedPostCard";
-import { getListedPosts } from "@/lib/notion/getPosts";
+import { getListedPosts } from "@/lib/notion/contentCatalog";
 import { getAuthorLookupMap } from "@/lib/notion/getAuthors";
 import { searchPosts } from "@/lib/searchPosts";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import { resolveAuthors } from "@/lib/resolveAuthor";
+import { resolveAuthors } from "@/lib/resolveAuthors";
 import type { AuthorSummary } from "@/types";
 import type { Metadata } from "next";
 

@@ -11,7 +11,8 @@
     "test:security": "node --no-warnings --experimental-loader ./scripts/typescript-loader.mjs scripts/security-helpers.test.mjs",
     "test:visibility": "node --no-warnings --experimental-loader ./scripts/typescript-loader.mjs scripts/content-visibility.test.mjs",
     "test:mapping": "node --no-warnings --experimental-loader ./scripts/typescript-loader.mjs scripts/content-mapping.test.mjs",
-    "test": "npm run test:security && npm run test:visibility && npm run test:mapping"
+    "test:presentation": "node --no-warnings --experimental-loader ./scripts/typescript-loader.mjs scripts/presentation-helpers.test.mjs",
+    "test": "npm run test:security && npm run test:visibility && npm run test:mapping && npm run test:presentation"
   },
   "dependencies": {
     "@notionhq/client": "^5.9.0",

@@ -7,14 +7,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CategoryBadge } from "@/components/common/CategoryBadge";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 const INTERVAL_MS = brand.slideshow.intervalMs;
 const SWIPE_THRESHOLD_PX = 50;
 
 type Direction = "next" | "prev";
 
-export function FeaturedSlideshow({ posts }: { posts: Post[] }) {
+export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");
   const [isAnimating, setIsAnimating] = useState(false);

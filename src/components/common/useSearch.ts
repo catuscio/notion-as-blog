@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 const SEARCH_API = "/api/search";
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function useSearch() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Post[]>([]);
+  const [results, setResults] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);

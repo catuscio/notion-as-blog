@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { brand } from "@/config/brand";
-import { getContentCatalog } from "@/lib/notion/getPosts";
+import { getContentCatalog } from "@/lib/notion/contentCatalog";
 import { readNotionImageResizedAsBase64 } from "@/lib/notion/imageProxy";
 
 let logoSrc: string | null = null;

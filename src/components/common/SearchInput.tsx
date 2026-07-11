@@ -8,7 +8,7 @@ import { Search, Loader2, SearchX, FileText } from "lucide-react";
 import { copy } from "@/config/copy";
 import { useSearch } from "./useSearch";
 import { useSearchKeyboard } from "./useSearchKeyboard";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 const noop = () => () => {};
 const getIsMac = () => navigator.platform.toUpperCase().includes("MAC");
@@ -42,7 +42,7 @@ export function SearchInput() {
   const onClose = useCallback(() => setOpen(false), []);
   const normalizedQuery = query.trim();
   const onSelect = useCallback(
-    (post: Post) => router.push(`/${post.slug}`),
+    (post: ContentItem) => router.push(`/${post.slug}`),
     [router]
   );
   const onSubmit = useCallback(() => {
@@ -113,7 +113,7 @@ function SearchResults({
   activeIndex,
   onClose,
 }: {
-  results: Post[];
+  results: ContentItem[];
   loading: boolean;
   error: boolean;
   activeIndex: number;

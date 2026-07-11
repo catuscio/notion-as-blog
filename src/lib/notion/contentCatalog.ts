@@ -1,20 +1,20 @@
 import { unstable_cache } from "next/cache";
 import { createSingleFlight } from "@/lib/singleFlight";
 import { notionClient } from "./client";
-import { getPageProperties } from "./getPageProperties";
+import { mapNotionPageToContent } from "./mapNotionPage";
 import {
   getListedPostsByDate,
   selectDetailAccessiblePages,
   selectDetailAccessiblePosts,
   selectListedPages,
-} from "./filterPosts";
+} from "./contentQueries";
 import { brand } from "@/config/brand";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export const NOTION_CONTENT_CACHE_TAG = "notion-content";
 
-async function fetchAllFromNotion(): Promise<Post[]> {
+async function fetchContentFromNotion(): Promise<ContentItem[]> {
   const dataSourceId = brand.notion.dataSourceId;
   if (!dataSourceId) {
     throw new Error("NOTION_DATA_SOURCE_ID environment variable is required");
@@ -39,12 +39,12 @@ async function fetchAllFromNotion(): Promise<Post[]> {
     cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
   } while (cursor);
 
-  return pages.map((page) => getPageProperties(page));
+  return pages.map(mapNotionPageToContent);
 }
 
-const getCachedPosts = unstable_cache(
-  fetchAllFromNotion,
-  ["all-posts"],
+const getCachedContent = unstable_cache(
+  fetchContentFromNotion,
+  ["all-content"],
   {
     revalidate: brand.cache.revalidate,
     tags: [NOTION_CONTENT_CACHE_TAG],
@@ -52,24 +52,24 @@ const getCachedPosts = unstable_cache(
 );
 
 export interface ContentCatalog {
-  listedPosts: Post[];
-  detailAccessiblePosts: Post[];
-  listedPages: Post[];
-  detailAccessiblePages: Post[];
+  listedPosts: ContentItem[];
+  detailAccessiblePosts: ContentItem[];
+  listedPages: ContentItem[];
+  detailAccessiblePages: ContentItem[];
 }
 
 /** Fetches the shared Notion dataset once and derives every visibility view from it. */
 export const getContentCatalog = createSingleFlight(async (): Promise<ContentCatalog> => {
-  const all = await getCachedPosts();
+  const contentItems = await getCachedContent();
   return {
-    listedPosts: getListedPostsByDate(all),
-    detailAccessiblePosts: selectDetailAccessiblePosts(all),
-    listedPages: selectListedPages(all),
-    detailAccessiblePages: selectDetailAccessiblePages(all),
+    listedPosts: getListedPostsByDate(contentItems),
+    detailAccessiblePosts: selectDetailAccessiblePosts(contentItems),
+    listedPages: selectListedPages(contentItems),
+    detailAccessiblePages: selectDetailAccessiblePages(contentItems),
   };
 });
 
 /** Content that may appear in feeds, search, navigation, and discovery surfaces. */
-export async function getListedPosts(): Promise<Post[]> {
+export async function getListedPosts(): Promise<ContentItem[]> {
   return (await getContentCatalog()).listedPosts;
 }

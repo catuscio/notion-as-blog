@@ -3,10 +3,10 @@ import Image from "next/image";
 import { FileText } from "lucide-react";
 import { copy } from "@/config/copy";
 import { formatDate } from "@/lib/format";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
 interface SeriesCollectionProps {
-  posts: Post[];
+  posts: ContentItem[];
   currentPostId: string;
   seriesName: string;
 }

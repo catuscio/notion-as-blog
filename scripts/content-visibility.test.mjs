@@ -12,7 +12,7 @@ const {
   selectDetailAccessiblePosts,
   selectListedPages,
 } = await import(
-  pathToFileURL(join(root, "src/lib/notion/filterPosts.ts")).href
+  pathToFileURL(join(root, "src/lib/notion/contentQueries.ts")).href
 );
 const { createSingleFlight } = await import(
   pathToFileURL(join(root, "src/lib/singleFlight.ts")).href

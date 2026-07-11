@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import { getCategorySlug } from "@/config/brand";
 import { copy } from "@/config/copy";
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
-export function PostBreadcrumb({ post }: { post: Post }) {
+export function PostBreadcrumb({ post }: { post: ContentItem }) {
   const categorySlug = post.category ? getCategorySlug(post.category) : undefined;
 
   return (

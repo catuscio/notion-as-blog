@@ -1,7 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/config/env";
-import { NOTION_CONTENT_CACHE_TAG } from "@/lib/notion/getPosts";
+import { NOTION_CONTENT_CACHE_TAG } from "@/lib/notion/contentCatalog";
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get("authorization") ?? "";

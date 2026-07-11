@@ -1,14 +1,14 @@
-import type { Post } from "@/types";
+import type { ContentItem } from "@/types";
 
-export function isListed(item: Post): boolean {
+export function isListed(item: ContentItem): boolean {
   return item.status === "Public";
 }
 
-export function isDetailAccessible(item: Post): boolean {
+export function isDetailAccessible(item: ContentItem): boolean {
   return item.status === "Public" || item.status === "PublicOnDetail";
 }
 
-export function getListedPostsByDate(posts: Post[]): Post[] {
+export function getListedPostsByDate(posts: ContentItem[]): ContentItem[] {
   return posts
     .filter((post) => post.type === "Post" && isListed(post))
     .sort((a, b) => {
@@ -19,42 +19,42 @@ export function getListedPostsByDate(posts: Post[]): Post[] {
     });
 }
 
-export function selectDetailAccessiblePosts(items: Post[]): Post[] {
+export function selectDetailAccessiblePosts(items: ContentItem[]): ContentItem[] {
   return items.filter((item) => item.type === "Post" && isDetailAccessible(item));
 }
 
-export function selectListedPages(items: Post[]): Post[] {
+export function selectListedPages(items: ContentItem[]): ContentItem[] {
   return items.filter((item) => item.type === "Page" && isListed(item));
 }
 
-export function selectDetailAccessiblePages(items: Post[]): Post[] {
+export function selectDetailAccessiblePages(items: ContentItem[]): ContentItem[] {
   return items.filter((item) => item.type === "Page" && isDetailAccessible(item));
 }
 
 export function getRelatedPosts(
-  post: Post,
-  allPosts: Post[],
+  post: ContentItem,
+  allPosts: ContentItem[],
   limit = 3
-): Post[] {
+): ContentItem[] {
   return allPosts
     .filter((p) => p.id !== post.id && p.category === post.category)
     .slice(0, limit);
 }
 
-export function getSeriesPosts(post: Post, allPosts: Post[]): Post[] {
+export function getSeriesPosts(post: ContentItem, allPosts: ContentItem[]): ContentItem[] {
   if (post.series === null) return [];
   return allPosts
     .filter((p) => p.series === post.series)
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export function filterPostsByCategory(posts: Post[], category: string): Post[] {
+export function filterPostsByCategory(posts: ContentItem[], category: string): ContentItem[] {
   return posts.filter(
     (p) => p.category?.toLowerCase() === category.toLowerCase()
   );
 }
 
-export function filterPostsByAuthor(allPosts: Post[], peopleIds: string[]): Post[] {
+export function filterPostsByAuthor(allPosts: ContentItem[], peopleIds: string[]): ContentItem[] {
   const pidSet = new Set(peopleIds);
   return allPosts.filter((post) =>
     post.authorIds.some((id) => pidSet.has(id))

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { getPostDetailData, getPageBySlug, estimateReadingTime } from "@/lib/notion/getPost";
-import { getContentCatalog } from "@/lib/notion/getPosts";
+import { getContentDetail } from "@/lib/notion/contentDetail";
+import { getContentCatalog } from "@/lib/notion/contentCatalog";
 import { getAuthorsByPeopleIds } from "@/lib/notion/getAuthors";
 import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
 import { TypewriterTitle } from "@/components/detail/TypewriterTitle";
@@ -19,42 +19,20 @@ import { PostTags } from "@/components/detail/PostTags";
 import { brand } from "@/config/brand";
 import { copy } from "@/config/copy";
 import type { Author } from "@/types";
-
-async function fetchPostAuthors(authorIds: string[]): Promise<Author[]> {
-  return getAuthorsByPeopleIds(authorIds);
-}
-import type { PostDetailData } from "@/lib/notion/getPost";
+import type { ContentDetailData } from "@/lib/notion/contentDetail";
 import type { Metadata } from "next";
 
-async function getPostPageData(slug: string): Promise<
-  (PostDetailData & { authors: Author[] }) | null
+async function getContentAuthors(authorIds: string[]): Promise<Author[]> {
+  return getAuthorsByPeopleIds(authorIds);
+}
+
+async function getContentPageData(slug: string): Promise<
+  (ContentDetailData & { authors: Author[] }) | null
 > {
-  // Try Post first
-  const result = await getPostDetailData(slug);
-  if (result) {
-    const authors = await fetchPostAuthors(result.post.authorIds);
-    return { ...result, authors };
-  }
-
-  // Fall back to Page type (about, etc.)
-  const pageResult = await getPageBySlug(slug);
-  if (!pageResult) return null;
-
-  const { page, blocks } = pageResult;
-  const text = blocks
-    .map((b) => {
-      const typed = (b as Record<string, unknown>)[b.type] as Record<string, unknown> | undefined;
-      if (typed && Array.isArray(typed.rich_text)) {
-        return (typed.rich_text as { plain_text: string }[]).map((t) => t.plain_text).join("");
-      }
-      return "";
-    })
-    .join(" ");
-  const wordCount = text.split(/\s+/).filter(Boolean).length;
-  const readingTime = estimateReadingTime(text);
-  const authors = await fetchPostAuthors(page.authorIds);
-
-  return { post: page, blocks, relatedPosts: [], seriesPosts: [], readingTime, wordCount, authors };
+  const detail = await getContentDetail(slug);
+  if (!detail) return null;
+  const authors = await getContentAuthors(detail.content.authorIds);
+  return { ...detail, authors };
 }
 
 type Props = {
@@ -63,7 +41,7 @@ type Props = {
 
 export const dynamicParams = true;
 
-async function findPostOrPage(slug: string) {
+async function findAccessibleContent(slug: string) {
   const catalog = await getContentCatalog();
   return catalog.detailAccessiblePosts.find((p) => p.slug === slug)
     ?? catalog.detailAccessiblePages.find((p) => p.slug === slug)
@@ -72,7 +50,7 @@ async function findPostOrPage(slug: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await findPostOrPage(slug);
+  const post = await findAccessibleContent(slug);
   if (!post) return { title: copy.notFound.title };
 
   const postUrl = `${brand.url}/${post.slug}`;
@@ -123,12 +101,12 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function PostPage({ params }: Props) {
+export default async function ContentPage({ params }: Props) {
   const { slug } = await params;
-  const data = await getPostPageData(slug);
+  const data = await getContentPageData(slug);
   if (!data) notFound();
 
-  const { post, blocks, relatedPosts, seriesPosts, readingTime, wordCount, authors } = data;
+  const { content: post, blocks, relatedPosts, seriesPosts, readingTime, wordCount, authors } = data;
   const animate = brand.postAnimation.enabled;
   const typingDuration = animate ? post.title.length * 40 + 200 : 0;
 

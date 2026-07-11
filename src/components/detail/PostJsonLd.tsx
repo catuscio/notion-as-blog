@@ -1,7 +1,7 @@
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { brand, getCategorySlug } from "@/config/brand";
 import { copy } from "@/config/copy";
-import type { Post, Author } from "@/types";
+import type { ContentItem, Author } from "@/types";
 
 export function PostJsonLd({
   post,
@@ -10,11 +10,11 @@ export function PostJsonLd({
   readingTime,
   seriesPosts,
 }: {
-  post: Post;
+  post: ContentItem;
   authors: Author[];
   wordCount?: number;
   readingTime?: number;
-  seriesPosts?: Post[];
+  seriesPosts?: ContentItem[];
 }) {
   const postUrl = `${brand.url}/${post.slug}`;
   const categorySlug = post.category ? getCategorySlug(post.category) : undefined;
