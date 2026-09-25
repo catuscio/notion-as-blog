@@ -12,7 +12,10 @@ export function BrandLogo({ size }: BrandLogoProps) {
   const src = brand.logo.image;
   const [error, setError] = useState(false);
 
-  if (!src || error) return null;
+  if (!src) return null;
+  if (error) {
+    return brand.logo.showNameWithLogo ? null : <span aria-hidden="true" className="font-bold">{brand.name}</span>;
+  }
 
   return (
     <Image

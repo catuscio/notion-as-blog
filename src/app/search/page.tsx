@@ -71,7 +71,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
   return (
-    <div className="max-w-[1024px] mx-auto px-6 py-12">
+    <div className="sg-content-limiter py-12">
       <h1 className="text-3xl font-bold tracking-tight mb-2">
         {query ? (
           copy.search.headingWithQuery(query)

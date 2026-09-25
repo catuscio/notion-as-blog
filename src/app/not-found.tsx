@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="max-w-[1024px] mx-auto px-6 py-24 text-center">
+    <div className="sg-content-limiter py-24 text-center">
       <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
       <p className="text-xl text-muted-foreground mb-8">
         {copy.notFound.heading}

@@ -9,7 +9,7 @@ export function NewsletterCTA() {
   if (!brand.newsletter.enabled) return null;
 
   return (
-    <section className="max-w-[1024px] mx-auto px-6 mb-20" id="subscribe">
+    <section className="sg-content-limiter mb-20" id="subscribe">
       <div className="bg-muted rounded-3xl p-8 md:p-16 text-center relative overflow-hidden">
         <div className="absolute -top-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />

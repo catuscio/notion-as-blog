@@ -17,10 +17,12 @@ const navLinkClass = (active: boolean) =>
 export function HeaderNav({
   aboutLabel,
   categories,
+  showAbout,
   mobile = false,
 }: {
   aboutLabel: string;
   categories: readonly HeaderNavCategory[];
+  showAbout: boolean;
   mobile?: boolean;
 }) {
   const pathname = usePathname();
@@ -28,7 +30,7 @@ export function HeaderNav({
 
   return (
     <nav aria-label={mobile ? "Categories" : "Main navigation"} className={`${mobile ? "flex md:hidden" : "hidden md:flex"} min-w-0 items-center gap-2 overflow-x-auto hide-scrollbar`}>
-      {!mobile && (
+      {showAbout && !mobile && (
         <Link href="/about" className={navLinkClass(pathname === "/about")}>
           {aboutLabel}
         </Link>

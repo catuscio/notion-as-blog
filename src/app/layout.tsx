@@ -4,6 +4,7 @@ import { brand } from "@/config/brand";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WebSiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
+import { getContentCatalog } from "@/lib/notion/contentCatalog";
 import "./globals.css";
 
 export const revalidate = 1800;
@@ -76,11 +77,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { listedPages } = await getContentCatalog();
+  const showAbout = listedPages.some((page) => page.slug === "about");
+
   return (
     <html lang={brand.lang} suppressHydrationWarning>
       <head>
@@ -105,11 +109,11 @@ export default function RootLayout({
           Skip to content
         </a>
         <div className="min-h-screen flex flex-col">
-          <Header />
+          <Header showAbout={showAbout} />
           <main id="main-content" className="flex-1" tabIndex={-1}>
             {children}
           </main>
-          <Footer />
+          <Footer showAbout={showAbout} />
         </div>
         {brand.analytics.gaId && (
           <>

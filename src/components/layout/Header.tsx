@@ -5,7 +5,7 @@ import { BrandLogo } from "@/components/common/BrandLogo";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { HeaderNav } from "./HeaderNav";
 
-export function Header() {
+export function Header({ showAbout }: { showAbout: boolean }) {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md transition-colors duration-200">
       <div className="sg-content-limiter flex h-16 items-center justify-between">
@@ -19,13 +19,15 @@ export function Header() {
           </span>
         </Link>
         <div className="flex items-center gap-3 md:gap-4 shrink-0">
-          <HeaderNav aboutLabel={copy.footer.about} categories={brand.categories} />
-          <Link
-            href="/about"
-            className="md:hidden rounded-full px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-          >
-            {copy.footer.about}
-          </Link>
+          <HeaderNav aboutLabel={copy.footer.about} categories={brand.categories} showAbout={showAbout} />
+          {showAbout && (
+            <Link
+              href="/about"
+              className="md:hidden rounded-full px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            >
+              {copy.footer.about}
+            </Link>
+          )}
           <ThemeToggle />
           {brand.newsletter.enabled && (
             <Link
@@ -38,7 +40,7 @@ export function Header() {
         </div>
       </div>
       <div className="sg-content-limiter pb-3 md:hidden">
-        <HeaderNav aboutLabel={copy.footer.about} categories={brand.categories} mobile />
+        <HeaderNav aboutLabel={copy.footer.about} categories={brand.categories} showAbout={showAbout} mobile />
       </div>
     </header>
   );

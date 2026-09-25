@@ -4,7 +4,7 @@ import { copy } from "@/config/copy";
 import { BrandLogo } from "@/components/common/BrandLogo";
 import { socialIconMap } from "./SocialIcons";
 
-export function Footer() {
+export function Footer({ showAbout }: { showAbout: boolean }) {
   return (
     <footer className="border-t border-border bg-background">
       <div className="sg-content-limiter py-12">
@@ -16,15 +16,17 @@ export function Footer() {
             </span>
           </div>
           <div className="sg-cluster text-sm font-medium text-muted-foreground [--cluster-gap:var(--space-6)]">
-            <Link href="/" className="hover:text-primary transition-colors">
+            <Link href="/" className="rounded transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
               {copy.footer.home}
             </Link>
-            <Link href="/about" className="hover:text-primary transition-colors">
-              {copy.footer.about}
-            </Link>
+            {showAbout && (
+              <Link href="/about" className="rounded transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
+                {copy.footer.about}
+              </Link>
+            )}
             <a
               href={brand.templateUrl}
-              className="hover:text-primary transition-colors"
+              className="rounded transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -40,7 +42,7 @@ export function Footer() {
                   key={key}
                   href={url}
                   aria-label={label}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

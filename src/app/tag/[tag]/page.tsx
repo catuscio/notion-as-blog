@@ -53,7 +53,7 @@ export default async function TagPage({ params }: Props) {
   const description = copy.tag.description(brand.name, decoded, posts.length);
 
   return (
-    <div className="max-w-[1024px] mx-auto px-6 py-12">
+    <div className="sg-content-limiter py-12">
       <BlogJsonLd url={tagUrl} name={`#${decoded} — ${brand.name}`} description={description} />
       <BreadcrumbJsonLd items={[
         { name: copy.footer.home, url: brand.url },

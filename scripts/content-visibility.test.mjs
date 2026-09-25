@@ -17,6 +17,9 @@ const {
 const { createSingleFlight } = await import(
   pathToFileURL(join(root, "src/lib/singleFlight.ts")).href
 );
+const { getContentRobots } = await import(
+  pathToFileURL(join(root, "src/lib/contentMetadata.ts")).href
+);
 
 function content(status, type = "Post", overrides = {}) {
   return {
@@ -95,6 +98,33 @@ test("detail and page selectors enforce status and content type together", () =>
     selectDetailAccessiblePages(items).map((item) => item.status),
     ["Public", "PublicOnDetail"],
   );
+});
+
+test("only a public About page is eligible for navigation", () => {
+  const aboutPages = visibilityCases.map(([status]) =>
+    content(status, "Page", { slug: "about" })
+  );
+
+  assert.deepEqual(
+    selectListedPages(aboutPages).map((item) => item.status),
+    ["Public"],
+  );
+});
+
+test("unlisted content receives consistent noindex directives", () => {
+  assert.equal(getContentRobots("Public"), undefined);
+  assert.equal(getContentRobots("Draft"), undefined);
+  assert.equal(getContentRobots("Private"), undefined);
+  assert.deepEqual(getContentRobots("PublicOnDetail"), {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  });
 });
 
 test("single-flight coalesces concurrent cold loads and resets afterward", async () => {

@@ -56,7 +56,7 @@ export default async function SeriesPage({ params }: Props) {
   const description = copy.series.description(decoded, brand.name, posts.length);
 
   return (
-    <div className="max-w-[1024px] mx-auto px-6 py-12">
+    <div className="sg-content-limiter py-12">
       <SeriesJsonLd
         name={decoded}
         url={seriesUrl}

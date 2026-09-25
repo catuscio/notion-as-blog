@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getContentDetail } from "@/lib/notion/contentDetail";
 import { getContentCatalog } from "@/lib/notion/contentCatalog";
+import { getContentRobots } from "@/lib/contentMetadata";
 import { getOptionalAuthorsByPeopleIds } from "@/lib/notion/getAuthors";
 import { PostHeader, PostHeaderMeta } from "@/components/detail/PostHeader";
 import { TypewriterTitle } from "@/components/detail/TypewriterTitle";
@@ -54,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: copy.notFound.title };
 
   const postUrl = `${brand.url}/${post.slug}`;
-  const isUnlisted = post.status === "PublicOnDetail";
+  const robots = getContentRobots(post.status);
   return {
     title: post.title,
     description: post.summary,
@@ -79,18 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       images: [`/${post.slug}/opengraph-image`],
     },
-    ...(isUnlisted && {
-      robots: {
-        index: false,
-        follow: false,
-        nocache: true,
-        googleBot: {
-          index: false,
-          follow: false,
-          noimageindex: true,
-        },
-      },
-    }),
+    ...(robots && { robots }),
   };
 }
 

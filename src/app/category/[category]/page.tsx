@@ -48,7 +48,7 @@ export default async function CategoryPage({ params }: Props) {
   const categoryUrl = `${brand.url}/category/${cat.slug}`;
 
   return (
-    <div className="max-w-[1024px] mx-auto px-6 py-12">
+    <div className="sg-content-limiter py-12">
       <BlogJsonLd url={categoryUrl} name={`${cat.name} — ${brand.name}`} description={cat.description} />
       <BreadcrumbJsonLd items={[
         { name: copy.footer.home, url: brand.url },

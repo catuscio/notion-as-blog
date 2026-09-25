@@ -67,13 +67,17 @@
   }
   html {
     overflow-y: scroll;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 7rem;
   }
   body {
     @apply bg-background text-foreground antialiased break-keep;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-wrap: break-word;
   }
+}
+
+@media (min-width: 768px) {
+  html { scroll-padding-top: 5rem; }
 }
 
 @layer components {
@@ -157,6 +161,10 @@
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.tag-scroll-reel {
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 2rem), transparent 100%);
 }
 
 /* Notion color utilities — light mode */

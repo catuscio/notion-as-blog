@@ -62,7 +62,7 @@ export default async function AuthorPage({ params }: Props) {
   const sameAs = Object.values(author.socials).filter(Boolean) as string[];
 
   return (
-    <div className="max-w-[1024px] mx-auto px-6 py-12">
+    <div className="sg-content-limiter py-12">
       <PersonJsonLd
         name={author.name}
         url={authorUrl}

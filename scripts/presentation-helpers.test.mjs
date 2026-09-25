@@ -5,6 +5,7 @@ import { getPaginationItems } from "../src/lib/pagination.ts";
 import { createListingMetadata } from "../src/lib/listingMetadata.ts";
 import { brand } from "../src/config/brand.ts";
 import { toSearchResult } from "../src/lib/searchContract.ts";
+import { searchPosts } from "../src/lib/searchPosts.ts";
 
 test("pagination shows every page for short ranges", () => {
   assert.deepEqual(getPaginationItems(3, 5), [1, 2, 3, 4, 5]);
@@ -62,4 +63,14 @@ test("search responses expose only the public dropdown contract", () => {
   });
   assert.equal("id" in result, false);
   assert.equal("authorIds" in result, false);
+});
+
+test("search normalizes full-width text and matches words across fields", () => {
+  const posts = [
+    { title: "ＮｅｘｔＪＳ", summary: "", category: "Development", series: "Guide", author: "Ada", slug: "nextjs-guide", tags: [] },
+    { title: "Other", summary: "", category: "Design", series: null, author: "Bea", slug: "other", tags: [] },
+  ];
+
+  assert.deepEqual(searchPosts(posts, "  nextjs   GUIDE "), [posts[0]]);
+  assert.deepEqual(searchPosts(posts, "   "), posts);
 });

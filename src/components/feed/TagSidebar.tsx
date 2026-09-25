@@ -16,7 +16,7 @@ function tagHref(tag: string) {
 /** Mobile: horizontal scrollable tag pills */
 export function MobileTagBar({ tags }: TagSidebarProps) {
   return (
-    <div className="lg:hidden -mx-6 overflow-x-auto px-6 hide-scrollbar">
+    <nav aria-label="Tags, scroll horizontally for more" className="tag-scroll-reel lg:hidden -mx-6 overflow-x-auto px-6 hide-scrollbar">
       <div className="flex gap-2 pb-2" style={{ minWidth: "min-content" }}>
         <Link
           href="/"
@@ -35,7 +35,7 @@ export function MobileTagBar({ tags }: TagSidebarProps) {
           </Link>
         ))}
       </div>
-    </div>
+    </nav>
   );
 }
 

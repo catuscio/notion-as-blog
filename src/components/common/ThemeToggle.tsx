@@ -53,7 +53,7 @@ export function ThemeToggle() {
       aria-label="Toggle theme"
       aria-pressed={mounted ? isDark : undefined}
     >
-      {mounted ? (isDark ? <SunIcon /> : <MoonIcon />) : <span className="inline-block h-5 w-5" />}
+      {mounted && isDark ? <SunIcon /> : <MoonIcon />}
     </Button>
   );
 }

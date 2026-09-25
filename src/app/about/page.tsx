@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getContentDetail } from "@/lib/notion/contentDetail";
 import { NotionRenderer } from "@/components/detail/NotionRenderer";
 import { brand } from "@/config/brand";
+import { getContentRobots } from "@/lib/contentMetadata";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -12,12 +13,14 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const { content } = result;
+  const robots = getContentRobots(content.status);
   return {
     title: `${content.title} - ${brand.name}`,
     description: content.summary || `About ${brand.name}`,
     alternates: {
       canonical: `${brand.url}/about`,
     },
+    ...(robots && { robots }),
   };
 }
 
