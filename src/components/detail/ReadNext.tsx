@@ -13,16 +13,16 @@ export function ReadNext({
   if (posts.length === 0) return null;
 
   return (
-    <div>
+    <div className="sg-stack [--stack-gap:var(--space-4)]">
       <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
         {copy.readNext}
       </h4>
-      <div className="flex flex-col gap-4">
+      <div className="sg-stack [--stack-gap:var(--space-4)]">
         {posts.slice(0, 3).map((post) => (
           <Link
             key={post.id}
             href={`/${post.slug}`}
-            className="group flex gap-3 items-start"
+            className="group flex items-start gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           >
             <PostThumbnail
               src={post.thumbnail}

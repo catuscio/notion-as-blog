@@ -46,6 +46,18 @@
 
 :root {
   --radius: 0.625rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --content-max: 70rem;
+  --prose-max: 70ch;
+  --aside-width: 18rem;
   /* Theme colors are injected from brand.ts via layout.tsx */
 }
 
@@ -61,6 +73,74 @@
     @apply bg-background text-foreground antialiased break-keep;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-wrap: break-word;
+  }
+}
+
+@layer components {
+  .sg-content-limiter {
+    margin-inline: auto;
+    max-inline-size: var(--content-max);
+    padding-inline: var(--space-6);
+    width: 100%;
+  }
+
+  .sg-prose-limiter {
+    margin-inline: auto;
+    max-inline-size: var(--prose-max);
+    width: 100%;
+  }
+
+  .sg-stack {
+    display: grid;
+    gap: var(--stack-gap, var(--space-4));
+  }
+
+  .sg-cluster {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cluster-gap, var(--space-3));
+    justify-content: flex-start;
+  }
+
+  .sg-card-grid {
+    display: grid;
+    gap: var(--grid-gap, var(--space-4));
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  }
+
+  .sg-sticky-aside {
+    display: block;
+    gap: var(--space-12);
+  }
+
+  .sg-sticky-aside-main {
+    min-inline-size: 0;
+  }
+
+  .sg-sticky-aside-side {
+    inset-block-start: var(--space-20);
+    position: sticky;
+  }
+
+  @media (min-width: 1024px) {
+    .sg-sticky-aside {
+      align-items: start;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--aside-width);
+    }
+  }
+
+  .sg-skip-link {
+    position: fixed;
+    inset-block-start: var(--space-3);
+    inset-inline-start: var(--space-3);
+    transform: translateY(-150%);
+    z-index: 100;
+  }
+
+  .sg-skip-link:focus {
+    transform: translateY(0);
   }
 }
 

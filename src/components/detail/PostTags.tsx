@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { displayTagName } from "@/lib/displayTagName";
 
 export function PostTags({ tags }: { tags: string[] }) {
   if (tags.length === 0) return null;
@@ -11,7 +12,7 @@ export function PostTags({ tags }: { tags: string[] }) {
         {tags.map((tag) => (
           <Badge key={tag} variant="secondary" className="rounded-lg" asChild>
             <Link href={`/tag/${encodeURIComponent(tag)}`}>
-              #{tag}
+              #{displayTagName(tag)}
             </Link>
           </Badge>
         ))}

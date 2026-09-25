@@ -7,9 +7,12 @@ import { HeaderNav } from "./HeaderNav";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border transition-all duration-200">
-      <div className="max-w-[1024px] mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group shrink-0">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md transition-colors duration-200">
+      <div className="sg-content-limiter flex h-16 items-center justify-between">
+        <Link
+          href="/"
+          className="group flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        >
           {brand.logo.image && <BrandLogo size={32} />}
           <span className={`text-xl font-bold tracking-tight ${brand.logo.image && !brand.logo.showNameWithLogo ? "sr-only" : ""}`}>
             {brand.name}
@@ -33,6 +36,9 @@ export function Header() {
             </Link>
           )}
         </div>
+      </div>
+      <div className="sg-content-limiter pb-3 md:hidden">
+        <HeaderNav aboutLabel={copy.footer.about} categories={brand.categories} mobile />
       </div>
     </header>
   );

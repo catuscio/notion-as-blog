@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { copy } from "@/config/copy";
+import { displayTagName } from "@/lib/displayTagName";
 
 interface TagFilterProps {
   tags: string[];
@@ -61,7 +62,7 @@ export function TagFilter({
       {tags.map((tag) => (
         <TagButton
           key={tag}
-          label={tag}
+          label={displayTagName(tag)}
           active={activeTag === tag}
           asLink={asLinks}
           href={`/tag/${encodeURIComponent(tag)}`}

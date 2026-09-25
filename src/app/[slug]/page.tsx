@@ -160,12 +160,12 @@ export default async function ContentPage({ params }: Props) {
   );
 
   return (
-    <div className="w-full max-w-[1024px] mx-auto flex flex-col lg:flex-row gap-12 px-6 py-8">
+    <div className="sg-content-limiter sg-sticky-aside py-8">
       {post.status === "Public" && (
         <PostJsonLd post={post} authors={authors} wordCount={wordCount} readingTime={readingTime} seriesPosts={seriesPosts} />
       )}
 
-      <article className="w-full flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0">
+      <article className="sg-sticky-aside-main sg-prose-limiter lg:mx-0">
         <PostBreadcrumb post={post} />
         <PostHeader
           post={post}
@@ -183,8 +183,8 @@ export default async function ContentPage({ params }: Props) {
       </article>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-72 shrink-0">
-        <div className={`sticky top-20 max-h-[calc(100vh-6rem)] flex flex-col gap-12 ${animate ? "overflow-hidden" : "overflow-y-auto"}`}>
+      <aside className="sg-sticky-aside-side hidden lg:block">
+        <div className={`flex max-h-[calc(100vh-6rem)] flex-col gap-12 ${animate ? "overflow-hidden" : "overflow-y-auto"}`}>
           {animate ? (
             <AnimatedReveal delay={typingDuration} unlockOverflowParent>{sidebarContent}</AnimatedReveal>
           ) : (

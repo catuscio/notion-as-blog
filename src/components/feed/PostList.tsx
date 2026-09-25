@@ -16,9 +16,9 @@ export function PostList({
   }
 
   return (
-    <div className="flex flex-col divide-y divide-border">
+    <div className="sg-stack [--stack-gap:var(--space-8)]">
       {posts.map((post, index) => (
-        <div key={post.id} className="py-8 md:py-12 first:pt-0 last:pb-0">
+        <div key={post.id}>
           <PostCard post={post} priorityImage={prioritizeFirstImage && index === 0} />
         </div>
       ))}

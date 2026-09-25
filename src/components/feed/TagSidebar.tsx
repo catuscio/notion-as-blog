@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { copy } from "@/config/copy";
+import { displayTagName } from "@/lib/displayTagName";
 import type { TagItem } from "@/types";
 
 interface TagSidebarProps {
@@ -15,11 +16,11 @@ function tagHref(tag: string) {
 /** Mobile: horizontal scrollable tag pills */
 export function MobileTagBar({ tags }: TagSidebarProps) {
   return (
-    <div className="lg:hidden -mx-6 px-6 overflow-x-auto hide-scrollbar">
+    <div className="lg:hidden -mx-6 overflow-x-auto px-6 hide-scrollbar">
       <div className="flex gap-2 pb-2" style={{ minWidth: "min-content" }}>
         <Link
           href="/"
-          className="shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors bg-primary/15 text-foreground ring-1 ring-primary/30"
+          className="shrink-0 rounded-full bg-primary/15 px-4 py-1.5 text-sm font-semibold text-foreground ring-1 ring-primary/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
           {copy.tag.all}
         </Link>
@@ -27,9 +28,9 @@ export function MobileTagBar({ tags }: TagSidebarProps) {
           <Link
             key={tag.name}
             href={tagHref(tag.name)}
-            className="shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-muted text-muted-foreground hover:text-foreground"
+            className="shrink-0 rounded-full bg-muted px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           >
-            {tag.name}
+            {displayTagName(tag.name)}
             <span className="ml-1 opacity-60">{tag.count}</span>
           </Link>
         ))}
@@ -41,15 +42,15 @@ export function MobileTagBar({ tags }: TagSidebarProps) {
 /** Desktop: vertical sidebar */
 export function TagSidebar({ tags, totalCount }: TagSidebarProps) {
   return (
-    <aside className="hidden lg:block w-56 shrink-0">
-      <div className="sticky top-28">
+    <aside className="sg-sticky-aside-side hidden lg:block">
+      <div>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
           {copy.tag.tagsHeading}
         </h3>
         <div className="flex flex-col gap-1.5">
           <Link
             href="/"
-            className="group flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors bg-primary/15 text-foreground font-semibold ring-1 ring-primary/30"
+            className="group flex items-center justify-between rounded-lg bg-primary/15 px-3 py-2 text-sm font-semibold text-foreground ring-1 ring-primary/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           >
             <span>{copy.tag.allPosts}</span>
             <Badge
@@ -64,9 +65,9 @@ export function TagSidebar({ tags, totalCount }: TagSidebarProps) {
             <Link
               key={tag.name}
               href={tagHref(tag.name)}
-              className="group flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="group flex items-center justify-between rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
             >
-              <span className="truncate mr-2">{tag.name}</span>
+              <span className="truncate mr-2">{displayTagName(tag.name)}</span>
               <Badge
                 variant="secondary"
                 className="text-[11px] px-1.5 py-0 min-w-[22px] justify-center"

@@ -18,7 +18,9 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");
   const [isAnimating, setIsAnimating] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [touching, setTouching] = useState(false);
 
   const total = posts.length;
 
@@ -26,7 +28,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
     (index: number, dir: Direction) => {
       if (isAnimating || index === current) return;
       setDirection(dir);
-      setIsAnimating(true);
+      setIsAnimating(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
       setCurrent(index);
     },
     [isAnimating, current]
@@ -41,10 +43,10 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
   }, [current, total, goTo]);
 
   useEffect(() => {
-    if (paused || total <= 1) return;
+    if (hovered || focused || touching || total <= 1) return;
     const id = setInterval(next, INTERVAL_MS);
     return () => clearInterval(id);
-  }, [paused, next, total]);
+  }, [hovered, focused, touching, next, total]);
 
   /* ── Touch swipe ── */
   const touchRef = useRef<{ x: number; y: number } | null>(null);
@@ -52,7 +54,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
   const onTouchStart = useCallback(
     (e: React.TouchEvent) => {
       touchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      setPaused(true);
+      setTouching(true);
     },
     []
   );
@@ -67,7 +69,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
           if (dx < 0) { next(); } else { prev(); }
         }
       }
-      setPaused(false);
+      setTouching(false);
     },
     [next, prev]
   );
@@ -88,7 +90,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
   if (total === 0) return null;
 
   const arrowClassName =
-    "absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300";
+    "absolute top-4 md:top-1/2 md:-translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur text-white flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-opacity duration-300";
 
   const slideClass = (i: number) => {
     if (i === current) {
@@ -102,9 +104,13 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
 
   return (
     <section
-      className="max-w-[1024px] mx-auto px-6 mb-24 md:mb-32"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      className="sg-content-limiter mb-20 md:mb-28"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
+      }}
     >
       <div
         role="region"
@@ -112,7 +118,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
         aria-label={copy.aria.featuredPosts}
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className="group relative w-full aspect-[2/1] md:aspect-[5/2] rounded-2xl overflow-hidden bg-muted outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        className="group relative w-full min-h-80 md:min-h-0 md:aspect-[5/2] rounded-2xl overflow-hidden bg-muted outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -123,7 +129,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
             href={`/${p.slug}`}
             aria-hidden={i !== current}
             tabIndex={i !== current ? -1 : undefined}
-            className={`absolute inset-0 transition-all duration-500 ease-in-out ${slideClass(i)}`}
+            className={`absolute inset-0 transition-[transform,opacity] duration-500 ease-in-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white ${slideClass(i)}`}
             onTransitionEnd={() => setIsAnimating(false)}
           >
             {/* Thumbnail */}
@@ -142,18 +148,18 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
             )}
 
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
 
             {/* Text content */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 text-white">
+            <div className="absolute bottom-0 left-0 right-0 p-6 pb-10 md:p-10 text-white">
               <div className="flex items-center gap-3 mb-3">
                 {p.category && <CategoryBadge category={p.category} />}
               </div>
-              <h2 className="text-xl md:text-4xl font-semibold mb-2 leading-snug drop-shadow-lg line-clamp-2">
+              <h2 className="text-xl md:text-4xl font-semibold mb-2 leading-snug drop-shadow-lg line-clamp-3 md:line-clamp-2">
                 {p.title}
               </h2>
               {p.summary && (
-                <p className="text-sm md:text-base text-white/80 line-clamp-2 max-w-2xl drop-shadow">
+                <p className="text-sm md:text-base text-white/80 line-clamp-3 md:line-clamp-2 max-w-2xl drop-shadow">
                   {p.summary}
                 </p>
               )}
@@ -167,7 +173,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); prev(); }}
-              className={`${arrowClassName} left-3`}
+              className={`${arrowClassName} right-14 md:right-auto md:left-3`}
               aria-label={copy.aria.previousSlide}
             >
               <ChevronLeft size={20} />

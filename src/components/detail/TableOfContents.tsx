@@ -109,16 +109,16 @@ export function TableOfContents() {
   if (headings.length === 0) return null;
 
   return (
-    <div className="flex flex-col">
+    <div className="sg-stack [--stack-gap:var(--space-4)]">
       <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
         {copy.toc.heading}
       </h4>
-      <nav className="flex flex-col gap-3 relative border-l border-border">
+      <nav className="sg-stack relative border-l border-border [--stack-gap:var(--space-3)]">
         {headings.map((h) => (
           <a
             key={h.id}
             href={`#${h.id}`}
-            className={`${INDENT[h.level] ?? "pl-4"} text-sm font-medium transition-colors block ${
+            className={`${INDENT[h.level] ?? "pl-4"} block rounded-r-md py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
               activeId === h.id
                 ? "text-primary border-l-2 border-primary -ml-px"
                 : "text-muted-foreground hover:text-foreground"

@@ -14,15 +14,18 @@ export function PostCard({
   priorityImage?: boolean;
 }) {
   return (
-    <Link href={`/${post.slug}`}>
-      <article className="group relative flex flex-col md:flex-row gap-6 md:gap-10 items-start p-4 -mx-4 rounded-2xl hover:bg-muted/50 transition-colors duration-300 cursor-pointer overflow-hidden">
+    <Link
+      href={`/${post.slug}`}
+      className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+    >
+      <article className="relative grid gap-6 overflow-hidden rounded-2xl border border-transparent bg-card/60 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-border hover:bg-muted/40 hover:shadow-toss md:grid-cols-[minmax(0,1fr)_12rem] md:gap-10">
         <div className="flex-1 order-2 md:order-1">
-          <div className="flex items-center gap-3 mb-3 text-sm font-medium">
+          <div className="sg-cluster mb-3 text-sm font-medium [--cluster-gap:var(--space-3)]">
             {post.category && <CategoryBadge category={post.category} />}
             <span className="text-muted-foreground/50">&bull;</span>
             <span className="text-muted-foreground">{formatDate(post.date)}</span>
           </div>
-          <h3 className="text-xl md:text-3xl font-semibold mb-3 group-hover:text-primary transition-colors leading-snug break-words">
+          <h3 className="mb-3 text-xl font-semibold leading-snug text-balance transition-colors group-hover:text-primary md:text-3xl">
             {post.title}
           </h3>
           {post.summary && (
@@ -30,9 +33,9 @@ export function PostCard({
               {post.summary}
             </p>
           )}
-          <div className="flex items-center text-primary font-semibold text-sm">
+          <div className="sg-cluster text-sm font-semibold text-primary [--cluster-gap:var(--space-2)]">
             <span>{copy.readArticle}</span>
-            <ArrowRight size={18} className="ml-1 transition-transform group-hover:translate-x-1" />
+            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </div>
         </div>
         <PostThumbnail
@@ -40,7 +43,8 @@ export function PostCard({
           alt={post.title}
           size="md"
           preload={priorityImage}
-          className="order-1 md:order-2 w-full md:w-48 aspect-video md:aspect-auto md:h-32"
+          hoverScale
+          className="order-1 aspect-video w-full md:order-2 md:h-32 md:w-48"
         />
       </article>
     </Link>

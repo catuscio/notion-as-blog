@@ -14,6 +14,7 @@ import {
   type SearchErrorCode,
   type SearchResult,
 } from "@/lib/searchContract";
+import { displayTagName } from "@/lib/displayTagName";
 
 const noop = () => () => {};
 const getIsMac = () => navigator.platform.toUpperCase().includes("MAC");
@@ -198,7 +199,7 @@ function SearchResults({
                     key={tag}
                     className="text-[11px] bg-muted px-1.5 py-0.5 rounded"
                   >
-                    {tag}
+                    {displayTagName(tag)}
                   </span>
                 ))}
               </div>

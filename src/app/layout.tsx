@@ -98,9 +98,17 @@ export default function RootLayout({
       <body
         className="font-sans antialiased overflow-x-clip selection:bg-primary/20 selection:text-primary"
       >
+        <a
+          href="#main-content"
+          className="sg-skip-link rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-toss transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+        >
+          Skip to content
+        </a>
         <div className="min-h-screen flex flex-col">
           <Header />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1" tabIndex={-1}>
+            {children}
+          </main>
           <Footer />
         </div>
         {brand.analytics.gaId && (

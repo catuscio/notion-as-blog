@@ -13,12 +13,12 @@ function Multiline({ text }: { text: string }) {
 
 export function HeroSection() {
   return (
-    <section className="max-w-[1024px] mx-auto px-6 mb-24 md:mb-32">
-      <div className="max-w-3xl">
-        <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.15] break-words">
+    <section className="sg-content-limiter mb-20 grid min-h-[42dvh] items-center md:mb-28">
+      <div className="sg-stack max-w-3xl [--stack-gap:var(--space-6)]">
+        <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight text-balance md:text-7xl">
           <HeroTitle title={brand.title} highlight={brand.highlight} />
         </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground font-normal leading-relaxed max-w-2xl">
+        <p className="max-w-2xl text-xl font-normal leading-relaxed text-muted-foreground md:text-2xl">
           <Multiline text={brand.description} />
         </p>
       </div>

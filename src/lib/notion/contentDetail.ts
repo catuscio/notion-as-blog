@@ -40,6 +40,18 @@ export async function getContentDetail(slug: string): Promise<ContentDetailData 
 
   if (!content) return null;
 
+  if (process.env.BLOG_UI_PREVIEW === "1" && process.env.NOTION_API_KEY === "preview") {
+    const { uiPreviewBlocks } = await import("./uiPreviewFixture");
+    return {
+      content,
+      blocks: uiPreviewBlocks,
+      relatedPosts: getRelatedPosts(content, catalog.listedPosts),
+      seriesPosts: [],
+      readingTime: 2,
+      wordCount: 80,
+    };
+  }
+
   const blocks = await getPageBlocks(content.id);
   await enrichBookmarkOgInPlace(blocks);
   const text = extractTextFromBlocks(blocks);

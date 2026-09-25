@@ -25,8 +25,8 @@ export function PostHeaderMeta({
       : post.author || copy.authorFallback;
 
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-border pb-8">
-      <div className="flex items-center gap-4 min-w-0">
+    <div className="sg-cluster justify-between border-b border-border pb-8 [--cluster-gap:var(--space-4)]">
+      <div className="flex min-w-0 items-center gap-4">
         {authorSummaries.length > 0 ? (
           <AvatarStack authors={authorSummaries} size="md" showNames={false} />
         ) : (
@@ -36,7 +36,7 @@ export function PostHeaderMeta({
         )}
         <div>
           <p className="font-semibold">{displayName}</p>
-          <p className="text-sm text-muted-foreground flex items-center gap-2">
+          <p className="sg-cluster text-sm text-muted-foreground [--cluster-gap:var(--space-2)]">
             <span>{formatDate(post.date)}</span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
             <span>{readingTime} {copy.readingTime}</span>
@@ -63,7 +63,7 @@ export function PostHeader({
 }) {
   return (
     <div className="mb-8">
-      <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 leading-[1.15] break-words">
+      <h1 className="mb-6 text-3xl font-bold leading-[1.15] tracking-tight text-balance md:text-5xl">
         {titleSlot ?? post.title}
       </h1>
       {metaSlot ?? <PostHeaderMeta post={post} authors={authors} readingTime={readingTime} />}

@@ -21,8 +21,8 @@ export function RecentPostsSection({
   const paginatedPosts = posts.slice(start, start + brand.postsPerPage);
 
   return (
-    <section className="max-w-[1024px] mx-auto px-6 mt-12 mb-24">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+    <section className="sg-content-limiter mb-24 mt-12">
+      <div className="sg-cluster mb-10 justify-between [--cluster-gap:var(--space-4)]">
         <h2 className="text-2xl font-bold shrink-0">{copy.recentPosts}</h2>
         <div className="w-full sm:w-64">
           <SearchInputLoader />
@@ -31,8 +31,8 @@ export function RecentPostsSection({
 
       <MobileTagBar tags={tags} totalCount={posts.length} />
 
-      <div className="flex gap-10 mt-8 lg:mt-0">
-        <div className="flex-1 min-w-0">
+      <div className="sg-sticky-aside mt-8 lg:mt-0">
+        <div className="sg-sticky-aside-main">
           <PostList posts={paginatedPosts} prioritizeFirstImage={prioritizeFirstImage} />
           <PaginationNav
             totalItems={posts.length}

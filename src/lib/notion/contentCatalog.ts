@@ -60,6 +60,9 @@ export interface ContentCatalog {
 
 /** Fetches the shared Notion dataset once and derives every visibility view from it. */
 export const getContentCatalog = createSingleFlight(async (): Promise<ContentCatalog> => {
+  if (process.env.BLOG_UI_PREVIEW === "1" && process.env.NOTION_API_KEY === "preview") {
+    return (await import("./uiPreviewFixture")).uiPreviewCatalog;
+  }
   const contentItems = await getCachedContent();
   return {
     listedPosts: getListedPostsByDate(contentItems),

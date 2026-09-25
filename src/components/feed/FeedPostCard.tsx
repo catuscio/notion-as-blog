@@ -4,6 +4,7 @@ import { AvatarStack } from "@/components/common/AvatarStack";
 import { copy } from "@/config/copy";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
+import { displayTagName } from "@/lib/displayTagName";
 import type { ContentItem, AuthorSummary } from "@/types";
 
 const cardClassName = cn(
@@ -25,19 +26,24 @@ export function FeedPostCard({
   const authorList = authors && authors.length > 0
     ? authors
     : [{ name: post.author || copy.authorFallback, avatar: "" }];
+  const primaryTag = post.tags?.[0] ? displayTagName(post.tags[0]) : "";
 
   return (
-    <Link href={`/${post.slug}`} aria-label={post.title}>
+    <Link
+      href={`/${post.slug}`}
+      aria-label={post.title}
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+    >
       <article className={cardClassName}>
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-700 ease-out" />
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
           <div className="flex-1 flex flex-col h-full justify-between">
             <div>
               <div className="flex items-center gap-3 mb-3 text-sm">
-                {post.tags?.[0] && (
-                  <span className="font-semibold text-primary">{post.tags[0]}</span>
+                {primaryTag && (
+                  <span className="font-semibold text-primary">{primaryTag}</span>
                 )}
-                {post.tags?.[0] && readingTime && (
+                {primaryTag && readingTime && (
                   <span className="text-muted-foreground/30">&bull;</span>
                 )}
                 {readingTime && (

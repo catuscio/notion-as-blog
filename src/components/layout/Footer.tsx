@@ -7,15 +7,15 @@ import { socialIconMap } from "./SocialIcons";
 export function Footer() {
   return (
     <footer className="border-t border-border bg-background">
-      <div className="max-w-[1024px] mx-auto px-6 py-12">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+      <div className="sg-content-limiter py-12">
+        <div className="sg-cluster justify-between [--cluster-gap:var(--space-6)]">
           <div className="flex items-center gap-2">
             {brand.logo.image && <BrandLogo size={24} />}
             <span className={`text-lg font-bold ${brand.logo.image && !brand.logo.showNameWithLogo ? "sr-only" : ""}`}>
               {brand.name}
             </span>
           </div>
-          <div className="flex gap-8 text-sm font-medium text-muted-foreground">
+          <div className="sg-cluster text-sm font-medium text-muted-foreground [--cluster-gap:var(--space-6)]">
             <Link href="/" className="hover:text-primary transition-colors">
               {copy.footer.home}
             </Link>
@@ -31,7 +31,7 @@ export function Footer() {
               {copy.footer.template}
             </a>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="sg-cluster [--cluster-gap:var(--space-3)]">
             {socialIconMap.map(({ key, label, icon }) => {
               const url = brand.social[key];
               if (!url) return null;
