@@ -8,32 +8,32 @@ export function Footer({ showAbout }: { showAbout: boolean }) {
   return (
     <footer className="border-t border-border bg-background">
       <div className="sg-content-limiter py-12">
-        <div className="sg-cluster justify-between [--cluster-gap:var(--space-6)]">
-          <div className="flex items-center gap-2">
+        <div className="grid items-center gap-6 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+          <div className="flex items-center gap-2 justify-self-center md:justify-self-start">
             {brand.logo.image && <BrandLogo size={24} />}
             <span className={`text-lg font-bold ${brand.logo.image && !brand.logo.showNameWithLogo ? "sr-only" : ""}`}>
               {brand.name}
             </span>
           </div>
-          <div className="sg-cluster text-sm font-medium text-muted-foreground [--cluster-gap:var(--space-6)]">
-            <Link href="/" className="rounded transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
+          <div className="sg-cluster justify-center justify-self-center text-sm font-medium text-muted-foreground [--cluster-gap:var(--space-6)]">
+            <Link href="/" className="rounded ui-nav-link">
               {copy.footer.home}
             </Link>
             {showAbout && (
-              <Link href="/about" className="rounded transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
+              <Link href="/about" className="rounded ui-nav-link">
                 {copy.footer.about}
               </Link>
             )}
             <a
               href={brand.templateUrl}
-              className="rounded transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="rounded ui-nav-link"
               target="_blank"
               rel="noopener noreferrer"
             >
               {copy.footer.template}
             </a>
           </div>
-          <div className="sg-cluster [--cluster-gap:var(--space-3)]">
+          <div className="sg-cluster justify-center justify-self-center md:justify-self-end [--cluster-gap:var(--space-3)]">
             {socialIconMap.map(({ key, label, icon }) => {
               const url = brand.social[key];
               if (!url) return null;
@@ -42,7 +42,8 @@ export function Footer({ showAbout }: { showAbout: boolean }) {
                   key={key}
                   href={url}
                   aria-label={label}
-                  className="rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                  data-social={key}
+                  className="social-link rounded text-muted-foreground transition-colors ui-focus-ring"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

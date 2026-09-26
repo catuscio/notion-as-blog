@@ -1,19 +1,7 @@
-import katex from "katex";
-
-function renderKatex(expression: string, displayMode: boolean): string {
-  try {
-    return katex.renderToString(expression, {
-      displayMode,
-      throwOnError: false,
-      output: "htmlAndMathml",
-    });
-  } catch {
-    return expression;
-  }
-}
+import { renderEquationHtml } from "@/lib/security/equation";
 
 export function EquationBlock({ expression }: { expression: string }) {
-  const html = renderKatex(expression, true);
+  const html = renderEquationHtml(expression, true);
   return (
     <div
       className="my-6 overflow-x-auto text-center"
@@ -23,7 +11,7 @@ export function EquationBlock({ expression }: { expression: string }) {
 }
 
 export function InlineEquation({ expression }: { expression: string }) {
-  const html = renderKatex(expression, false);
+  const html = renderEquationHtml(expression, false);
   return (
     <span
       className="inline-block align-middle"

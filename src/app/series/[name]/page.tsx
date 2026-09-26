@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { SeriesHeader } from "@/components/feed/SeriesHeader";
+import { FeedPageHeader } from "@/components/feed/FeedPageHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BreadcrumbJsonLd, SeriesJsonLd } from "@/components/seo/JsonLd";
 import { getListedPosts } from "@/lib/notion/contentCatalog";
@@ -67,7 +67,7 @@ export default async function SeriesPage({ params }: Props) {
         { name: copy.footer.home, url: brand.url },
         { name: decoded, url: seriesUrl },
       ]} />
-      <SeriesHeader seriesName={decoded} />
+      <FeedPageHeader title={decoded} count={posts.length} />
       <Suspense>
         <FeedPostList posts={posts} tags={tags} authorsMap={authorsMap} />
       </Suspense>

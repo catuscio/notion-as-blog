@@ -136,7 +136,7 @@ export default async function ContentPage({ params }: Props) {
   );
 
   const sidebarContent = (
-    <>
+    <div className="sg-stack [--stack-gap:var(--space-8)]">
       <TableOfContents />
       {seriesPosts.length > 0 && (
         <SeriesNav
@@ -146,7 +146,7 @@ export default async function ContentPage({ params }: Props) {
         />
       )}
       <ReadNext posts={relatedPosts} />
-    </>
+    </div>
   );
 
   return (

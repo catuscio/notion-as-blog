@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { TagControl } from "@/components/common/TagControl";
 import { copy } from "@/config/copy";
 import { displayTagName } from "@/lib/displayTagName";
 
@@ -13,61 +12,15 @@ interface TagFilterProps {
   allHref?: string;
 }
 
-const tagBtnClass = "rounded-full px-5 py-2.5 text-sm font-medium active:scale-95 transition-transform";
-
-function TagButton({
-  label,
-  active,
-  asLink,
-  href,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  asLink: boolean;
-  href: string;
-  onClick: () => void;
-}) {
-  const variant = active ? "default" : "outline";
-  if (asLink) {
-    return (
-      <Button variant={variant} className={tagBtnClass} asChild>
-        <Link href={href}>{label}</Link>
-      </Button>
-    );
-  }
+export function TagFilter({ tags, activeTag, onTagClick, asLinks = false, allHref = "/" }: TagFilterProps) {
   return (
-    <Button variant={variant} className={tagBtnClass} onClick={onClick}>
-      {label}
-    </Button>
-  );
-}
-
-export function TagFilter({
-  tags,
-  activeTag,
-  onTagClick,
-  asLinks = false,
-  allHref = "/",
-}: TagFilterProps) {
-  return (
-    <div className="flex flex-wrap gap-2 mt-8 py-2">
-      <TagButton
-        label={copy.tag.allPosts}
-        active={activeTag === null}
-        asLink={asLinks}
-        href={allHref}
-        onClick={() => onTagClick(null)}
-      />
+    <div className="flex flex-wrap gap-x-[var(--tag-gap)] gap-y-2">
+      <TagControl label={copy.tag.allPosts} selected={activeTag === null}
+        href={asLinks ? allHref : undefined} onClick={asLinks ? undefined : () => onTagClick(null)} />
       {tags.map((tag) => (
-        <TagButton
-          key={tag}
-          label={displayTagName(tag)}
-          active={activeTag === tag}
-          asLink={asLinks}
-          href={`/tag/${encodeURIComponent(tag)}`}
-          onClick={() => onTagClick(tag)}
-        />
+        <TagControl key={tag} label={displayTagName(tag)} selected={activeTag === tag}
+          href={asLinks ? `/tag/${encodeURIComponent(tag)}` : undefined}
+          onClick={asLinks ? undefined : () => onTagClick(tag)} />
       ))}
     </div>
   );

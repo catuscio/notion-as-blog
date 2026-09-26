@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { TagHeader } from "@/components/feed/TagHeader";
+import { FeedPageHeader } from "@/components/feed/FeedPageHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { getListedPosts } from "@/lib/notion/contentCatalog";
@@ -59,7 +59,7 @@ export default async function TagPage({ params }: Props) {
         { name: copy.footer.home, url: brand.url },
         { name: `#${decoded}`, url: tagUrl },
       ]} />
-      <TagHeader tagName={decoded} />
+      <FeedPageHeader title={`#${decoded}`} count={posts.length} />
       <Suspense>
         <FeedPostList
           posts={posts}

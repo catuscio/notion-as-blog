@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { FeedPostCard } from "@/components/feed/FeedPostCard";
+import { SearchInputLoader } from "@/components/common/SearchInputLoader";
+import { PostCard } from "@/components/feed/PostCard";
 import { getListedPosts } from "@/lib/notion/contentCatalog";
 import { getOptionalAuthorLookupMap } from "@/lib/notion/getAuthors";
 import { searchPosts } from "@/lib/searchPosts";
@@ -55,9 +56,9 @@ async function SearchResults({ query }: { query: string }) {
   }
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col">
       {results.map((post) => (
-        <FeedPostCard
+        <PostCard
           key={post.id}
           post={post}
           authors={resolveAuthors(post, authorsMap)}
@@ -79,6 +80,7 @@ export default async function SearchPage({ searchParams }: Props) {
           copy.search.heading
         )}
       </h1>
+      <div className="max-w-xl mt-6 mb-4"><SearchInputLoader /></div>
       <Suspense>
         <SearchResults query={query} />
       </Suspense>

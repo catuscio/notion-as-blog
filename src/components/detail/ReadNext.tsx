@@ -14,7 +14,7 @@ export function ReadNext({
 
   return (
     <div className="sg-stack [--stack-gap:var(--space-4)]">
-      <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
+      <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
         {copy.readNext}
       </h4>
       <div className="sg-stack [--stack-gap:var(--space-4)]">
@@ -22,13 +22,12 @@ export function ReadNext({
           <Link
             key={post.id}
             href={`/${post.slug}`}
-            className="group flex items-start gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            className="group flex items-start gap-3 rounded-lg ui-focus-ring"
           >
             <PostThumbnail
               src={post.thumbnail}
               alt={post.title}
               size="sm"
-              hoverScale
             />
             <div>
               <h5 className="text-sm font-semibold group-hover:text-primary transition-colors line-clamp-2">

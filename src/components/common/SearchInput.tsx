@@ -77,7 +77,7 @@ export function SearchInput() {
 
   return (
     <div ref={containerRef} className="relative">
-      <div className="flex items-center bg-muted rounded-full px-4 py-2 w-full focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+      <div className="flex items-center bg-muted ui-search-field px-4 py-2 w-full focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
         <Search size={20} className="text-muted-foreground" />
         <input
           ref={inputRef}

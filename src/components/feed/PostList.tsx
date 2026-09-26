@@ -16,7 +16,7 @@ export function PostList({
   }
 
   return (
-    <div className="sg-stack [--stack-gap:var(--space-8)]">
+    <div className="sg-stack [--stack-gap:0px]">
       {posts.map((post, index) => (
         <div key={post.id}>
           <PostCard post={post} priorityImage={prioritizeFirstImage && index === 0} />

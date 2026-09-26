@@ -9,7 +9,7 @@ const SearchInput = dynamic(
     loading: () => (
       <div
         aria-hidden="true"
-        className="h-9 w-full rounded-full bg-muted"
+        className="ui-search-field w-full bg-muted"
       />
     ),
   },

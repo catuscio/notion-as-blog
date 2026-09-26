@@ -16,6 +16,8 @@ type Direction = "next" | "prev";
 
 export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
   const [current, setCurrent] = useState(0);
+  const [previous, setPrevious] = useState<number | null>(null);
+  const regionRef = useRef<HTMLDivElement>(null);
   const [direction, setDirection] = useState<Direction>("next");
   const [isAnimating, setIsAnimating] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -27,6 +29,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
   const goTo = useCallback(
     (index: number, dir: Direction) => {
       if (isAnimating || index === current) return;
+      setPrevious(current);
       setDirection(dir);
       setIsAnimating(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
       setCurrent(index);
@@ -48,6 +51,13 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
     return () => clearInterval(id);
   }, [hovered, focused, touching, next, total]);
 
+  useEffect(() => {
+    const region = regionRef.current;
+    const finish = () => setIsAnimating(false);
+    region?.addEventListener("animationcancel", finish);
+    return () => region?.removeEventListener("animationcancel", finish);
+  }, []);
+
   /* ── Touch swipe ── */
   const touchRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -66,7 +76,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
         const dy = e.changedTouches[0].clientY - touchRef.current.y;
         touchRef.current = null;
         if (Math.abs(dx) >= SWIPE_THRESHOLD_PX && Math.abs(dx) > Math.abs(dy)) {
-          if (dx < 0) { next(); } else { prev(); }
+          if (dx > 0) { next(); } else { prev(); }
         }
       }
       setTouching(false);
@@ -89,22 +99,25 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
 
   if (total === 0) return null;
 
+  const hasImages = posts.some((post) => post.thumbnail);
+  const currentHasImage = Boolean(posts[current]?.thumbnail);
   const arrowClassName =
-    "absolute top-4 md:top-1/2 md:-translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur text-white flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-opacity duration-300";
+    `absolute top-4 z-10 w-10 h-10 rounded-full ${currentHasImage ? "bg-black/50 hover:bg-black/70 text-white" : "bg-background hover:bg-muted text-foreground"} flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 ${currentHasImage ? "focus-visible:ring-white" : "focus-visible:ring-ring"} transition-opacity duration-[var(--motion-feedback)]`;
 
   const slideClass = (i: number) => {
     if (i === current) {
-      return "translate-x-0 opacity-100 pointer-events-auto";
+      if (!isAnimating) return "opacity-100 pointer-events-auto";
+      return direction === "next" ? "ui-slide-in-right" : "ui-slide-in-left";
     }
-    if (direction === "next") {
-      return "translate-x-full opacity-0 pointer-events-none";
+    if (isAnimating && i === previous) {
+      return `${direction === "next" ? "ui-slide-out-right" : "ui-slide-out-left"} pointer-events-none`;
     }
-    return "-translate-x-full opacity-0 pointer-events-none";
+    return "invisible opacity-0 pointer-events-none";
   };
 
   return (
     <section
-      className="sg-content-limiter mb-20 md:mb-28"
+      className="sg-content-limiter"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
@@ -113,12 +126,13 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
       }}
     >
       <div
+        ref={regionRef}
         role="region"
         aria-roledescription="carousel"
         aria-label={copy.aria.featuredPosts}
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className="group relative w-full min-h-80 md:min-h-0 md:aspect-[5/2] rounded-2xl overflow-hidden bg-muted outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        className={`group relative w-full overflow-hidden rounded-lg border border-border outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${hasImages ? "min-h-80 md:min-h-0 md:aspect-[5/2] bg-muted" : "grid bg-background"}`}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -129,8 +143,8 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
             href={`/${p.slug}`}
             aria-hidden={i !== current}
             tabIndex={i !== current ? -1 : undefined}
-            className={`absolute inset-0 transition-[transform,opacity] duration-500 ease-in-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white ${slideClass(i)}`}
-            onTransitionEnd={() => setIsAnimating(false)}
+            className={`${hasImages ? "absolute inset-0" : "relative [grid-area:1/1]"} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset ${p.thumbnail ? "focus-visible:ring-white" : "focus-visible:ring-ring"} ${slideClass(i)}`}
+            onAnimationEnd={() => setIsAnimating(false)}
           >
             {/* Thumbnail */}
             {p.thumbnail ? (
@@ -143,23 +157,21 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : "auto"}
               />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
-            )}
+            ) : null}
 
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
+            {p.thumbnail && <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />}
 
             {/* Text content */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 pb-10 md:p-10 text-white">
+            <div className={p.thumbnail ? "absolute bottom-0 left-0 right-0 p-6 pb-10 md:p-10 text-white" : `${hasImages ? "absolute inset-0 flex flex-col justify-center bg-background" : "relative"} p-6 pt-16 pb-10 md:p-10 md:pt-16 md:pr-24`}>
               <div className="flex items-center gap-3 mb-3">
                 {p.category && <CategoryBadge category={p.category} />}
               </div>
-              <h2 className="text-xl md:text-4xl font-semibold mb-2 leading-snug drop-shadow-lg line-clamp-3 md:line-clamp-2">
+              <h2 className="text-xl md:text-3xl font-semibold mb-2 leading-snug text-balance break-words line-clamp-3 md:line-clamp-2">
                 {p.title}
               </h2>
               {p.summary && (
-                <p className="text-sm md:text-base text-white/80 line-clamp-3 md:line-clamp-2 max-w-2xl drop-shadow">
+                <p className={`text-sm md:text-base line-clamp-3 md:line-clamp-2 max-w-2xl ${p.thumbnail ? "text-white/80" : "text-muted-foreground"}`}>
                   {p.summary}
                 </p>
               )}
@@ -173,7 +185,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); prev(); }}
-              className={`${arrowClassName} right-14 md:right-auto md:left-3`}
+              className={`${arrowClassName} right-14`}
               aria-label={copy.aria.previousSlide}
             >
               <ChevronLeft size={20} />
@@ -191,7 +203,7 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
 
         {/* Indicators */}
         {total > 1 && (
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex opacity-100 md:opacity-0 md:group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-[var(--motion-feedback)]">
             {posts.map((p, i) => (
               <button
                 key={p.id}
@@ -204,10 +216,10 @@ export function FeaturedSlideshow({ posts }: { posts: ContentItem[] }) {
                 aria-label={copy.aria.goToSlide(i + 1)}
               >
                 <span
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                  className={`h-1.5 rounded-full transition-all duration-[var(--motion-feedback)] ${
                     i === current
-                      ? "w-8 bg-white"
-                      : "w-4 bg-white/40 group-hover:bg-white/60"
+                      ? `w-8 ${currentHasImage ? "bg-white" : "bg-primary"}`
+                      : `w-4 ${currentHasImage ? "bg-white/60" : "bg-muted-foreground/50"}`
                   }`}
                 />
               </button>

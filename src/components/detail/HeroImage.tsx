@@ -10,13 +10,13 @@ export function HeroImage({
   if (!src) return null;
 
   return (
-    <figure className="mb-12 group relative overflow-hidden rounded-2xl shadow-sm">
+    <figure className="mb-12 relative overflow-hidden rounded-2xl shadow-sm">
       <div className="aspect-[16/9] w-full bg-muted overflow-hidden relative">
         <Image
           src={src}
           alt={alt}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          className="object-cover"
           priority
         />
       </div>

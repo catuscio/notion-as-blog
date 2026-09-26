@@ -21,8 +21,8 @@ export function RecentPostsSection({
   const paginatedPosts = posts.slice(start, start + brand.postsPerPage);
 
   return (
-    <section className="sg-content-limiter mb-24 mt-12">
-      <div className="sg-cluster mb-10 justify-between [--cluster-gap:var(--space-4)]">
+    <section className="sg-content-limiter mt-12">
+      <div className="sg-cluster mb-6 justify-between [--cluster-gap:var(--space-4)]">
         <h2 className="text-2xl font-bold shrink-0">{copy.recentPosts}</h2>
         <div className="w-full sm:w-64">
           <SearchInputLoader />

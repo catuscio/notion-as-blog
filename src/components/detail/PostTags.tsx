@@ -1,21 +1,13 @@
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { TagControl } from "@/components/common/TagControl";
 import { displayTagName } from "@/lib/displayTagName";
 
 export function PostTags({ tags }: { tags: string[] }) {
   if (tags.length === 0) return null;
-
   return (
     <>
       <hr className="border-border my-12" />
-      <div className="flex flex-wrap gap-2 mb-12">
-        {tags.map((tag) => (
-          <Badge key={tag} variant="secondary" className="rounded-lg" asChild>
-            <Link href={`/tag/${encodeURIComponent(tag)}`}>
-              #{displayTagName(tag)}
-            </Link>
-          </Badge>
-        ))}
+      <div className="flex flex-wrap gap-x-[var(--tag-gap)] gap-y-2 mb-12">
+        {tags.map((tag) => <TagControl key={tag} href={`/tag/${encodeURIComponent(tag)}`} label={`#${displayTagName(tag)}`} />)}
       </div>
     </>
   );

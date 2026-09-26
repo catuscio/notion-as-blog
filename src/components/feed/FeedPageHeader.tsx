@@ -1,29 +1,22 @@
 import type { ReactNode } from "react";
+import { copy } from "@/config/copy";
 
 interface FeedPageHeaderProps {
-  badge: string;
   title: ReactNode;
+  count?: number;
   subtitle?: ReactNode;
   children?: ReactNode;
 }
 
-export function FeedPageHeader({ badge, title, subtitle, children }: FeedPageHeaderProps) {
+export function FeedPageHeader({ title, count, subtitle, children }: FeedPageHeaderProps) {
   return (
-    <section className="mb-12">
-      <div>
-        <span className="inline-block mb-3 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-          {badge}
-        </span>
-        {children}
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-            {subtitle}
-          </p>
-        )}
+    <section className="mb-6">
+      {children}
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight break-words min-w-0">{title}</h1>
+        {count !== undefined && <span className="text-sm text-muted-foreground">{copy.postCount(count)}</span>}
       </div>
+      {subtitle && <p className="mt-3 text-base text-muted-foreground max-w-xl leading-normal">{subtitle}</p>}
     </section>
   );
 }

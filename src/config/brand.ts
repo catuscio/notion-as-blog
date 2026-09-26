@@ -287,6 +287,7 @@ export const brand = {
     threads: "",
     tiktok: "",
     naverBlog: "",
+    huggingface: "",
   },
 
   // ═══════════════════════════════════════════════════════════════

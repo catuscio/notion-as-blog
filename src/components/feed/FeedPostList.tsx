@@ -1,6 +1,6 @@
 "use client";
 
-import { FeedPostCard } from "./FeedPostCard";
+import { PostCard } from "./PostCard";
 import { TagFilter } from "./TagFilter";
 import { QueryPagination } from "@/components/common/QueryPagination";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -46,12 +46,12 @@ export function FeedPostList({
           allHref={allHref}
         />
       )}
-      <section className="flex flex-col gap-6 mt-8">
+      <section className="flex flex-col mt-4">
         {paginatedPosts.length === 0 ? (
           <EmptyState message={copy.noPostsFilter} />
         ) : (
           paginatedPosts.map((post) => (
-            <FeedPostCard key={post.id} post={post} authors={resolveAuthors(post, authorsMap)} />
+            <PostCard key={post.id} post={post} authors={resolveAuthors(post, authorsMap)} />
           ))
         )}
       </section>

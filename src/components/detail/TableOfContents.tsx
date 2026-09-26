@@ -110,7 +110,7 @@ export function TableOfContents() {
 
   return (
     <div className="sg-stack [--stack-gap:var(--space-4)]">
-      <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
+      <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
         {copy.toc.heading}
       </h4>
       <nav className="sg-stack relative border-l border-border [--stack-gap:var(--space-3)]">
@@ -118,7 +118,7 @@ export function TableOfContents() {
           <a
             key={h.id}
             href={`#${h.id}`}
-            className={`${INDENT[h.level] ?? "pl-4"} block rounded-r-md py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
+            className={`${INDENT[h.level] ?? "pl-4"} block rounded-r-md text-sm font-medium transition-colors ui-focus-ring ${
               activeId === h.id
                 ? "text-primary border-l-2 border-primary -ml-px"
                 : "text-muted-foreground hover:text-foreground"

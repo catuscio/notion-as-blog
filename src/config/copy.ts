@@ -3,6 +3,7 @@
  * To localize your blog, translate the strings in this section.
  */
 export const copy = {
+  postCount: (count: number) => `${count} ${count === 1 ? "post" : "posts"}`,
   copyright: "All rights reserved.",
   /** Default name shown for posts without author info */
   authorFallback: "Author",

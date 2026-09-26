@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { FileText } from "lucide-react";
 import { copy } from "@/config/copy";
 import { formatDate } from "@/lib/format";
 import type { ContentItem } from "@/types";
@@ -41,33 +40,19 @@ export function SeriesCollection({
 
             const card = (
               <article
-                className={`group relative bg-card rounded-xl overflow-hidden shadow-[var(--shadow-toss)] border transition-all duration-300 w-56 shrink-0 ${
+                className={`group relative rounded-lg overflow-hidden border w-56 shrink-0 ${
                   isCurrent
                     ? "ring-2 ring-primary border-transparent"
-                    : "border-transparent dark:border-border hover:shadow-[var(--shadow-toss-hover)] hover:-translate-y-0.5"
+                    : "border-border"
                 }`}
               >
-                <div className="aspect-video relative bg-muted">
-                  {post.thumbnail ? (
-                    <Image
-                      src={post.thumbnail}
-                      alt={post.title}
-                      fill
-                      sizes="224px"
-                      className={`object-cover transition-transform duration-700 ${
-                        !isCurrent ? "group-hover:scale-110" : ""
-                      }`}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary/30">
-                      <FileText size={36} className="opacity-50" />
-                    </div>
-                  )}
-                  <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-md">
-                    {index + 1}
-                  </span>
-                </div>
+                {post.thumbnail && (
+                  <div className="aspect-video relative bg-muted">
+                    <Image src={post.thumbnail} alt={post.title} fill sizes="224px" className="object-cover" />
+                  </div>
+                )}
                 <div className="p-4">
+                  <span className="block mb-2 text-xs text-muted-foreground tabular-nums">{index + 1}</span>
                   <h4
                     className={`text-sm font-semibold line-clamp-2 mb-1 transition-colors ${
                       isCurrent
@@ -93,7 +78,7 @@ export function SeriesCollection({
             }
 
             return (
-              <Link key={post.id} href={`/${post.slug}`} className="shrink-0">
+              <Link key={post.id} href={`/${post.slug}`} className="shrink-0 rounded-lg ui-focus-ring">
                 {card}
               </Link>
             );

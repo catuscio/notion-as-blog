@@ -1,0 +1,35 @@
+:root {
+  --radius: 0.625rem;
+  --social-github: #000;
+  --social-icon-box: 2rem;
+  --social-icon-size: 1.75rem;
+  --social-icon-medium: 1.625rem;
+  --social-icon-compact: 1.5rem;
+  --social-linkedin: #0a66c2;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --content-max: 70rem;
+  --prose-max: 70ch;
+  --aside-width: 18rem;
+  --motion-fast: 150ms;
+  --motion-standard: 200ms;
+  --motion-slide: 500ms;
+  --motion-feedback: 300ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --focus-ring-width: 2px;
+  --nav-gap: 1.25rem;
+  --control-height: 2.25rem;
+  --control-radius: 0.5rem;
+  --tag-gap: var(--space-4);
+  --tag-underline-width: 2px;
+  /* Theme colors are injected from brand.ts via layout.tsx */
+}
+
+.dark { --social-github: #fff; }

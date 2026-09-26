@@ -1,12 +1,10 @@
 import Image from "next/image";
-import { copy } from "@/config/copy";
 import { FeedPageHeader } from "./FeedPageHeader";
 import type { Author } from "@/types";
 
 export function AuthorHeader({ author }: { author: Author }) {
   return (
     <FeedPageHeader
-      badge={copy.author.badge}
       title={
         <span className="flex items-center gap-4">
           {author.avatar && (

@@ -1,0 +1,50 @@
+/* Shared interaction styles. Values come from design-tokens.css. */
+@utility ui-focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-[length:var(--focus-ring-width)] focus-visible:ring-ring/50;
+}
+
+@utility ui-nav-link {
+  @apply rounded ui-focus-ring;
+  transition: color var(--motion-fast) var(--motion-ease);
+  &:hover, &:focus-visible { color: var(--primary); }
+}
+
+@utility ui-search-field {
+  min-block-size: var(--control-height);
+  border-radius: var(--control-radius);
+}
+
+@utility ui-tag-control {
+  @apply ui-focus-ring;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--control-height);
+  padding-block: var(--space-2);
+  border-block-end: var(--tag-underline-width) solid transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+  border-radius: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--motion-fast) var(--motion-ease), border-color var(--motion-fast) var(--motion-ease);
+  &:hover, &:focus-visible { color: var(--primary); }
+  &[data-selected="true"] {
+    color: var(--primary);
+    border-block-end-color: var(--primary);
+  }
+}
+
+@utility ui-slide-in-right { animation: slide-in-right var(--motion-slide) var(--motion-ease) both; }
+@utility ui-slide-out-right { animation: slide-out-right var(--motion-slide) var(--motion-ease) both; }
+@utility ui-slide-in-left { animation: slide-in-left var(--motion-slide) var(--motion-ease) both; }
+@utility ui-slide-out-left { animation: slide-out-left var(--motion-slide) var(--motion-ease) both; }
+@keyframes slide-in-right { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slide-out-right { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+@keyframes slide-in-left { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slide-out-left { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ui-slide-in-right, .ui-slide-out-right, .ui-slide-in-left, .ui-slide-out-left { animation: none; }
+}

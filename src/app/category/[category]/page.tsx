@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { CategoryHeader } from "@/components/feed/CategoryHeader";
+import { FeedPageHeader } from "@/components/feed/FeedPageHeader";
 import { FeedPostList } from "@/components/feed/FeedPostList";
 import { BlogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { getListedPosts } from "@/lib/notion/contentCatalog";
@@ -54,7 +54,7 @@ export default async function CategoryPage({ params }: Props) {
         { name: copy.footer.home, url: brand.url },
         { name: cat.name, url: categoryUrl },
       ]} />
-      <CategoryHeader categoryName={cat.name} />
+      <FeedPageHeader title={cat.name} count={posts.length} />
       <Suspense>
         <FeedPostList
           posts={posts}

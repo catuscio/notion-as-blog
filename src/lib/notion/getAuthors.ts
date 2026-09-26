@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { notionClient } from "./client";
+import { queryDataSourcePages } from "./queryDataSourcePages";
 import { brand } from "@/config/brand";
 import type { Author, AuthorSummary } from "@/types";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -34,25 +34,7 @@ async function fetchAuthorsFromNotion(): Promise<Author[]> {
   const dataSourceId = brand.notion.authorsDataSourceId;
   if (!dataSourceId) return [];
 
-  const pages: PageObjectResponse[] = [];
-  let cursor: string | undefined;
-
-  do {
-    const response = await notionClient.dataSources.query({
-      data_source_id: dataSourceId,
-      start_cursor: cursor,
-      page_size: brand.notion.pageSize,
-    });
-
-    for (const page of response.results) {
-      if ("properties" in page) {
-        pages.push(page as PageObjectResponse);
-      }
-    }
-
-    cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
-  } while (cursor);
-
+  const pages = await queryDataSourcePages(dataSourceId);
   return pages.map(parseAuthorPage);
 }
 

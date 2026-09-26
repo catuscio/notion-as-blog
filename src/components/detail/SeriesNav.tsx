@@ -19,13 +19,12 @@ function SeriesNavItem({
   index: number;
   isCurrent: boolean;
 }) {
-  const thumbnail = (
+  const thumbnail = post.thumbnail ? (
     <div className="w-16 h-16 rounded-lg bg-muted overflow-hidden shrink-0 relative">
       <PostThumbnail
         src={post.thumbnail}
         alt={post.title}
         size="sm"
-        hoverScale={!isCurrent}
         className="w-full h-full"
       />
       <span
@@ -38,7 +37,7 @@ function SeriesNavItem({
         {index + 1}
       </span>
     </div>
-  );
+  ) : <span className="shrink-0 text-xs text-muted-foreground tabular-nums pt-0.5">{index + 1}</span>;
 
   const content = (
     <div className="min-w-0">
@@ -69,7 +68,7 @@ function SeriesNavItem({
   return (
     <Link
       href={`/${post.slug}`}
-      className="group flex gap-3 items-start rounded-lg p-2 hover:bg-muted/50 transition-colors"
+      className="group flex gap-3 items-start rounded-lg p-2 ui-focus-ring"
     >
       {thumbnail}
       {content}

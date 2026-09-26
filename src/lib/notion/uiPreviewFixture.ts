@@ -1,4 +1,5 @@
 import type { ContentItem } from "@/types";
+import { getListedPostsByDate, selectDetailAccessiblePosts, selectListedPages, selectDetailAccessiblePages } from "./contentQueries";
 import type { ContentCatalog } from "./contentCatalog";
 import type { NotionBlockWithChildren } from "./types";
 
@@ -40,11 +41,36 @@ const aboutPage: ContentItem = {
   pinned: false,
 };
 
+// Status sentinels exercise real visibility selectors and direct-link routes.
+const linkOnlyPost: ContentItem = {
+  ...base,
+  id: "preview-link-only",
+  slug: "preview-link-only",
+  title: "Visibilitysentinel: link-only preview",
+  status: "PublicOnDetail",
+  tags: [...base.tags, "Visibilitysentinel"],
+};
+const linkOnlyPage: ContentItem = {
+  ...aboutPage,
+  id: "preview-link-page",
+  slug: "preview-link-page",
+  title: "Visibilitysentinel: link-only page",
+  status: "PublicOnDetail",
+};
+const items: ContentItem[] = [
+  ...posts,
+  aboutPage,
+  linkOnlyPost,
+  linkOnlyPage,
+  { ...linkOnlyPost, id: "preview-private", slug: "preview-private", status: "Private" },
+  { ...linkOnlyPost, id: "preview-draft", slug: "preview-draft", status: "Draft" },
+];
+
 export const uiPreviewCatalog: ContentCatalog = {
-  listedPosts: posts,
-  detailAccessiblePosts: posts,
-  listedPages: [aboutPage],
-  detailAccessiblePages: [aboutPage],
+  listedPosts: getListedPostsByDate(items),
+  detailAccessiblePosts: selectDetailAccessiblePosts(items),
+  listedPages: selectListedPages(items),
+  detailAccessiblePages: selectDetailAccessiblePages(items),
 };
 
 const previewText = (plain_text: string) => ({ type: "text", plain_text, href: null, annotations: {} });

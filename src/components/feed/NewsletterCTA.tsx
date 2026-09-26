@@ -11,8 +11,6 @@ export function NewsletterCTA() {
   return (
     <section className="sg-content-limiter mb-20" id="subscribe">
       <div className="bg-muted rounded-3xl p-8 md:p-16 text-center relative overflow-hidden">
-        <div className="absolute -top-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
         <div className="relative z-10 max-w-xl mx-auto">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-background shadow-sm text-primary mb-6">
             <Mail size={24} />

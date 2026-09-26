@@ -49,3 +49,16 @@ test("resolvePublicUrl blocks local and private targets before fetch", async () 
   assert.equal(await resolvePublicUrl("http://169.254.169.254/latest/meta-data"), null);
   assert.equal(await resolvePublicUrl("file:///etc/passwd"), null);
 });
+
+const { renderEquationHtml } = await import(
+  pathToFileURL(join(root, "src/lib/security/equation.ts")).href
+);
+
+test("equations render normal math and escape HTML when malformed nesting exhausts the parser", () => {
+  assert.match(renderEquationHtml("x^2", false), /class="katex"/);
+  const expression = "{".repeat(10000) + '<img src=x onerror="window.__audit=1">' + "}".repeat(10000);
+  const html = renderEquationHtml(expression, true);
+  assert.ok(!html.includes("<img"));
+  assert.ok(html.includes("&lt;img"));
+  assert.ok(html.includes("&quot;"));
+});

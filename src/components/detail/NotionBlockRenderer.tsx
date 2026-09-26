@@ -53,7 +53,7 @@ function ParagraphBlock({ block }: { block: NotionBlockWithChildren }) {
   if (block.type !== "paragraph") return null;
   const isEmpty = block.paragraph.rich_text.length === 0;
   return (
-    <p className="my-5 leading-relaxed">
+    <p className="my-4 leading-normal text-balance">
       {isEmpty ? <br /> : <RichText richText={block.paragraph.rich_text} />}
       <BlockChildren blocks={block.children} />
     </p>
@@ -468,7 +468,7 @@ function LinkToPageBlock({ block }: { block: NotionBlockWithChildren }) {
 function ListItemContent({ block }: { block: NotionBlockWithChildren }) {
   if (block.type === "bulleted_list_item") {
     return (
-      <li className="leading-relaxed">
+      <li className="leading-normal">
         <RichText richText={block.bulleted_list_item.rich_text} />
         <BlockChildren blocks={block.children} />
       </li>
@@ -476,7 +476,7 @@ function ListItemContent({ block }: { block: NotionBlockWithChildren }) {
   }
   if (block.type === "numbered_list_item") {
     return (
-      <li className="leading-relaxed">
+      <li className="leading-normal">
         <RichText richText={block.numbered_list_item.rich_text} />
         <BlockChildren blocks={block.children} />
       </li>

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "shadcn/tailwind.css";
+@import "./design-tokens.css";
+@import "./ui-primitives.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -30,9 +32,8 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Custom shadows for toss-style cards (light mode) */
+  /* Elevated skip-link surface */
   --shadow-toss: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --shadow-toss-hover: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 @keyframes cursor-blink {
@@ -44,22 +45,6 @@
   animation: cursor-blink 1s step-end infinite;
 }
 
-:root {
-  --radius: 0.625rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --content-max: 70rem;
-  --prose-max: 70ch;
-  --aside-width: 18rem;
-  /* Theme colors are injected from brand.ts via layout.tsx */
-}
 
 @layer base {
   * {
@@ -148,10 +133,26 @@
   }
 }
 
+.social-link { display: grid; place-items: center; inline-size: var(--social-icon-box); block-size: var(--social-icon-box); }
+.social-icon { width: var(--social-icon-size); height: var(--social-icon-size); }
+.social-link[data-social="twitter"],
+.social-link[data-social="huggingface"] { --social-icon-size: var(--social-icon-medium); }
+.social-link[data-social="linkedin"] { --social-icon-size: var(--social-icon-compact); }
+
+/* Social links retain platform colors for pointer and keyboard feedback. */
+.social-link[data-social="github"] { --social-interaction-color: var(--social-github); }
+.social-link[data-social="twitter"] { --social-interaction-color: var(--social-github); }
+.social-link[data-social="linkedin"] { --social-interaction-color: var(--social-linkedin); }
+.social-link:hover,
+.social-link:focus-visible { color: var(--social-interaction-color, var(--foreground)); }
+
+.social-link[data-social="huggingface"] img { filter: grayscale(1); opacity: 0.65; transition: filter var(--motion-fast) ease-out, opacity var(--motion-fast) ease-out; }
+.social-link[data-social="huggingface"]:hover img,
+.social-link[data-social="huggingface"]:focus-visible img { filter: none; opacity: 1; }
+
 /* Dark mode shadow overrides */
 .dark {
   --shadow-toss: 0 4px 20px rgba(0, 0, 0, 0.25);
-  --shadow-toss-hover: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 /* Hide scrollbar utility */

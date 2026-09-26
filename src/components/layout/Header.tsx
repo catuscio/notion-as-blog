@@ -7,11 +7,11 @@ import { HeaderNav } from "./HeaderNav";
 
 export function Header({ showAbout }: { showAbout: boolean }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md transition-colors duration-200">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md transition-colors duration-[var(--motion-standard)]">
       <div className="sg-content-limiter flex h-16 items-center justify-between">
         <Link
           href="/"
-          className="group flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          className="group flex shrink-0 items-center gap-2 rounded-lg ui-focus-ring"
         >
           {brand.logo.image && <BrandLogo size={32} />}
           <span className={`text-xl font-bold tracking-tight ${brand.logo.image && !brand.logo.showNameWithLogo ? "sr-only" : ""}`}>
@@ -23,7 +23,7 @@ export function Header({ showAbout }: { showAbout: boolean }) {
           {showAbout && (
             <Link
               href="/about"
-              className="md:hidden rounded-full px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="md:hidden rounded-full px-3 py-1.5 text-sm font-semibold text-muted-foreground ui-nav-link"
             >
               {copy.footer.about}
             </Link>
@@ -32,7 +32,7 @@ export function Header({ showAbout }: { showAbout: boolean }) {
           {brand.newsletter.enabled && (
             <Link
               href="#subscribe"
-              className="hidden md:flex bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-3xl text-sm font-semibold transition-transform active:scale-95 duration-200 shadow-sm"
+              className="hidden md:flex bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-3xl text-sm font-semibold transition-transform active:scale-95 duration-[var(--motion-standard)] shadow-sm"
             >
               {brand.newsletter.cta}
             </Link>
