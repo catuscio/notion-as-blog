@@ -16,6 +16,7 @@ export function HeroImage({
           src={src}
           alt={alt}
           fill
+          sizes="(min-width: 1024px) 688px, (min-width: 768px) 70ch, calc(100vw - 48px)"
           className="object-cover"
           priority
         />

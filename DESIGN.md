@@ -233,3 +233,8 @@ Mixed, but quiet: tonal shifts carry most structure, borders define reading/supp
 
 - Archive lists and pagination render the first page in cached HTML. URL query synchronization suspends independently with an empty fallback, preserving native links and existing interactions. Query filters/page numbers apply after hydration; direct query URLs initially provide the same canonical first-page HTML.
 - Keep the existing Notion data cache and ISR lifetimes; do not fetch Notion during client filter/pagination interaction.
+
+## Related writing and media
+
+- ReadNext keeps its existing layout and three-link limit. Rank public posts by shared series, then shared tags, category and publication date; never include link-only, draft or private content. Do not treat two missing categories as a relationship.
+- Article hero images keep the 16:9 frame and loading priority while advertising the actual responsive article width with `sizes`. Person schema does not infer employment from publisher ownership; actual author roles remain source data.

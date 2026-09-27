@@ -6,6 +6,7 @@ import { join } from "node:path";
 const root = process.cwd();
 const {
   getListedPostsByDate,
+  getRelatedPosts,
   isDetailAccessible,
   isListed,
   selectDetailAccessiblePages,
@@ -72,6 +73,23 @@ test("listed post selection excludes unlisted posts and all Page content", () =>
     getListedPostsByDate(posts).map((post) => post.id),
     ["newer", "older"],
   );
+});
+
+test("related posts rank series and shared tags while excluding hidden content", () => {
+  const current = content("Public", "Post", { id: "current", tags: ["infra", "wsl"], series: "home", category: "dev" });
+  const items = [
+    current,
+    content("Public", "Post", { id: "recent", category: "dev", date: "2026-05-01" }),
+    content("Public", "Post", { id: "tags", tags: ["infra", "wsl"] }),
+    content("Public", "Post", { id: "series", series: "home" }),
+    content("PublicOnDetail", "Post", { id: "unlisted", series: "home" }),
+    content("Private", "Post", { id: "private", series: "home" }),
+    content("Public", "Page", { id: "page", series: "home" }),
+    content("Public", "Post", { id: "unrelated" }),
+  ];
+  assert.deepEqual(getRelatedPosts(current, items).map((item) => item.id), ["series", "tags", "recent"]);
+  assert.deepEqual(getRelatedPosts(current, items, 0), []);
+  assert.deepEqual(getRelatedPosts(content("Public"), [content("Public", "Post", { id: "other" })]), []);
 });
 
 test("detail and page selectors enforce status and content type together", () => {

@@ -266,11 +266,6 @@ export function PersonJsonLd({
         ...(jobTitle && { jobTitle }),
         ...(description && { description }),
         ...(sameAs && sameAs.length > 0 && { sameAs }),
-        worksFor: {
-          "@type": "Organization",
-          name: brand.name,
-          url: brand.organization.url,
-        },
       }}
     />
   );

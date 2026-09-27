@@ -36,9 +36,23 @@ export function getRelatedPosts(
   allPosts: ContentItem[],
   limit = 3
 ): ContentItem[] {
+  const tags = new Set(post.tags);
   return allPosts
-    .filter((p) => p.id !== post.id && p.category === post.category)
-    .slice(0, limit);
+    .filter((candidate) => candidate.id !== post.id && candidate.type === "Post" && isListed(candidate))
+    .map((candidate) => ({
+      candidate,
+      sameSeries: Boolean(post.series && candidate.series === post.series),
+      sharedTags: candidate.tags.filter((tag) => tags.has(tag)).length,
+      sameCategory: Boolean(post.category && candidate.category === post.category),
+    }))
+    .filter(({ sameSeries, sharedTags, sameCategory }) => sameSeries || sharedTags > 0 || sameCategory)
+    .sort((a, b) => Number(b.sameSeries) - Number(a.sameSeries)
+      || b.sharedTags - a.sharedTags
+      || Number(b.sameCategory) - Number(a.sameCategory)
+      || b.candidate.date.localeCompare(a.candidate.date)
+      || a.candidate.slug.localeCompare(b.candidate.slug))
+    .slice(0, Math.max(0, limit))
+    .map(({ candidate }) => candidate);
 }
 
 export function getSeriesPosts(post: ContentItem, allPosts: ContentItem[]): ContentItem[] {
