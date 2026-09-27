@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useQueryString } from "@/hooks/useQueryString";
 import { PaginationNav } from "./PaginationNav";
 
 interface QueryPaginationProps {
@@ -11,7 +12,7 @@ interface QueryPaginationProps {
 
 export function QueryPagination(props: QueryPaginationProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { searchParams, querySync } = useQueryString();
 
   function getPageHref(page: number) {
     const params = new URLSearchParams(searchParams.toString());
@@ -25,11 +26,14 @@ export function QueryPagination(props: QueryPaginationProps) {
   }
 
   return (
-    <PaginationNav
-      {...props}
-      getPageHref={getPageHref}
-      onNavigate={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      scroll={false}
-    />
+    <>
+      {querySync}
+      <PaginationNav
+        {...props}
+        getPageHref={getPageHref}
+        onNavigate={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        scroll={false}
+      />
+    </>
   );
 }

@@ -1,14 +1,15 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useQueryString } from "./useQueryString";
 import { brand } from "@/config/brand";
 import type { ContentItem } from "@/types";
 
 export function useFeedPagination(posts: ContentItem[]) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { searchParams, querySync } = useQueryString();
   const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
   const activeTag = searchParams.get("tag");
 
@@ -37,5 +38,5 @@ export function useFeedPagination(posts: ContentItem[]) {
     return filteredPosts.slice(start, start + brand.postsPerPage);
   }, [filteredPosts, currentPage]);
 
-  return { activeTag, setActiveTag, filteredPosts, paginatedPosts, currentPage };
+  return { querySync, activeTag, setActiveTag, filteredPosts, paginatedPosts, currentPage };
 }

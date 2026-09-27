@@ -38,7 +38,7 @@ export async function generateStaticParams() {
   const tags = getVisibleTagCounts(posts);
   return tags
     .filter((t) => posts.filter((p) => p.tags.includes(t.name)).length > 2)
-    .map((t) => ({ tag: encodeURIComponent(t.name) }));
+    .map((t) => ({ tag: t.name }));
 }
 
 export default async function TagPage({ params }: Props) {

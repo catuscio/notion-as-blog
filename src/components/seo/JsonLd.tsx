@@ -22,10 +22,13 @@ function JsonLdScript({ data }: JsonLdProps) {
   );
 }
 
+const publisherId = `${brand.url.replace(/\/$/, "")}#publisher`;
+
 const publisher = {
+  "@id": publisherId,
   "@type": "Organization" as const,
-  name: brand.name,
-  url: brand.url,
+  name: brand.organization.name || brand.name,
+  url: brand.organization.url || brand.url,
   logo: {
     "@type": "ImageObject" as const,
     url: `${brand.url}${brand.logo.png}`,
@@ -44,11 +47,7 @@ export function WebSiteJsonLd() {
         inLanguage: brand.lang,
         ...(brand.organization.name
           ? {
-              publisher: {
-                "@type": "Organization",
-                name: brand.organization.name,
-                ...(brand.organization.url ? { url: brand.organization.url } : {}),
-              },
+              publisher: { "@id": publisherId },
             }
           : {}),
         potentialAction: {
@@ -75,7 +74,8 @@ export function OrganizationJsonLd() {
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: org.name,
+    "@id": publisherId,
+    name: org.name || brand.name,
     logo: `${brand.url}${brand.logo.png}`,
   };
 

@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const authors = await getOptionalAllAuthors();
-  return authors.map((a) => ({ name: encodeURIComponent(a.name) }));
+  return authors.map((a) => ({ name: a.name }));
 }
 
 export default async function AuthorPage({ params }: Props) {

@@ -9,14 +9,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const result = await getContentDetail("about");
 
   if (!result || result.content.type !== "Page") {
-    return { title: `About - ${brand.name}` };
+    return { title: "About" };
   }
 
   const { content } = result;
   const robots = getContentRobots(content.status);
   return {
-    title: `${content.title} - ${brand.name}`,
-    description: content.summary || `About ${brand.name}`,
+    title: content.title,
+    description: content.summary || brand.organization.description || brand.description,
     alternates: {
       canonical: `${brand.url}/about`,
     },

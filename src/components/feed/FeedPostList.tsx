@@ -26,6 +26,7 @@ export function FeedPostList({
   initialTag?: string;
 }) {
   const {
+    querySync,
     activeTag,
     setActiveTag,
     filteredPosts,
@@ -37,6 +38,7 @@ export function FeedPostList({
 
   return (
     <>
+      {querySync}
       {tags.length > 0 && (
         <TagFilter
           tags={tags}

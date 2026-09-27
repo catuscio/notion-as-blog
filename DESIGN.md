@@ -228,3 +228,8 @@ Mixed, but quiet: tonal shifts carry most structure, borders define reading/supp
 - Unused badge and hover-shadow code from former pill/card treatments is removed. Keep configurable fallback/optional features even when currently disabled.
 - Shared Notion cursor pagination belongs in queryDataSourcePages; content and author caches keep their independent configuration and failure behavior.
 - Finish UI work with unused-reference and duplication checks, then lint/build and verify changed states in the browser.
+
+## Cached archive rendering
+
+- Archive lists and pagination render the first page in cached HTML. URL query synchronization suspends independently with an empty fallback, preserving native links and existing interactions. Query filters/page numbers apply after hydration; direct query URLs initially provide the same canonical first-page HTML.
+- Keep the existing Notion data cache and ISR lifetimes; do not fetch Notion during client filter/pagination interaction.
